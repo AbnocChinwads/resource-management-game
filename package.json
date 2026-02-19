@@ -1,0 +1,17 @@
+{
+  "name": "who-ate-all-the-iceream",
+  "version": "1.0.0",
+  "description": "In the grim dark of the near future... Cows have gone extinct... and with them, the last of the frozen dairy confectionary products has been consumed. What will humanity survive on now?",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "AbnocChinwads",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "pg": "^8.18.0"
+  }
+}
