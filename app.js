@@ -27,9 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // Allows us to pass webpage
 app.use(express.static("public")); // Allows use of static files with expressjs
 
 app.get('/', (req, res) => {
-  //res.sendFile(__dirname + '/public/index.html');
-  res.send('Welcome to the Resource Management Game!');
-  res.end();
+  res.render('index.ejs');
 });
 
 app.listen(port, () => {
