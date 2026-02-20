@@ -1,2 +1,27 @@
 <%- include('partials/header.ejs'); -%>
+
+<h2>Resources</h2>
+<ul>
+    <% resources.forEach(resource => { %>
+    <li><%= resource.resource_type %>: <%= resource.amount %></li>
+    <% }) %>
+</ul>
+
+<h2>Field</h2>
+<ul>
+    <% crops.forEach(crop => { %>
+    <li> Crop #<%= crop.id  %> -
+        Planted at: <%= crop.planted_at.toLocaleString() %> -
+        Harvested: <%= crop.harvested ? 'Yes' : 'No' %>
+    </li>
+    <% }) %>
+</ul>
+
+<form action="/plant" method="POST">
+    <button type="submit" class="btn btn-primary">Plant Wheat</button>
+</form>
+<form action="/harvest" method="POST">
+    <button type="submit" class="btn btn-success">Harvest Ready Crops</button>
+</form>
+
 <%- include('partials/footer.ejs'); -%>
