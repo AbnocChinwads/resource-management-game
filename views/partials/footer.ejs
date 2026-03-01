@@ -6,6 +6,20 @@
         <script>
           setInterval( () => {window.location.reload()},5000);
         </script>
+        <script>
+          document.addEventListener("DOMContentLoaded", function(){
+            const growTime = 10000; // 10 seconds
+            const bars = document.querySelectorAll(".progress-bar"); //select all progress bars
+            bars.forEach(bar => {
+              const plantedAt = parseInt(bar.dataset.plantedAt);
+              const now = Date.now();
+              let progress = (now - plantedAt) / growTime;
+              if (progress > 1) progress = 1;
+              if (progress < 0) progress = 0;
+              bar.style.width = (progress * 100) + "%";
+            })
+          })
+        </script>
         <div class="container fixed-bottom">
           <footer
             class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
