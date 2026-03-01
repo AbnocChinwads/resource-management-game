@@ -45,15 +45,11 @@ app.post('/plant', async (req, res) => {
 });
 
 app.post('/harvest', async (req, res) => {
-    const result = await db.query("SELECT id FROM crops WHERE harvested = FALSE AND NOW() >= planted_at + INTERVAL '10 seconds'");
-    if (result.rows.length === 0) {
-        return res.redirect('/');
+    const cropId = req.body.cropId;
+    const result = await db.query("UPDATE crops SET harvested = TRUE WHERE id = $1 AND harvested = FALSE AND NOW() >= planted_at + INTERVAL '10 seconds' RETURNING id", [cropId]);
+    if (result.rows.length > 0) {
+        await db.query("UPDATE resources SET amount = amount + 1 WHERE resource_type = 'wheat'");
     }
-    const ids = result.rows.map(crop => crop.id);
-    for (const id of ids) {
-      await db.query("UPDATE crops SET harvested = TRUE WHERE id = $1", [id]);
-    }
-    await db.query("UPDATE resources SET amount = amount + $1 WHERE resource_type = 'wheat'", [ids.length]);
     
     res.redirect('/');
 });

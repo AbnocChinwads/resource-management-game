@@ -21,15 +21,17 @@
         <div class="col-3">
             <ul class="list-group">
                 <% crops.forEach(crop=> { %>
-                    <li class="list-group-item"> Crop #<%= crop.id %> -
+                    <% if (!crop.harvested) { %>
+                    <li class="list-group-item">
                             <% if (crop.isReady) { %>
                                 <form action="/harvest" method="POST">
+                                    <input type="hidden" name="cropId" value="<%= crop.id %>">
                                     <button type="submit" class="btn btn-success">Harvest</button>
                                 </form>
                             <% } %>
-                        Planted at: <%= crop.planted_at.toLocaleString() %> -
-                        Harvested: <%= crop.harvested ? 'Yes' : 'No' %>
+                        Planted at: <%= crop.planted_at.toLocaleString() %>
                     </li>
+                    <% } %>
                     <% }) %>
             </ul>
         </div>
