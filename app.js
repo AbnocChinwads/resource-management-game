@@ -28,8 +28,15 @@ app.use(express.static("public")); // Allows use of static files with expressjs
 
 app.get('/', async (req, res) => {
     const cropsRes = await db.query("SELECT * FROM crops ORDER BY id ASC");
-    const resourcesRes = await db.query("SELECT * FROM resources ORDER BY id ASC");
-    res.render('index.ejs', { crops: cropsRes.rows, resources: resourcesRes.rows });
+    const bankedRes = await db.query("SELECT * FROM resources ORDER BY id ASC");
+    cropsRes.rows.forEach(crop => {
+      if (Date.now() >= new Date(crop.planted_at).getTime() + 10000) {
+        crop.isReady = true;
+      } else {
+        crop.isReady = false;
+      }
+    });
+    res.render('index.ejs', { crops: cropsRes.rows, resources: bankedRes.rows });
 });
 
 app.post('/plant', async (req, res) => {

@@ -1,8 +1,10 @@
 <%- include('partials/header.ejs'); -%>
 
     <div class="row">
-        <div class="col">
+        <div class="col-3">
             <h2>Resources</h2>
+        </div>
+        <div class="col-3">
             <ul class="list-group">
                 <% resources.forEach(resource=> { %>
                     <li class="list-group-item">
@@ -13,22 +15,27 @@
         </div>
     </div>
     <div class="row">
-        <div class="col">
-            <h2>Field</h2>
+        <div class="col-3">
+            <h2>Fields</h2>
+        </div>
+        <div class="col-3">
             <ul class="list-group">
                 <% crops.forEach(crop=> { %>
                     <li class="list-group-item"> Crop #<%= crop.id %> -
-                            Planted at: <%= crop.planted_at.toLocaleString() %> -
-                                Harvested: <%= crop.harvested ? 'Yes' : 'No' %>
+                            <% if (crop.isReady) { %>
+                                <form action="/harvest" method="POST">
+                                    <button type="submit" class="btn btn-success">Harvest</button>
+                                </form>
+                            <% } %>
+                        Planted at: <%= crop.planted_at.toLocaleString() %> -
+                        Harvested: <%= crop.harvested ? 'Yes' : 'No' %>
                     </li>
                     <% }) %>
             </ul>
-
+        </div>
+        <div class="col-3">
             <form action="/plant" method="POST">
                 <button type="submit" class="btn btn-primary">Plant Wheat</button>
-            </form>
-            <form action="/harvest" method="POST">
-                <button type="submit" class="btn btn-success">Harvest Ready Crops</button>
             </form>
         </div>
     </div>
