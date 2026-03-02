@@ -1,35 +1,55 @@
-        <script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-          crossorigin="anonymous"
-        ></script>
-        <script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<!--<script>
           setInterval( () => {window.location.reload()},5000);
-        </script>
-        <script>
-          document.addEventListener("DOMContentLoaded", function(){
-            const growTime = 10000; // 10 seconds
-            const bars = document.querySelectorAll(".progress-bar"); //select all progress bars
-            bars.forEach(bar => {
-              const plantedAt = parseInt(bar.dataset.plantedAt);
-              const now = Date.now();
-              let progress = (now - plantedAt) / growTime;
-              if (progress > 1) progress = 1;
-              if (progress < 0) progress = 0;
-              bar.style.width = (progress * 100) + "%";
-            })
-          })
-        </script>
-        <div class="container fixed-bottom">
-          <footer
-            class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
-          >
-            <p class="col-md-4 mb-0 text-body-secondary">
-              Copyright © <%= new Date().getFullYear() %>
-            </p>
-          </footer>
-        </div>
-      </main>
-    </div>
-  </body>
+        </script>-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    function updateProgress() {
+
+      const growTime = 10000;
+      const bars = document.querySelectorAll(".progress-bar");
+
+      bars.forEach(bar => {
+
+        const plantedAt = parseInt(bar.dataset.plantedAt);
+        const now = Date.now();
+
+        let progress = (now - plantedAt) / growTime;
+
+        if (progress > 1) progress = 1;
+        if (progress < 0) progress = 0;
+
+        // Update bar
+        bar.style.width = (progress * 100) + "%";
+
+        // Only toggle button
+        const li = bar.closest("li");
+        const harvestContainer = li.querySelector(".harvest-container");
+
+        if (harvestContainer) {
+          harvestContainer.style.display = progress >= 1 ? "block" : "none";
+        }
+
+      });
+
+    }
+
+    updateProgress();
+    setInterval(updateProgress, 1000);
+
+  });
+</script>
+<div class="container fixed-bottom">
+  <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+    <p class="col-md-4 mb-0 text-body-secondary">
+      Copyright © <%= new Date().getFullYear() %>
+    </p>
+  </footer>
+</div>
+</main>
+</div>
+</body>
+
 </html>

@@ -23,19 +23,21 @@
                 <% crops.forEach(crop=> { %>
                     <% if (!crop.harvested) { %>
                         <li class="list-group-item">
-                            Planted at:
+                            Time to harvest:
                             <div class="progress" role="progressbar">
-                                <div class="progress-bar" data-planted-at="<%= new Date(crop.planted_at).getTime() %>" style="width: 0%"></div>
+                                <div class="progress-bar"
+                                    data-planted-at="<%= new Date(crop.planted_at).getTime() %>" style="width: 0%">
+                                </div>
                             </div>
-                            <% if (crop.isReady) { %>
+                            <div class="harvest-container" style="display: none;">
                                 <form action="/harvest" method="POST">
                                     <input type="hidden" name="cropId" value="<%= crop.id %>">
                                     <button type="submit" class="btn btn-success">Harvest</button>
                                 </form>
-                                <% } %>
+                            </div>
                         </li>
-                        <% } %>
-                            <% }) %>
+                    <% } %>
+                <% }) %>
             </ul>
         </div>
         <div class="col-3">
