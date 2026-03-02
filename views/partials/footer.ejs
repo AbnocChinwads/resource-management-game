@@ -24,12 +24,16 @@
         // Update bar
         bar.style.width = (progress * 100) + "%";
 
-        // Only toggle button
         const li = bar.closest("li");
+        const progressContainer = li.querySelector(".progress-container");
         const harvestContainer = li.querySelector(".harvest-container");
 
-        if (harvestContainer) {
-          harvestContainer.style.display = progress >= 1 ? "block" : "none";
+        if (progress >= 1) {
+          progressContainer.style.display = "none";
+          harvestContainer.style.display = "block";
+        } else {
+          progressContainer.style.display = "block";
+          harvestContainer.style.display = "none";
         }
 
       });
