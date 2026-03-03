@@ -4,46 +4,65 @@
           setInterval( () => {window.location.reload()},5000);
         </script>-->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-    function updateProgress() {
+  const growTime = 10000;
+  const bars = document.querySelectorAll(".progress-bar");
 
-      const growTime = 10000;
-      const bars = document.querySelectorAll(".progress-bar");
+  // Function that updates the bar width
+  function updateProgress() {
 
-      bars.forEach(bar => {
+    bars.forEach(bar => {
 
-        const plantedAt = parseInt(bar.dataset.plantedAt);
-        const now = Date.now();
+      const plantedAt = parseInt(bar.dataset.plantedAt);
+      const now = Date.now();
 
-        let progress = (now - plantedAt) / growTime;
+      let progress = (now - plantedAt) / growTime;
 
-        if (progress > 1) progress = 1;
-        if (progress < 0) progress = 0;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
 
-        // Update bar
-        bar.style.width = (progress * 100) + "%";
+      bar.style.width = (progress * 100) + "%";
+
+    });
+
+  }
+
+  // Run immediately
+  updateProgress();
+
+  // Update every second
+  setInterval(updateProgress, 100);
+
+  // Add transition listener ONCE per bar
+  bars.forEach(bar => {
+
+    bar.addEventListener("transitionend", function (event) {
+
+      // Only react to width transitions
+      if (event.propertyName !== "width") return;
+
+      // Check if fully filled
+      const width = parseFloat(bar.style.width);
+
+      if (width >= 100) {
 
         const li = bar.closest("li");
-        const progressContainer = li.querySelector(".progress-container");
+        const progressContainer = li.querySelector(".progress");
         const harvestContainer = li.querySelector(".harvest-container");
 
-        if (progress >= 1) {
+        if (progressContainer && harvestContainer) {
           progressContainer.style.display = "none";
           harvestContainer.style.display = "block";
-        } else {
-          progressContainer.style.display = "block";
-          harvestContainer.style.display = "none";
         }
 
-      });
+      }
 
-    }
-
-    updateProgress();
-    setInterval(updateProgress, 1000);
+    });
 
   });
+
+});
 </script>
 <div class="container fixed-bottom">
   <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">

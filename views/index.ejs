@@ -24,13 +24,11 @@
                     <% if (!crop.harvested) { %>
                         <li class="list-group-item">
                             Time to harvest:
-                            <div class="progress-container">
                                 <div class="progress" role="progressbar">
-                                    <div class="progress-bar bg-success"
+                                    <div class="progress-bar"
                                         data-planted-at="<%= new Date(crop.planted_at).getTime() %>" style="width: 0%">
                                     </div>
                                 </div>
-                            </div>
 
                             <div class="harvest-container" style="display: none;">
                                 <form action="/harvest" method="POST">
