@@ -4,65 +4,87 @@
           setInterval( () => {window.location.reload()},5000);
         </script>-->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
 
-  const growTime = 10000;
-  const bars = document.querySelectorAll(".progress-bar");
+    let initialLoad = true;
+    const growTime = 10000;
+    const bars = document.querySelectorAll(".progress-bar");
 
-  // Function that updates the bar width
-  function updateProgress() {
+    // Function that updates the bar width
+    function updateProgress() {
 
-    bars.forEach(bar => {
+      bars.forEach(bar => {
 
-      const plantedAt = parseInt(bar.dataset.plantedAt);
-      const now = Date.now();
+        const plantedAt = parseInt(bar.dataset.plantedAt);
+        const now = Date.now();
 
-      let progress = (now - plantedAt) / growTime;
+        let progress = (now - plantedAt) / growTime;
 
-      if (progress < 0) progress = 0;
-      if (progress > 1) progress = 1;
-
-      bar.style.width = (progress * 100) + "%";
-
-    });
-
-  }
-
-  // Run immediately
-  updateProgress();
-
-  // Update every second
-  setInterval(updateProgress, 100);
-
-  // Add transition listener ONCE per bar
-  bars.forEach(bar => {
-
-    bar.addEventListener("transitionend", function (event) {
-
-      // Only react to width transitions
-      if (event.propertyName !== "width") return;
-
-      // Check if fully filled
-      const width = parseFloat(bar.style.width);
-
-      if (width >= 100) {
+        if (progress < 0) progress = 0;
+        if (progress > 1) progress = 1;
 
         const li = bar.closest("li");
         const progressContainer = li.querySelector(".progress");
         const harvestContainer = li.querySelector(".harvest-container");
 
-        if (progressContainer && harvestContainer) {
-          progressContainer.style.display = "none";
-          harvestContainer.style.display = "block";
+        if (progress >= 1) {
+
+          bar.style.width = "100%";
+
+          // If this is NOT the first load, let transition handle it
+          if (!initialLoad) return;
+
+          // If it IS initial load, swap immediately
+          if (progressContainer && harvestContainer) {
+            progressContainer.style.display = "none";
+            harvestContainer.style.display = "block";
+          }
+
+          return;
         }
 
-      }
+        bar.style.width = (progress * 100) + "%";
+
+      });
+
+      initialLoad = false;
+    }
+
+    // Run immediately
+    updateProgress();
+
+    // Update every second
+    setInterval(updateProgress, 100);
+
+    // Add transition listener ONCE per bar
+    bars.forEach(bar => {
+
+      bar.addEventListener("transitionend", function (event) {
+
+        // Only react to width transitions
+        if (event.propertyName !== "width") return;
+
+        // Check if fully filled
+        const width = parseFloat(bar.style.width);
+
+        if (width >= 100) {
+
+          const li = bar.closest("li");
+          const progressContainer = li.querySelector(".progress");
+          const harvestContainer = li.querySelector(".harvest-container");
+
+          if (progressContainer && harvestContainer) {
+            progressContainer.style.display = "none";
+            harvestContainer.style.display = "block";
+          }
+
+        }
+
+      });
 
     });
 
   });
-
-});
 </script>
 <div class="container fixed-bottom">
   <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
