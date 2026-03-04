@@ -26,7 +26,8 @@
                             Time to harvest:
                                 <div class="progress" role="progressbar">
                                     <div class="progress-bar"
-                                        data-planted-at="<%= new Date(crop.planted_at).getTime() %>">
+                                        data-planted-at="<%= new Date(crop.planted_at).getTime() %>"
+                                        data-grow-time="<%= crop.grow_time_seconds %>">
                                     </div>
                                 </div>
 
@@ -44,6 +45,7 @@
         </div>
         <div class="col-3">
             <form action="/plant" method="POST">
+                <input type="hidden" name="cropTypeId" value="1">
                 <button type="submit" class="btn btn-primary">Plant Wheat</button>
             </form>
         </div>

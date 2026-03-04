@@ -7,7 +7,6 @@
   document.addEventListener("DOMContentLoaded", function () {
 
     let initialLoad = true;
-    const growTime = 10000;
     const bars = document.querySelectorAll(".progress-bar");
 
     // Function that updates the bar width
@@ -17,6 +16,7 @@
 
         const plantedAt = parseInt(bar.dataset.plantedAt);
         const now = Date.now();
+        const growTime = parseInt(bar.dataset.growTime) * 1000; // convert server side grow_time value from seconds to milliseconds
 
         let progress = (now - plantedAt) / growTime;
 
