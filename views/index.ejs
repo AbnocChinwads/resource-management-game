@@ -19,17 +19,16 @@
             <h2>Fields</h2>
         </div>
         <div class="col-3">
-            <ul class="list-group">
-                <% crops.forEach(crop=> { %>
+            <% crops.forEach(crop=> { %>
+                <ul class="list-group">
                     <% if (!crop.harvested) { %>
                         <li class="list-group-item">
                             Time to harvest:
-                                <div class="progress" role="progressbar">
-                                    <div class="progress-bar"
-                                        data-planted-at="<%= new Date(crop.planted_at).getTime() %>"
-                                        data-grow-time="<%= crop.grow_time_seconds %>">
-                                    </div>
+                            <div class="progress" role="progressbar">
+                                <div class="progress-bar" data-planted-at="<%= new Date(crop.planted_at).getTime() %>"
+                                    data-grow-time="<%= crop.grow_time_seconds %>">
                                 </div>
+                            </div>
 
                             <div class="harvest-container" style="display: none;">
                                 <form action="/harvest" method="POST">
@@ -39,15 +38,19 @@
                             </div>
 
                         </li>
-                        <% } %>
-                            <% }) %>
-            </ul>
-        </div>
-        <div class="col-3">
-            <form action="/plant" method="POST">
-                <input type="hidden" name="cropTypeId" value="1">
-                <button type="submit" class="btn btn-primary">Plant Wheat</button>
-            </form>
+                    <% } %>
+                </ul>
+                <% }) %>
+            <% cropTypes.forEach(type=> { %>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <form action="/plant" method="POST">
+                            <input type="hidden" name="cropTypeId" value="<%= type.id %>">
+                            <button type="submit" class="btn btn-primary">Plant <%= type.name %></button>
+                        </form>
+                    </li>
+                </ul>
+            <% }) %>
         </div>
     </div>
     <%- include('partials/footer.ejs'); -%>

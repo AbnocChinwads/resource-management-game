@@ -41,15 +41,20 @@ app.get("/", async (req, res) => {
     WHERE crops.player_id = $1
     ORDER BY crops.id ASC`
     ,[playerId]);
+  const cropTypesRes = await db.query(`
+    SELECT *
+    FROM crop_types
+    ORDER BY id ASC`
+  );
   const bankedRes = await db.query(`
     SELECT player_resources.*, resource_types.name
     FROM player_resources
     JOIN resource_types
     ON player_resources.resource_type_id = resource_types.id
     WHERE player_resources.player_id = $1
-    ORDER BY player_resources.id ASC`
+    ORDER BY player_resources.resource_type_id ASC`
     ,[playerId]);
-  res.render("index.ejs", { crops: cropsRes.rows, resources: bankedRes.rows });
+  res.render("index.ejs", { crops: cropsRes.rows, cropTypes: cropTypesRes.rows, resources: bankedRes.rows });
 });
 
 app.post("/plant", async (req, res) => {
