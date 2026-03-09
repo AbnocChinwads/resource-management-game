@@ -34,57 +34,70 @@ app.use((req, res, next) => {
 
 app.get("/", async (req, res) => {
   const playerId = req.playerId;
-  const cropsRes = await db.query(`
-    SELECT crops.*, crop_types.grow_time_seconds
-    FROM crops
-    JOIN crop_types ON crops.crop_type_id = crop_types.id
-    WHERE crops.player_id = $1
-    ORDER BY crops.id ASC`
-    ,[playerId]);
-  const cropTypesRes = await db.query(`
-    SELECT *
-    FROM crop_types
-    ORDER BY id ASC`
-  );
-  const bankedRes = await db.query(`
-    SELECT player_resources.*, resource_types.name
-    FROM player_resources
-    JOIN resource_types
-    ON player_resources.resource_type_id = resource_types.id
-    WHERE player_resources.player_id = $1
-    ORDER BY player_resources.resource_type_id ASC`
-    ,[playerId]);
-  res.render("index.ejs", { crops: cropsRes.rows, cropTypes: cropTypesRes.rows, resources: bankedRes.rows });
+
+  // Player tasks (active jobs)
+  const tasksRes = await db.query(`
+    SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.output_resource_id, r.output_amount
+    FROM player_tasks pt
+    JOIN recipes r ON pt.recipe_id = r.id
+    WHERE pt.player_id = $1
+    ORDER BY pt.id ASC
+  `, [playerId]);
+
+  // All recipes (for planting buttons)
+  const recipesRes = await db.query(`
+    SELECT * FROM recipes ORDER BY id ASC
+  `);
+
+  // Player resources
+  const resourcesRes = await db.query(`
+    SELECT pr.*, rt.name
+    FROM player_resources pr
+    JOIN resource_types rt ON pr.resource_type_id = rt.id
+    WHERE pr.player_id = $1
+    ORDER BY pr.resource_type_id ASC
+  `, [playerId]);
+
+  res.render("index.ejs", { tasks: tasksRes.rows, recipes: recipesRes.rows, resources: resourcesRes.rows });
 });
 
-app.post("/plant", async (req, res) => {
+app.post("/start-task", async (req, res) => {
   const playerId = req.playerId;
-  const cropTypeId = req.body.cropTypeId;
-  await db.query(`
-    INSERT INTO crops 
-    (player_id, crop_type_id, planted_at, harvested) 
-    VALUES ($1, $2, NOW(), FALSE)`
-    ,[playerId, cropTypeId]);
+  const recipeId = req.body.recipeId;
+
+  await db.query(
+    `INSERT INTO player_tasks (player_id, recipe_id) VALUES ($1, $2)`,
+    [playerId, recipeId]
+  );
+
   res.redirect("/");
 });
 
-app.post("/harvest", async (req, res) => {
+app.post("/complete-task", async (req, res) => {
   const playerId = req.playerId;
-  const cropId = req.body.cropId;
+  const taskId = req.body.taskId;
+
   const result = await db.query(`
-    UPDATE crops SET harvested = TRUE 
-    FROM crop_types WHERE crops.id = $1 AND crops.player_id = $2 AND crops.harvested = FALSE AND crops.crop_type_id = crop_types.id 
-    AND NOW() >= crops.planted_at + crop_types.grow_time_seconds * INTERVAL '1 second' RETURNING crops.id, crop_types.resource_type_id`,
-    [cropId, playerId]);
+    SELECT pt.id, r.output_resource_id, r.output_amount, r.craft_time_seconds
+    FROM player_tasks pt
+    JOIN recipes r ON pt.recipe_id = r.id
+    WHERE pt.id = $1 AND pt.player_id = $2 AND pt.finished = FALSE
+      AND NOW() >= pt.started_at + r.craft_time_seconds * INTERVAL '1 second'
+  `, [taskId, playerId]);
 
   if (result.rows.length > 0) {
-    const resourceTypeId = result.rows[0].resource_type_id;
+    const { id, output_resource_id, output_amount } = result.rows[0];
+
+    // Mark task as finished
+    await db.query(`UPDATE player_tasks SET finished = TRUE WHERE id = $1`, [id]);
+
+    // Add resources
     await db.query(`
       INSERT INTO player_resources (player_id, resource_type_id, amount)
-      VALUES ($1, $2, 1)
+      VALUES ($1, $2, $3)
       ON CONFLICT (player_id, resource_type_id)
-      DO UPDATE SET amount = player_resources.amount + 1`,
-      [playerId, resourceTypeId]);
+      DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount
+    `, [playerId, output_resource_id, output_amount]);
   }
 
   res.redirect("/");

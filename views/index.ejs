@@ -16,41 +16,41 @@
     </div>
     <div class="row">
         <div class="col-3">
-            <h2>Fields</h2>
+            <h2>Tasks</h2>
         </div>
         <div class="col-3">
-            <% crops.forEach(crop=> { %>
-                <ul class="list-group">
-                    <% if (!crop.harvested) { %>
+            <ul class="list-group">
+                <% tasks.forEach(task=> { %>
+                    <% if (!task.finished) { %>
                         <li class="list-group-item">
-                            Time to harvest:
+                            <%= task.recipe_name %> in progress:
                             <div class="progress" role="progressbar">
-                                <div class="progress-bar" data-planted-at="<%= new Date(crop.planted_at).getTime() %>"
-                                    data-grow-time="<%= crop.grow_time_seconds %>">
+                                <div class="progress-bar"
+                                    data-started-at="<%= new Date(task.started_at).getTime() %>"
+                                    data-craft-time="<%= task.craft_time_seconds %>">
                                 </div>
                             </div>
-
                             <div class="harvest-container" style="display: none;">
-                                <form action="/harvest" method="POST">
-                                    <input type="hidden" name="cropId" value="<%= crop.id %>">
-                                    <button type="submit" class="btn btn-success">Harvest</button>
+                                <form action="/complete-task" method="POST">
+                                    <input type="hidden" name="taskId" value="<%= task.id %>">
+                                    <button type="submit" class="btn btn-success">Complete</button>
                                 </form>
                             </div>
-
                         </li>
                     <% } %>
-                </ul>
                 <% }) %>
-            <% cropTypes.forEach(type=> { %>
-                <ul class="list-group">
+            </ul>
+            <ul class="list-group">
+                <% recipes.forEach(recipe => { %>
                     <li class="list-group-item">
-                        <form action="/plant" method="POST">
-                            <input type="hidden" name="cropTypeId" value="<%= type.id %>">
-                            <button type="submit" class="btn btn-primary">Plant <%= type.name %></button>
+                        <form action="/start-task" method="POST">
+                            <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                            <button type="submit" class="btn btn-primary">Start <%= recipe.name %></button>
                         </form>
                     </li>
-                </ul>
-            <% }) %>
+                <% }) %>
+            </ul>
         </div>
     </div>
-    <%- include('partials/footer.ejs'); -%>
+
+<%- include('partials/footer.ejs'); -%>

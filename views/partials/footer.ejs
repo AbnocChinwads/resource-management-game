@@ -14,11 +14,11 @@
 
       bars.forEach(bar => {
 
-        const plantedAt = parseInt(bar.dataset.plantedAt);
+        const startedAt = parseInt(bar.dataset.startedAt);
         const now = Date.now();
-        const growTime = parseInt(bar.dataset.growTime) * 1000; // convert server side grow_time value from seconds to milliseconds
+        const craftTime = parseInt(bar.dataset.craftTime) * 1000; // convert server side grow_time value from seconds to milliseconds
 
-        let progress = (now - plantedAt) / growTime;
+        let progress = (now - startedAt) / craftTime;
 
         if (progress < 0) progress = 0;
         if (progress > 1) progress = 1;
