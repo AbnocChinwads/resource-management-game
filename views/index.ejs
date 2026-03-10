@@ -14,43 +14,47 @@
             </ul>
         </div>
     </div>
+
     <div class="row">
         <div class="col-3">
-            <h2>Tasks</h2>
+            <h2>Active Tasks</h2>
         </div>
         <div class="col-3">
             <ul class="list-group">
                 <% tasks.forEach(task=> { %>
-                    <% if (!task.finished) { %>
-                        <li class="list-group-item">
-                            <%= task.recipe_name %> in progress:
+                    <li class="list-group-item">
+                        <%= task.name %> <!-- task name from recipe -->
                             <div class="progress" role="progressbar">
-                                <div class="progress-bar"
-                                    data-started-at="<%= new Date(task.started_at).getTime() %>"
+                                <div class="progress-bar" data-started-at="<%= new Date(task.started_at).getTime() %>"
                                     data-craft-time="<%= task.craft_time_seconds %>">
                                 </div>
                             </div>
-                            <div class="harvest-container" style="display: none;">
+                            <div class="complete-container" style="display:none;">
                                 <form action="/complete-task" method="POST">
                                     <input type="hidden" name="taskId" value="<%= task.id %>">
                                     <button type="submit" class="btn btn-success">Complete</button>
                                 </form>
                             </div>
-                        </li>
-                    <% } %>
-                <% }) %>
+                    </li>
+                    <% }) %>
             </ul>
+        </div>
+
+        <div class="col-3">
+            <h2>Available Recipes</h2>
             <ul class="list-group">
-                <% recipes.forEach(recipe => { %>
+                <% recipes.forEach(recipe=> { %>
                     <li class="list-group-item">
                         <form action="/start-task" method="POST">
                             <input type="hidden" name="recipeId" value="<%= recipe.id %>">
-                            <button type="submit" class="btn btn-primary">Start <%= recipe.name %></button>
+                            <button type="submit" class="btn btn-primary">
+                                Start <%= recipe.name %>
+                            </button>
                         </form>
                     </li>
-                <% }) %>
+                    <% }) %>
             </ul>
         </div>
     </div>
 
-<%- include('partials/footer.ejs'); -%>
+    <%- include('partials/footer.ejs'); -%>

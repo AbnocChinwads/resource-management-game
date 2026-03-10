@@ -4,87 +4,83 @@
           setInterval( () => {window.location.reload()},5000);
         </script>-->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-    let initialLoad = true;
-    const bars = document.querySelectorAll(".progress-bar");
+  let initialLoad = true;
+  const bars = document.querySelectorAll(".progress-bar");
 
-    // Function that updates the bar width
-    function updateProgress() {
+  // Function that updates the bar width
+  function updateProgress() {
+    const now = Date.now();
 
-      bars.forEach(bar => {
+    bars.forEach(bar => {
+      const startedAt = parseInt(bar.dataset.startedAt);
+      const craftTime = parseInt(bar.dataset.craftTime) * 1000;
 
-        const startedAt = parseInt(bar.dataset.startedAt);
-        const now = Date.now();
-        const craftTime = parseInt(bar.dataset.craftTime) * 1000; // convert server side grow_time value from seconds to milliseconds
+      let progress = (now - startedAt) / craftTime;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
 
-        let progress = (now - startedAt) / craftTime;
+      const li = bar.closest("li");
+      const progressContainer = li.querySelector(".progress");
+      const completeContainer = li.querySelector(".complete-container");
 
-        if (progress < 0) progress = 0;
-        if (progress > 1) progress = 1;
+      bar.style.width = (progress * 100) + "%";
 
-        const li = bar.closest("li");
-        const progressContainer = li.querySelector(".progress");
-        const harvestContainer = li.querySelector(".harvest-container");
+      if (progress >= 1) {
 
-        if (progress >= 1) {
-
-          bar.style.width = "100%";
-
-          // If this is NOT the first load, let transition handle it
-          if (!initialLoad) return;
-
-          // If it IS initial load, swap immediately
-          if (progressContainer && harvestContainer) {
-            progressContainer.style.display = "none";
-            harvestContainer.style.display = "block";
+        // If first load, replace progress bar immediately
+        if (initialLoad) {
+          if (progressContainer && completeContainer) {
+            progressContainer.remove();
+            completeContainer.style.display = "block";
           }
-
           return;
         }
 
-        bar.style.width = (progress * 100) + "%";
-
-      });
-
-      initialLoad = false;
-    }
-
-    // Run immediately
-    updateProgress();
-
-    // Update every 100 milliseconds
-    setInterval(updateProgress, 100);
-
-    // Add transition listener ONCE per bar
-    bars.forEach(bar => {
-
-      bar.addEventListener("transitionend", function (event) {
-
-        // Only react to width transitions
-        if (event.propertyName !== "width") return;
-
-        // Check if fully filled
-        const width = parseFloat(bar.style.width);
-
-        if (width >= 100) {
-
-          const li = bar.closest("li");
-          const progressContainer = li.querySelector(".progress");
-          const harvestContainer = li.querySelector(".harvest-container");
-
-          if (progressContainer && harvestContainer) {
-            progressContainer.style.display = "none";
-            harvestContainer.style.display = "block";
-          }
-
-        }
-
-      });
-
+        // On subsequent updates, let transition handle it
+        return;
+      }
     });
 
+    initialLoad = false;
+  }
+
+  // Run immediately
+  updateProgress();
+
+  // Update every 100 milliseconds
+  setInterval(updateProgress, 100);
+
+  // Add transition listener ONCE per bar
+  bars.forEach(bar => {
+    bar.addEventListener("transitionend", function(event) {
+      if (event.propertyName !== "width") return;
+
+      const width = parseFloat(bar.style.width);
+      if (width >= 100) {
+        const li = bar.closest("li");
+        const progressContainer = li.querySelector(".progress");
+        const completeContainer = li.querySelector(".complete-container");
+
+        if (progressContainer && completeContainer) {
+          progressContainer.remove();
+          completeContainer.style.display = "block";
+        }
+      }
+    });
   });
+
+  // Remove completed task from DOM after button click
+  const completeForms = document.querySelectorAll(".complete-container form");
+  completeForms.forEach(form => {
+    form.addEventListener("submit", e => {
+      const li = form.closest("li");
+      setTimeout(() => li.remove(), 50); // small delay to allow form submission
+    });
+  });
+
+});
 </script>
 <div class="container fixed-bottom">
   <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
