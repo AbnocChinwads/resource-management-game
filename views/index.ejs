@@ -61,25 +61,23 @@
             <h2>Available Recipes</h2>
 
             <ul class="list-group">
-
                 <% recipes.forEach(recipe=> { %>
-
-                    <li class="list-group-item">
-
-                        <form action="/start-task" method="POST">
-
-                            <input type="hidden" name="recipeId" value="<%= recipe.id %>">
-
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                Start <%= recipe.name %>
-                            </button>
-
-                        </form>
-
-                    </li>
-
-                    <% }) %>
-
+                    <% const playerResource=resources.find(r=> r.resource_type_id === recipe.input_resource_id); %>
+                        <% const playerAmount=playerResource ? playerResource.amount : 0; %>
+                            <li class="list-group-item <%= playerAmount < recipe.input_amount ? 'text-muted' : '' %>">
+                                <form action="/start-task" method="POST">
+                                    <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                                    <button type="submit" class="btn btn-primary btn-sm" <%=playerAmount <
+                                        recipe.input_amount ? 'disabled' : '' %>>
+                                        Start <%= recipe.name %>
+                                    </button>
+                                </form>
+                                <% if (playerAmount < recipe.input_amount) { %>
+                                    <small>Needs <%= recipe.input_amount %>
+                                            <%= playerResource ? playerResource.name : '?' %></small>
+                                    <% } %>
+                            </li>
+                            <% }) %>
             </ul>
         </div>
 

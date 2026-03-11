@@ -79,35 +79,45 @@ app.post("/start-task", async (req, res) => {
   const playerId = req.playerId;
   const recipeId = req.body.recipeId;
 
-  // Get recipe info
-  const recipeRes = await db.query("SELECT * FROM recipes WHERE id = $1", [
-    recipeId,
-  ]);
-  const recipe = recipeRes.rows[0];
+  try {
+    await db.query("BEGIN");
 
-  // Check if player has enough of input resource
-  const playerRes = await db.query(
-    "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2",
-    [playerId, recipe.input_resource_id],
-  );
-  const playerAmount = playerRes.rows[0]?.amount || 0;
+    // Get recipe info
+    const recipeRes = await db.query("SELECT * FROM recipes WHERE id = $1", [
+      recipeId,
+    ]);
+    const recipe = recipeRes.rows[0];
 
-  if (playerAmount < recipe.input_amount) {
-    // Not enough resources
-    return res.redirect("/?error=NotEnoughResources");
+    // Lock the player's resource row
+    const playerRes = await db.query(
+      "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2 FOR UPDATE",
+      [playerId, recipe.input_resource_id],
+    );
+
+    const playerAmount = playerRes.rows[0]?.amount || 0;
+
+    if (playerAmount < recipe.input_amount) {
+      await db.query("ROLLBACK");
+      return res.redirect("/?error=NotEnoughResources");
+    }
+
+    // Deduct resources
+    await db.query(
+      "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
+      [recipe.input_amount, playerId, recipe.input_resource_id],
+    );
+
+    // Start task
+    await db.query(
+      "INSERT INTO player_tasks (player_id, recipe_id, started_at, completed) VALUES ($1, $2, NOW(), FALSE)",
+      [playerId, recipeId],
+    );
+
+    await db.query("COMMIT");
+  } catch (err) {
+    await db.query("ROLLBACK");
+    throw err;
   }
-
-  // Deduct resources
-  await db.query(
-    "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
-    [recipe.input_amount, playerId, recipe.input_resource_id],
-  );
-
-  // Start task
-  await db.query(
-    "INSERT INTO player_tasks (player_id, recipe_id, started_at, completed) VALUES ($1, $2, NOW(), FALSE)",
-    [playerId, recipeId],
-  );
 
   res.redirect("/");
 });
@@ -117,9 +127,12 @@ app.post("/complete-task", async (req, res) => {
   const playerId = req.playerId;
   const taskId = req.body.taskId;
 
-  // Mark task complete and add output to player_resources
-  const result = await db.query(
-    `
+  try {
+    await db.query("BEGIN");
+
+    // Mark task complete and add output to player_resources
+    const result = await db.query(
+      `
     UPDATE player_tasks pt
     SET completed = TRUE
     FROM recipes r
@@ -129,11 +142,15 @@ app.post("/complete-task", async (req, res) => {
       AND pt.recipe_id = r.id
       AND NOW() >= pt.started_at + r.craft_time_seconds * INTERVAL '1 second'
     RETURNING r.output_resource_id, r.output_amount
-  `,
-    [taskId, playerId],
-  );
+    `,
+      [taskId, playerId],
+    );
 
-  if (result.rows.length > 0) {
+    if (result.rows.length === 0) {
+      await db.query("ROLLBACK");
+      return res.redirect("/?error=CouldNotComplete");
+    }
+
     const { output_resource_id, output_amount } = result.rows[0];
 
     // Add to player_resources (create if doesn't exist)
@@ -146,6 +163,11 @@ app.post("/complete-task", async (req, res) => {
     `,
       [playerId, output_resource_id, output_amount],
     );
+
+    await db.query("COMMIT");
+  } catch (err) {
+    await db.query("ROLLBACK");
+    throw err;
   }
 
   res.redirect("/");
