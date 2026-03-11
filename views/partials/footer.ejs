@@ -7,11 +7,11 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   let initialLoad = true;
-  const bars = document.querySelectorAll(".progress-bar");
 
-  // Function that updates the bar width
+  // Function that updates all progress bars
   function updateProgress() {
     const now = Date.now();
+    const bars = document.querySelectorAll(".progress-bar"); // fresh query each time
 
     bars.forEach(bar => {
       const startedAt = parseInt(bar.dataset.startedAt);
@@ -27,57 +27,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
       bar.style.width = (progress * 100) + "%";
 
-      if (progress >= 1) {
-
-        // If first load, replace progress bar immediately
+      if (progress >= 1 && completeContainer) {
         if (initialLoad) {
-          if (progressContainer && completeContainer) {
-            progressContainer.remove();
-            completeContainer.style.display = "block";
-          }
-          return;
+          if (progressContainer) progressContainer.remove();
+          completeContainer.style.display = "block";
         }
-
-        // On subsequent updates, let transition handle it
-        return;
       }
     });
 
     initialLoad = false;
   }
 
-  // Run immediately
+  // Run immediately and every 100ms
   updateProgress();
-
-  // Update every 100 milliseconds
   setInterval(updateProgress, 100);
 
-  // Add transition listener ONCE per bar
-  bars.forEach(bar => {
-    bar.addEventListener("transitionend", function(event) {
-      if (event.propertyName !== "width") return;
-
+  // Transition listener for bars that fill mid-session
+  document.addEventListener("transitionend", function(event) {
+    if (event.target.classList.contains("progress-bar") && event.propertyName === "width") {
+      const bar = event.target;
       const width = parseFloat(bar.style.width);
       if (width >= 100) {
         const li = bar.closest("li");
         const progressContainer = li.querySelector(".progress");
         const completeContainer = li.querySelector(".complete-container");
 
-        if (progressContainer && completeContainer) {
-          progressContainer.remove();
-          completeContainer.style.display = "block";
-        }
+        if (progressContainer) progressContainer.remove();
+        if (completeContainer) completeContainer.style.display = "block";
       }
-    });
+    }
   });
 
-  // Remove completed task from DOM after button click
-  const completeForms = document.querySelectorAll(".complete-container form");
-  completeForms.forEach(form => {
-    form.addEventListener("submit", e => {
+  // Event delegation for removing completed tasks after form submit
+  document.body.addEventListener("submit", function(e) {
+    const form = e.target.closest("form");
+    if (form && form.closest(".complete-container")) {
       const li = form.closest("li");
-      setTimeout(() => li.remove(), 50); // small delay to allow form submission
-    });
+      setTimeout(() => li.remove(), 50); // remove after submission
+    }
   });
 
 });
