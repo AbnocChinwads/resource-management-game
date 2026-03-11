@@ -153,6 +153,16 @@ app.post("/complete-task", async (req, res) => {
 
     const { output_resource_id, output_amount } = result.rows[0];
 
+    await db.query(
+      `
+      SELECT amount
+      FROM player_resources
+      WHERE player_id = $1 AND resource_type_id = $2
+      FOR UPDATE
+    `,
+      [playerId, output_resource_id],
+    );
+
     // Add to player_resources (create if doesn't exist)
     await db.query(
       `
