@@ -27,8 +27,12 @@
                         <strong>
                             <%= task.recipe_name %>
                         </strong>
-                        <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id);
-                            %>
+                        <div class="progress" role="progressbar">
+                            <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
+                                data-craft-time="<%= task.craft_time_seconds %>">
+                            </div>
+                        </div>
+                        <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
                             <% if (inputs.length> 0) { %>
                                 <small>Needs:
                                     <% inputs.forEach((input, idx)=> {
@@ -41,12 +45,13 @@
                                                     <% }); %>
                                 </small>
                                 <% } %>
-                                    <!-- Optionally, you can keep the "Complete" button here -->
-                                    <div class="complete-container">
-                                        <form action="/complete-task" method="POST">
-                                            <input type="hidden" name="taskId" value="<%= task.id %>">
-                                            <button type="submit" class="btn btn-success btn-sm">Complete</button>
-                                        </form>
+                                    <div class="complete-container mt-2" style="display: none;">
+                                        <div class="complete-container">
+                                            <form action="/complete-task" method="POST">
+                                                <input type="hidden" name="taskId" value="<%= task.id %>">
+                                                <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                                            </form>
+                                        </div>
                                     </div>
                     </li>
                     <% }) %>
