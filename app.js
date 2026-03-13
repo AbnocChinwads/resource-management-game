@@ -27,7 +27,7 @@ app.use(express.static("public"));
 
 // Temp dev player
 app.use((req, res, next) => {
-  req.playerId = 1; // Always test as player 1
+  req.playerId = 1;
   next();
 });
 
@@ -37,46 +37,53 @@ app.use(async (req, res, next) => {
   if (!playerId) return next();
 
   try {
+    // Fetch player info
     const playerRes = await db.query(
       `SELECT id, population, workers, food_tick_rate_seconds, last_food_tick
        FROM players
        WHERE id = $1`,
       [playerId],
     );
-
     const player = playerRes.rows[0];
     if (!player) return next();
 
     const now = new Date();
-    const lastTick = new Date(player.last_food_tick);
-    const secondsPassed = Math.floor((now - lastTick) / 1000);
+    const lastTick = player.last_food_tick
+      ? new Date(player.last_food_tick)
+      : now;
     const tickRate = player.food_tick_rate_seconds || 1;
+
+    const secondsPassed = Math.floor((now - lastTick) / 1000);
     const ticks = Math.floor(secondsPassed / tickRate);
 
-    if (ticks <= 0) {
-      res.locals.population = player.population;
-      res.locals.workers = player.workers;
-      res.locals.food = 0;
-      return next();
-    }
+    let population = player.population;
+    let workers = player.workers;
 
     // Get all edible resources
     const foodRes = await db.query(
       `SELECT pr.resource_type_id, pr.amount, rt.nutrition_value
        FROM player_resources pr
-       JOIN resource_types rt
-       ON pr.resource_type_id = rt.id
-       WHERE pr.player_id = $1
-       AND rt.nutrition_value > 0`,
+       JOIN resource_types rt ON pr.resource_type_id = rt.id
+       WHERE pr.player_id = $1 AND rt.nutrition_value > 0
+       ORDER BY rt.nutrition_value DESC`,
       [playerId],
     );
 
-    let foods = foodRes.rows;
-    let population = player.population;
-    let totalNutritionNeeded = population * ticks;
+    const foods = foodRes.rows;
 
-    // Consume highest nutritional value first
-    foods.sort((a, b) => b.nutrition_value - a.nutrition_value);
+    // Calculate total nutrition for display before consumption
+    let totalNutrition = foods.reduce(
+      (sum, f) => sum + f.amount * f.nutrition_value,
+      0,
+    );
+    res.locals.food = totalNutrition;
+    res.locals.population = population;
+    res.locals.workers = workers;
+
+    if (ticks <= 0) return next(); // Nothing to consume yet
+
+    // Calculate total nutrition needed
+    let totalNutritionNeeded = population * ticks;
 
     for (let food of foods) {
       if (totalNutritionNeeded <= 0) break;
@@ -95,43 +102,33 @@ app.use(async (req, res, next) => {
       }
     }
 
-    // Starvation reduces population
+    // Population reduction if deficit
     if (totalNutritionNeeded > 0) {
-      const starvation = Math.ceil(totalNutritionNeeded);
+      const starvation = Math.ceil(totalNutritionNeeded / ticks);
       population = Math.max(population - starvation, 0);
     }
 
-    // Update food resources in DB
-    await db.query("BEGIN");
+    // Update food amounts in DB
     for (let food of foods) {
       await db.query(
         `UPDATE player_resources
          SET amount = $1
-         WHERE player_id = $2
-         AND resource_type_id = $3`,
+         WHERE player_id = $2 AND resource_type_id = $3`,
         [food.amount, playerId, food.resource_type_id],
       );
     }
 
-    // Update player population + last tick time
+    // Update player population & last tick
     await db.query(
       `UPDATE players
-       SET population = $1,
-           last_food_tick = NOW()
+       SET population = $1, last_food_tick = NOW()
        WHERE id = $2`,
       [population, playerId],
     );
-    await db.query("COMMIT");
 
-    // Total remaining nutrition for frontend
-    let totalFood = 0;
-    for (let food of foods) {
-      totalFood += food.amount * food.nutrition_value;
-    }
-
+    // Update locals after consumption
     res.locals.population = population;
-    res.locals.workers = player.workers;
-    res.locals.food = totalFood;
+    res.locals.workers = workers;
 
     next();
   } catch (err) {
@@ -145,57 +142,37 @@ app.get("/", async (req, res) => {
   const playerId = req.playerId;
 
   try {
-    // Active tasks
     const tasksRes = await db.query(
-      `
-      SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, r.output_resource_id, r.output_amount, r.output_building_id
-      FROM player_tasks pt
-      JOIN recipes r ON pt.recipe_id = r.id
-      WHERE pt.player_id = $1 AND pt.completed = FALSE
-      ORDER BY pt.id ASC
-      `,
+      `SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, 
+              r.output_resource_id, r.output_amount, r.output_building_id
+       FROM player_tasks pt
+       JOIN recipes r ON pt.recipe_id = r.id
+       WHERE pt.player_id = $1 AND pt.completed = FALSE
+       ORDER BY pt.id ASC`,
       [playerId],
     );
 
-    // Player resources
     const resourcesRes = await db.query(
-      `
-      SELECT pr.*, rt.name
-      FROM player_resources pr
-      JOIN resource_types rt ON pr.resource_type_id = rt.id
-      WHERE pr.player_id = $1
-      ORDER BY pr.resource_type_id ASC
-      `,
+      `SELECT pr.*, rt.name
+       FROM player_resources pr
+       JOIN resource_types rt ON pr.resource_type_id = rt.id
+       WHERE pr.player_id = $1
+       ORDER BY pr.resource_type_id ASC`,
       [playerId],
     );
 
-    // All recipes
-    const recipesRes = await db.query(
-      `
-      SELECT *
-      FROM recipes
-      ORDER BY id ASC
-      `,
-    );
+    const recipesRes = await db.query(`SELECT * FROM recipes ORDER BY id ASC`);
 
-    // Recipe inputs
     const recipeInputsRes = await db.query(
-      `
-      SELECT *
-      FROM recipe_inputs
-      ORDER BY recipe_id, resource_type_id
-      `,
+      `SELECT * FROM recipe_inputs ORDER BY recipe_id, resource_type_id`,
     );
 
-    // Player buildings
     const buildingsRes = await db.query(
-      `
-      SELECT pb.*, b.name, b.max_workers, b.max_health
-      FROM player_buildings pb
-      JOIN buildings b ON pb.building_id = b.id
-      WHERE pb.player_id = $1
-      ORDER BY pb.id ASC
-      `,
+      `SELECT pb.*, b.name, b.max_workers, b.max_health
+       FROM player_buildings pb
+       JOIN buildings b ON pb.building_id = b.id
+       WHERE pb.player_id = $1
+       ORDER BY pb.id ASC`,
       [playerId],
     );
 
@@ -233,7 +210,6 @@ app.post("/start-task", async (req, res) => {
       [recipeId],
     );
 
-    // Check all inputs
     for (const resource of resourceRes.rows) {
       const playerRes = await db.query(
         "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2 FOR UPDATE",
@@ -247,7 +223,6 @@ app.post("/start-task", async (req, res) => {
       }
     }
 
-    // Deduct all inputs
     for (const resource of resourceRes.rows) {
       await db.query(
         "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
@@ -255,7 +230,6 @@ app.post("/start-task", async (req, res) => {
       );
     }
 
-    // Start task
     await db.query(
       "INSERT INTO player_tasks (player_id, recipe_id, started_at, completed) VALUES ($1, $2, NOW(), FALSE)",
       [playerId, recipeId],
@@ -279,17 +253,12 @@ app.post("/complete-task", async (req, res) => {
     await db.query("BEGIN");
 
     const result = await db.query(
-      `
-      UPDATE player_tasks pt
-      SET completed = TRUE
-      FROM recipes r
-      WHERE pt.id = $1
-        AND pt.player_id = $2
-        AND pt.completed = FALSE
-        AND pt.recipe_id = r.id
-        AND NOW() >= pt.started_at + r.craft_time_seconds * INTERVAL '1 second'
-      RETURNING r.output_resource_id, r.output_amount, r.output_building_id
-      `,
+      `UPDATE player_tasks pt
+       SET completed = TRUE
+       FROM recipes r
+       WHERE pt.id = $1 AND pt.player_id = $2 AND pt.completed = FALSE AND pt.recipe_id = r.id
+         AND NOW() >= pt.started_at + r.craft_time_seconds * INTERVAL '1 second'
+       RETURNING r.output_resource_id, r.output_amount, r.output_building_id`,
       [taskId, playerId],
     );
 
@@ -301,26 +270,20 @@ app.post("/complete-task", async (req, res) => {
     const { output_resource_id, output_amount, output_building_id } =
       result.rows[0];
 
-    // Add resource output
     if (output_resource_id) {
       await db.query(
-        `
-        INSERT INTO player_resources (player_id, resource_type_id, amount)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (player_id, resource_type_id)
-        DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount
-        `,
+        `INSERT INTO player_resources (player_id, resource_type_id, amount)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (player_id, resource_type_id)
+         DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount`,
         [playerId, output_resource_id, output_amount],
       );
     }
 
-    // Add building output
     if (output_building_id) {
       await db.query(
-        `
-        INSERT INTO player_buildings (player_id, building_id, health, workers, built_at)
-        VALUES ($1, $2, 100, 0, NOW())
-        `,
+        `INSERT INTO player_buildings (player_id, building_id, health, workers, built_at)
+         VALUES ($1, $2, 100, 0, NOW())`,
         [playerId, output_building_id],
       );
     }
