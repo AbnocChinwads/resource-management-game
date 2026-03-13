@@ -22,38 +22,34 @@
 
         <div class="col-3">
             <ul class="list-group">
-
                 <% tasks.forEach(task=> { %>
-
-                    <% if (!task.completed) { %> <!-- prevent completed tasks showing -->
-
-                        <li class="list-group-item">
-
-                            <strong>
-                                <%= task.name %>
-                            </strong>
-
-                            <div class="progress mt-2" role="progressbar">
-                                <div class="progress-bar" data-started-at="<%= new Date(task.started_at).getTime() %>"
-                                    data-craft-time="<%= task.craft_time_seconds %>">
-                                </div>
-                            </div>
-
-                            <div class="complete-container mt-2" style="display:none;">
-                                <form action="/complete-task" method="POST">
-                                    <input type="hidden" name="taskId" value="<%= task.id %>">
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        Complete
-                                    </button>
-                                </form>
-                            </div>
-
-                        </li>
-
-                        <% } %>
-
-                            <% }) %>
-
+                    <li class="list-group-item">
+                        <strong>
+                            <%= task.recipe_name %>
+                        </strong>
+                        <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id);
+                            %>
+                            <% if (inputs.length> 0) { %>
+                                <small>Needs:
+                                    <% inputs.forEach((input, idx)=> {
+                                        const resourceName = resources.find(r => r.resource_type_id ===
+                                        input.resource_type_id)?.name || '?';
+                                        %>
+                                        <%= input.amount %>
+                                            <%= resourceName %>
+                                                <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                                    <% }); %>
+                                </small>
+                                <% } %>
+                                    <!-- Optionally, you can keep the "Complete" button here -->
+                                    <div class="complete-container">
+                                        <form action="/complete-task" method="POST">
+                                            <input type="hidden" name="taskId" value="<%= task.id %>">
+                                            <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                                        </form>
+                                    </div>
+                    </li>
+                    <% }) %>
             </ul>
         </div>
 
@@ -62,22 +58,42 @@
 
             <ul class="list-group">
                 <% recipes.forEach(recipe=> { %>
-                    <% const playerResource=resources.find(r=> r.resource_type_id === recipe.input_resource_id); %>
-                        <% const playerAmount=playerResource ? playerResource.amount : 0; %>
-                            <li class="list-group-item <%= playerAmount < recipe.input_amount ? 'text-muted' : '' %>">
-                                <form action="/start-task" method="POST">
-                                    <input type="hidden" name="recipeId" value="<%= recipe.id %>">
-                                    <button type="submit" class="btn btn-primary btn-sm" <%=playerAmount <
-                                        recipe.input_amount ? 'disabled' : '' %>>
-                                        Start <%= recipe.name %>
-                                    </button>
-                                </form>
-                                <% if (playerAmount < recipe.input_amount) { %>
-                                    <small>Needs <%= recipe.input_amount %>
-                                            <%= playerResource ? playerResource.name : '?' %></small>
-                                    <% } %>
-                            </li>
-                            <% }) %>
+                    <% const inputs=recipeInputs.filter(ri=> ri.recipe_id ===
+                        recipe.id); // Get all inputs for this recipe
+                        let canStart = true; // flag to check if all inputs are sufficient
+                        %>
+
+                        <% inputs.forEach(input=> { %>
+                            <% const playerAmount=resources.find(r=> r.resource_type_id ===
+                                input.resource_type_id)?.amount || 0;
+                                if (playerAmount < input.amount) canStart=false; %>
+                                    <% }); %>
+
+                                        <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
+                                            <form action="/start-task" method="POST">
+                                                <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                                                <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? ''
+                                                    : 'disabled' %>>
+                                                    Start <%= recipe.name %>
+                                                </button>
+                                            </form>
+
+                                            <% if (!canStart) { %>
+                                                <small>
+                                                    Needs:
+                                                    <% inputs.forEach((input, idx)=> {
+                                                        const playerAmount = resources.find(r => r.resource_type_id ===
+                                                        input.resource_type_id)?.amount || 0;
+                                                        %>
+                                                        <%= input.amount %>
+                                                            <%= resources.find(r=> r.resource_type_id ===
+                                                                input.resource_type_id)?.name || '?' %><%= idx <
+                                                                    inputs.length - 1 ? ', ' : '' %>
+                                                                    <% }); %>
+                                                </small>
+                                                <% } %>
+                                        </li>
+                                        <% }); %>
             </ul>
         </div>
 

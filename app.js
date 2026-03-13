@@ -39,10 +39,11 @@ app.get("/", async (req, res) => {
   // Fetch all player tasks in progress
   const tasksRes = await db.query(
     `
-    SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.input_resource_id, r.input_amount, r.output_resource_id, r.output_amount
+    SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.output_resource_id, r.output_amount
     FROM player_tasks pt
     JOIN recipes r ON pt.recipe_id = r.id
     WHERE pt.player_id = $1
+    AND pt.completed = FALSE
     ORDER BY pt.id ASC
   `,
     [playerId],
@@ -67,10 +68,18 @@ app.get("/", async (req, res) => {
     ORDER BY id ASC
   `);
 
+  // Fetch all required inputs for recipes
+  const recipeInputsRes = await db.query(`
+    SELECT *
+    FROM recipe_inputs
+    ORDER BY recipe_id, resource_type_id
+  `);
+
   res.render("index.ejs", {
     tasks: tasksRes.rows,
     resources: resourcesRes.rows,
     recipes: recipesRes.rows,
+    recipeInputs: recipeInputsRes.rows,
   });
 });
 
@@ -88,26 +97,36 @@ app.post("/start-task", async (req, res) => {
     ]);
     const recipe = recipeRes.rows[0];
 
-    // Lock the player's resource row
-    const playerRes = await db.query(
-      "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2 FOR UPDATE",
-      [playerId, recipe.input_resource_id],
+    // Get all required inputs for this recipe
+    const resourceRes = await db.query(
+      `SELECT resource_type_id, amount FROM recipe_inputs WHERE recipe_id = $1`,
+      [recipeId],
     );
 
-    const playerAmount = playerRes.rows[0]?.amount || 0;
+    // Step 1: Check all inputs
+    for (const resource of resourceRes.rows) {
+      const playerRes = await db.query(
+        "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2 FOR UPDATE",
+        [playerId, resource.resource_type_id],
+      );
 
-    if (playerAmount < recipe.input_amount) {
-      await db.query("ROLLBACK");
-      return res.redirect("/?error=NotEnoughResources");
+      const playerAmount = playerRes.rows[0]?.amount || 0;
+
+      if (playerAmount < resource.amount) {
+        await db.query("ROLLBACK");
+        return res.redirect("/?error=NotEnoughResources");
+      }
     }
 
-    // Deduct resources
-    await db.query(
-      "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
-      [recipe.input_amount, playerId, recipe.input_resource_id],
-    );
+    // Step 2: Deduct all inputs
+    for (const resource of resourceRes.rows) {
+      await db.query(
+        "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
+        [resource.amount, playerId, resource.resource_type_id],
+      );
+    }
 
-    // Start task
+    // Step 3: Start the task
     await db.query(
       "INSERT INTO player_tasks (player_id, recipe_id, started_at, completed) VALUES ($1, $2, NOW(), FALSE)",
       [playerId, recipeId],
