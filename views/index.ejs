@@ -1,10 +1,8 @@
 <%- include('partials/header.ejs'); -%>
 
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-3">
             <h2>Resources</h2>
-        </div>
-        <div class="col-3">
             <ul class="list-group">
                 <% resources.forEach(resource=> { %>
                     <li class="list-group-item">
@@ -12,15 +10,20 @@
                     </li>
                     <% }) %>
             </ul>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-3">
+            <h2 class="mt-3">Population</h2>
+            <ul class="list-group">
+                <li class="list-group-item">Population: <%= population %>
+                </li>
+                <li class="list-group-item">Workers: <%= workers %>
+                </li>
+                <li class="list-group-item">Food: <%= food %>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-4">
             <h2>Active Tasks</h2>
-        </div>
-
-        <div class="col-3">
             <ul class="list-group">
                 <% tasks.forEach(task=> { %>
                     <li class="list-group-item">
@@ -29,9 +32,9 @@
                         </strong>
                         <div class="progress" role="progressbar">
                             <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
-                                data-craft-time="<%= task.craft_time_seconds %>">
-                            </div>
+                                data-craft-time="<%= task.craft_time_seconds %>"></div>
                         </div>
+
                         <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
                             <% if (inputs.length> 0) { %>
                                 <small>Needs:
@@ -45,63 +48,88 @@
                                                     <% }); %>
                                 </small>
                                 <% } %>
+
                                     <div class="complete-container mt-2" style="display: none;">
-                                        <div class="complete-container">
-                                            <form action="/complete-task" method="POST">
-                                                <input type="hidden" name="taskId" value="<%= task.id %>">
-                                                <button type="submit" class="btn btn-success btn-sm">Complete</button>
-                                            </form>
-                                        </div>
+                                        <form action="/complete-task" method="POST">
+                                            <input type="hidden" name="taskId" value="<%= task.id %>">
+                                            <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                                        </form>
                                     </div>
                     </li>
                     <% }) %>
             </ul>
         </div>
 
-        <div class="col-3">
+        <div class="col-4">
             <h2>Available Recipes</h2>
-
             <ul class="list-group">
                 <% recipes.forEach(recipe=> { %>
-                    <% const inputs=recipeInputs.filter(ri=> ri.recipe_id ===
-                        recipe.id); // Get all inputs for this recipe
-                        let canStart = true; // flag to check if all inputs are sufficient
-                        %>
+                    <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === recipe.id);
+                        let canStart = true;
 
-                        <% inputs.forEach(input=> { %>
-                            <% const playerAmount=resources.find(r=> r.resource_type_id ===
-                                input.resource_type_id)?.amount || 0;
-                                if (playerAmount < input.amount) canStart=false; %>
+                        // Check resource requirements
+                        inputs.forEach(input => {
+                        const playerAmount = resources.find(r => r.resource_type_id === input.resource_type_id)?.amount
+                        || 0;
+                        if (playerAmount < input.amount) canStart=false; }); 
+                        // Check building prerequisites 
+                        if (recipe.required_building_id) { const hasBuilding=buildings.find(b=> b.building_id ===
+                            recipe.required_building_id);
+                            if (!hasBuilding) canStart = false;
+                            }
+
+                            // Hide recipe entirely if cannot start
+                            const hideRecipe = recipe.hide_until_available && !canStart;
+                            %>
+
+                            <% if (!hideRecipe) { %>
+                                <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
+                                    <form action="/start-task" method="POST">
+                                        <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                                        <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? ''
+                                            : 'disabled' %>>
+                                            Start <%= recipe.name %>
+                                        </button>
+                                    </form>
+
+                                    <% if (!canStart) { %>
+                                        <small>
+                                            Needs:
+                                            <% inputs.forEach((input, idx)=> {
+                                                const playerAmount = resources.find(r => r.resource_type_id ===
+                                                input.resource_type_id)?.amount || 0;
+                                                const resourceName = resources.find(r => r.resource_type_id ===
+                                                input.resource_type_id)?.name || '?';
+                                                %>
+                                                <%= input.amount %>
+                                                    <%= resourceName %>
+                                                        <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                                            <% }); %>
+
+                                                                <% if (recipe.required_building_id) { const
+                                                                    buildingName=buildings.find(b=> b.building_id ===
+                                                                    recipe.required_building_id)?.name || '?';
+                                                                    %>
+                                                                    , Requires building: <%= buildingName %>
+                                                                        <% } %>
+                                        </small>
+                                        <% } %>
+                                </li>
+                                <% } %>
                                     <% }); %>
+            </ul>
 
-                                        <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
-                                            <form action="/start-task" method="POST">
-                                                <input type="hidden" name="recipeId" value="<%= recipe.id %>">
-                                                <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? ''
-                                                    : 'disabled' %>>
-                                                    Start <%= recipe.name %>
-                                                </button>
-                                            </form>
-
-                                            <% if (!canStart) { %>
-                                                <small>
-                                                    Needs:
-                                                    <% inputs.forEach((input, idx)=> {
-                                                        const playerAmount = resources.find(r => r.resource_type_id ===
-                                                        input.resource_type_id)?.amount || 0;
-                                                        %>
-                                                        <%= input.amount %>
-                                                            <%= resources.find(r=> r.resource_type_id ===
-                                                                input.resource_type_id)?.name || '?' %><%= idx <
-                                                                    inputs.length - 1 ? ', ' : '' %>
-                                                                    <% }); %>
-                                                </small>
-                                                <% } %>
-                                        </li>
-                                        <% }); %>
+            <h2 class="mt-4">Your Buildings</h2>
+            <ul class="list-group">
+                <% buildings.forEach(building=> { %>
+                    <li class="list-group-item">
+                        <%= building.name %>
+                            (Health: <%= building.health %>/<%= building.max_health %>, Workers: <%= building.workers %>
+                                        /<%= building.max_workers %>)
+                    </li>
+                    <% }) %>
             </ul>
         </div>
-
     </div>
 
     <%- include('partials/footer.ejs'); -%>
