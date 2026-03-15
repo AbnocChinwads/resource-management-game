@@ -1,37 +1,35 @@
-<div class="col-4">
-    <h2>Active Tasks</h2>
-    <ul class="list-group">
-        <% tasks.forEach(task=> { %>
-            <li class="list-group-item">
-                <strong>
-                    <%= task.recipe_name %>
-                </strong>
-                <div class="progress" role="progressbar">
-                    <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
-                        data-craft-time="<%= task.craft_time_seconds %>"></div>
-                </div>
+<h2>Active Tasks</h2>
+<ul class="list-group">
+    <% tasks.forEach(task=> { %>
+        <li class="list-group-item">
+            <strong>
+                <%= task.recipe_name %>
+            </strong>
+            <div class="progress" role="progressbar">
+                <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
+                    data-craft-time="<%= task.craft_time_seconds %>"></div>
+            </div>
 
-                <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
-                    <% if (inputs.length> 0) { %>
-                        <small>Needs:
-                            <% inputs.forEach((input, idx)=> {
-                                const resourceName = resources.find(r => r.resource_type_id ===
-                                input.resource_type_id)?.name || '?';
-                                %>
-                                <%= input.amount %>
-                                    <%= resourceName %>
-                                        <%= idx < inputs.length - 1 ? ', ' : '' %>
-                                            <% }); %>
-                        </small>
-                        <% } %>
+            <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
+                <% if (inputs.length> 0) { %>
+                    <small>Needs:
+                        <% inputs.forEach((input, idx)=> {
+                            const resourceName = resources.find(r => r.resource_type_id ===
+                            input.resource_type_id)?.name || '?';
+                            %>
+                            <%= input.amount %>
+                                <%= resourceName %>
+                                    <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                        <% }); %>
+                    </small>
+                    <% } %>
 
-                            <div class="complete-container mt-2" style="display: none;">
-                                <form action="/complete-task" method="POST">
-                                    <input type="hidden" name="taskId" value="<%= task.id %>">
-                                    <button type="submit" class="btn btn-success btn-sm">Complete</button>
-                                </form>
-                            </div>
-            </li>
-            <% }) %>
-    </ul>
-</div>
+                        <div class="complete-container mt-2" style="display: none;">
+                            <form action="/complete-task" method="POST">
+                                <input type="hidden" name="taskId" value="<%= task.id %>">
+                                <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                            </form>
+                        </div>
+        </li>
+        <% }) %>
+</ul>

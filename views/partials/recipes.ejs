@@ -1,51 +1,49 @@
-<div class="col-4">
-    <h2>Available Recipes</h2>
-    <ul class="list-group">
-        <% recipes.forEach(recipe=> {
-            const inputs = recipeInputs.filter(ri => ri.recipe_id === recipe.id);
-            let canStart = true;
+<h2>Available Recipes</h2>
+<ul class="list-group">
+    <% recipes.forEach(recipe=> {
+        const inputs = recipeInputs.filter(ri => ri.recipe_id === recipe.id);
+        let canStart = true;
 
-            // Check resource requirements
-            inputs.forEach(input => {
-            const playerAmount = resources.find(r => r.resource_type_id === input.resource_type_id)?.amount ||
-            0;
-            if (playerAmount < input.amount) canStart=false; }); 
-            // Check building requirements 
-            if (recipe.required_building_id) { const hasBuilding=buildings.find(b=> b.building_id ===
-                recipe.required_building_id);
-                if (!hasBuilding) canStart = false;
-                }
+        // Check resource requirements
+        inputs.forEach(input => {
+        const playerAmount = resources.find(r => r.resource_type_id === input.resource_type_id)?.amount ||
+        0;
+        if (playerAmount < input.amount) canStart=false; }); // Check building requirements if
+            (recipe.required_building_id) { const hasBuilding=buildings.find(b=> b.building_id ===
+            recipe.required_building_id);
+            if (!hasBuilding) canStart = false;
+            }
 
-                const hideRecipe = recipe.hide_until_available && !canStart;
-                %>
-                <% if (!hideRecipe) { %>
-                    <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
-                        <form action="/start-task" method="POST">
-                            <input type="hidden" name="recipeId" value="<%= recipe.id %>">
-                            <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? '' : 'disabled' %>>
-                                Start <%= recipe.name %>
-                            </button>
-                        </form>
+            const hideRecipe = recipe.hide_until_available && !canStart;
+            %>
+            <% if (!hideRecipe) { %>
+                <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
+                    <form action="/start-task" method="POST">
+                        <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                        <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? '' : 'disabled' %>>
+                            Start <%= recipe.name %>
+                        </button>
+                    </form>
 
-                        <% if (!canStart) { %>
-                            <small>
-                                Needs:
-                                <% inputs.forEach((input, idx)=> {
-                                    const resourceName = resources.find(r => r.resource_type_id ===
-                                    input.resource_type_id)?.name || '?';
-                                    %>
-                                    <%= input.amount %>
-                                        <%= resourceName %>
-                                            <%= idx < inputs.length - 1 ? ', ' : '' %>
-                                                <% }); %>
-                                                    <% if (recipe.required_building_id) { %>
-                                                        , Requires building: <%= buildings.find(b=>
-                                                            b.building_id === recipe.required_building_id)?.name
-                                                            || '?' %>
-                                                            <% } %>
-                            </small>
-                            <% } %>
-                    </li>
-                    <% } %>
-                        <% }) %>
-    </ul>
+                    <% if (!canStart) { %>
+                        <small>
+                            Needs:
+                            <% inputs.forEach((input, idx)=> {
+                                const resourceName = resources.find(r => r.resource_type_id ===
+                                input.resource_type_id)?.name || '?';
+                                %>
+                                <%= input.amount %>
+                                    <%= resourceName %>
+                                        <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                            <% }); %>
+                                                <% if (recipe.required_building_id) { %>
+                                                    , Requires building: <%= buildings.find(b=>
+                                                        b.building_id === recipe.required_building_id)?.name
+                                                        || '?' %>
+                                                        <% } %>
+                        </small>
+                        <% } %>
+                </li>
+                <% } %>
+                    <% }) %>
+</ul>
