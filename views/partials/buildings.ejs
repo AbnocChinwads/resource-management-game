@@ -1,0 +1,11 @@
+<h2 class="mt-4">Your Buildings</h2>
+<ul class="list-group">
+    <% buildings.forEach(building=> { %>
+        <li class="list-group-item">
+            <%= building.name %> (Health: <%= building.health %>/<%= building.max_health %>, Workers:
+                        <%= building.workers %>/<%= building.max_workers %>)
+        </li>
+        <% }) %>
+</ul>
+</div>
+</div>
