@@ -3,7 +3,7 @@
     <% buildings.forEach(building=> { %>
         <li class="list-group-item">
             <%= building.name %> (Health: <%= building.health %>/<%= building.max_health %>, Workers:
-                        <%= building.workers %>/<%= building.max_workers %>)
+                        <%= building.workers_assigned %>/<%= building.max_workers %>)
         </li>
         <% }) %>
 </ul>

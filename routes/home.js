@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../db.js";
-const router = express.Router()
+const router = express.Router();
 
 // Homepage
 router.get("/", async (req, res) => {
@@ -41,6 +41,12 @@ router.get("/", async (req, res) => {
       [playerId],
     );
 
+    // Sum all workers assigned
+    const totalWorkers = buildingsRes.rows.reduce(
+      (sum, b) => sum + b.workers_assigned,
+      0,
+    );
+
     res.render("index.ejs", {
       tasks: tasksRes.rows,
       resources: resourcesRes.rows,
@@ -48,7 +54,7 @@ router.get("/", async (req, res) => {
       recipeInputs: recipeInputsRes.rows,
       buildings: buildingsRes.rows,
       population: res.locals.population,
-      workers: res.locals.workers,
+      workers: totalWorkers,
       food: res.locals.food,
     });
   } catch (err) {

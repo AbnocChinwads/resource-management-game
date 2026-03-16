@@ -8,8 +8,9 @@
         inputs.forEach(input => {
         const playerAmount = resources.find(r => r.resource_type_id === input.resource_type_id)?.amount ||
         0;
-        if (playerAmount < input.amount) canStart=false; }); // Check building requirements if
-            (recipe.required_building_id) { const hasBuilding=buildings.find(b=> b.building_id ===
+        if (playerAmount < input.amount) canStart=false; }); 
+        // Check building requirements
+        if (recipe.required_building_id) { const hasBuilding=buildings.find(b=> b.building_id ===
             recipe.required_building_id);
             if (!hasBuilding) canStart = false;
             }

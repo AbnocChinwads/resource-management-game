@@ -17,8 +17,8 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use(foodTick);
 app.use("/", homeRoute);
-app.use("/start-task", startRoute);
-app.use("/complete-task", completeRoute);
+app.use("/", startRoute);
+app.use("/", completeRoute);
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
