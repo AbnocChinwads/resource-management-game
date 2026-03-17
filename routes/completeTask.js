@@ -23,7 +23,7 @@ router.post("/complete-task", async (req, res) => {
         AND NOW() >= pt.started_at + r.craft_time_seconds * INTERVAL '1 second'
       RETURNING r.output_resource_id, r.output_amount, r.output_building_id
       `,
-      [taskId, playerId]
+      [taskId, playerId],
     );
 
     if (result.rows.length === 0) {
@@ -31,9 +31,12 @@ router.post("/complete-task", async (req, res) => {
       return res.redirect("/?error=CouldNotComplete");
     }
 
-    const { output_resource_id, output_amount, output_building_id } = result.rows[0];
+    const { output_resource_id, output_amount, output_building_id } =
+      result.rows[0];
 
-    // Add resource output
+    // =========================
+    // RESOURCE OUTPUT
+    // =========================
     if (output_resource_id) {
       await db.query(
         `
@@ -42,39 +45,59 @@ router.post("/complete-task", async (req, res) => {
         ON CONFLICT (player_id, resource_type_id)
         DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount
         `,
-        [playerId, output_resource_id, output_amount]
+        [playerId, output_resource_id, output_amount],
       );
     }
 
-    // Add building output
+    // =========================
+    // BUILDING OUTPUT
+    // =========================
     if (output_building_id) {
-      await db.query(
+      // Insert building (uses DB defaults)
+      const insertRes = await db.query(
         `
-        INSERT INTO player_buildings (player_id, building_id, health, workers_assigned, built_at)
-        VALUES ($1, $2, 100, 0, NOW())
+        INSERT INTO player_buildings (player_id, building_id)
+        VALUES ($1, $2)
+        RETURNING id
         `,
-        [playerId, output_building_id]
+        [playerId, output_building_id],
       );
 
-      // Auto-add some population and assign initial workers
-      const initialPopulation = 2; // adjust as needed
-      const initialWorkers = 1;
+      const newBuildingId = insertRes.rows[0].id;
 
-      // Update player population
-      await db.query(
-        `UPDATE players
-         SET population = population + $1
-         WHERE id = $2`,
-        [initialPopulation, playerId]
+      // Get building type
+      const buildingRes = await db.query(
+        `SELECT type, population_gain FROM buildings WHERE id = $1`,
+        [output_building_id],
       );
 
-      // Assign initial workers to the new building
-      await db.query(
-        `UPDATE player_buildings
-         SET workers_assigned = $1
-         WHERE player_id = $2 AND building_id = $3`,
-        [initialWorkers, playerId, output_building_id]
-      );
+      const { type, population_gain } = buildingRes.rows[0];
+
+      // =========================
+      // HOUSING BUILDINGS
+      // =========================
+      if (type === "housing") {
+        const popGain = population_gain || 2;
+
+        await db.query(
+          `UPDATE players
+           SET population = population + $1
+           WHERE id = $2`,
+          [popGain, playerId],
+        );
+      }
+
+      // =========================
+      // PRODUCTION BUILDINGS
+      // =========================
+      if (type === "production") {
+        await db.query(
+          `UPDATE player_buildings
+           SET workers_assigned = 1
+           WHERE id = $1`,
+          [newBuildingId],
+        );
+      }
     }
 
     await db.query("COMMIT");

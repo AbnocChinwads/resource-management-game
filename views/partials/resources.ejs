@@ -8,14 +8,14 @@
 </ul>
 <h2 class="mt-3">Population</h2>
 <ul class="list-group">
-    <li class="list-group-item">Population: <%= population %>
+    <li class="list-group-item">Population: <span id="population"> <%= population %> </span>
     </li>
-    <li class="list-group-item">Workers: <%= workers %>
+    <li class="list-group-item">Workers: <span id="workers"> <%= workers %> </span>
     </li>
     <li class="list-group-item">
-        Food (total nutrition): <%= food %>
+        Food (total nutrition): <span id="food"> <%= food %> </span>
             <% if (food===0) { %>
-                <span class="text-danger font-weight-bold"> - Starvation Risk!</span>
+                <span id="starvation-warning" class="text-danger font-weight-bold" style="display:none;"> - Starvation Risk!</span>
                 <% } %>
     </li>
 </ul>
