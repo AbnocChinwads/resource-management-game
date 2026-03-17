@@ -20,7 +20,7 @@ router.post("/complete-task", async (req, res) => {
         AND pt.player_id = $2
         AND pt.completed = FALSE
         AND pt.recipe_id = r.id
-        AND NOW() >= pt.started_at + r.craft_time_seconds * INTERVAL '1 second'
+        AND NOW() >= pt.started_at + pt.duration_seconds * INTERVAL '1 second'
       RETURNING r.output_resource_id, r.output_amount, r.output_building_id
       `,
       [taskId, playerId],

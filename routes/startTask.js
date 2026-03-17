@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../db.js";
-const router = express.Router()
+const router = express.Router();
 
 // Start a task
 router.post("/start-task", async (req, res) => {
@@ -10,16 +10,19 @@ router.post("/start-task", async (req, res) => {
   try {
     await db.query("BEGIN");
 
+    // Fetch recipe
     const recipeRes = await db.query("SELECT * FROM recipes WHERE id = $1", [
       recipeId,
     ]);
     const recipe = recipeRes.rows[0];
 
+    // Fetch required resources
     const resourceRes = await db.query(
       `SELECT resource_type_id, amount FROM recipe_inputs WHERE recipe_id = $1`,
       [recipeId],
     );
 
+    // Check if player has enough of each resource
     for (const resource of resourceRes.rows) {
       const playerRes = await db.query(
         "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2 FOR UPDATE",
@@ -33,6 +36,7 @@ router.post("/start-task", async (req, res) => {
       }
     }
 
+    // Deduct resources
     for (const resource of resourceRes.rows) {
       await db.query(
         "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
@@ -40,15 +44,39 @@ router.post("/start-task", async (req, res) => {
       );
     }
 
+    // Calculate task duration based on workers
+    // Check if a building produces this recipe
+    let assignedWorkers = 0;
+    const buildingRes = await db.query(
+      `SELECT pb.workers_assigned
+       FROM buildings b
+       JOIN player_buildings pb ON pb.building_id = b.id
+       WHERE b.production_recipe_id = $1 AND pb.player_id = $2`,
+      [recipeId, playerId],
+    );
+
+    if (buildingRes.rows.length > 0) {
+      // Use number of workers assigned for speed modifier
+      assignedWorkers = buildingRes.rows[0].workers_assigned || 1;
+    }
+
+    // Duration formula: base craft time / workers assigned (minimum 1)
+    const durationSeconds = Math.max(
+      1,
+      Math.ceil(recipe.craft_time_seconds / Math.max(assignedWorkers, 1)),
+    );
+
+    // Insert task with duration
     await db.query(
-      "INSERT INTO player_tasks (player_id, recipe_id, started_at, completed) VALUES ($1, $2, NOW(), FALSE)",
-      [playerId, recipeId],
+      `INSERT INTO player_tasks (player_id, recipe_id, started_at, completed, duration_seconds)
+       VALUES ($1, $2, NOW(), FALSE, $3)`,
+      [playerId, recipeId, durationSeconds],
     );
 
     await db.query("COMMIT");
   } catch (err) {
     await db.query("ROLLBACK");
-    console.error(err);
+    console.error("Error starting task:", err);
   }
 
   res.redirect("/");

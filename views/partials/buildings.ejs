@@ -1,9 +1,23 @@
 <h2 class="mt-4">Your Buildings</h2>
 <ul class="list-group">
-    <% buildings.forEach(building=> { %>
-        <li class="list-group-item">
-            <%= building.name %> (Health: <%= building.health %>/<%= building.max_health %>, Workers:
-                        <%= building.workers_assigned %>/<%= building.max_workers %>)
-        </li>
-        <% }) %>
+  <% buildings.forEach(building => { %>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <%= building.name %> (Health: <%= building.health %>/<%= building.max_health %>, Workers:
+        <%= building.workers_assigned %>/<%= building.max_workers %>)
+      </div>
+      <div>
+        <form action="/update-workers" method="POST" style="display:inline;">
+          <input type="hidden" name="buildingId" value="<%= building.id %>">
+          <input type="hidden" name="delta" value="-1">
+          <button type="submit" class="btn btn-sm btn-danger">-</button>
+        </form>
+        <form action="/update-workers" method="POST" style="display:inline;">
+          <input type="hidden" name="buildingId" value="<%= building.id %>">
+          <input type="hidden" name="delta" value="1">
+          <button type="submit" class="btn btn-sm btn-success">+</button>
+        </form>
+      </div>
+    </li>
+  <% }) %>
 </ul>
