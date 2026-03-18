@@ -12,31 +12,27 @@
         </div>
     </div>
     <script>
-        async function pollStats() {
+        async function updateStats() {
             try {
                 const res = await fetch("/api/player-stats");
                 const data = await res.json();
 
-                document.getElementById("population").textContent = data.population;
-                document.getElementById("workers").textContent = data.workers;
-                document.getElementById("food").textContent = data.food;
+                document.getElementById("population-count").textContent = data.population;
+                document.getElementById("worker-count").textContent = data.workers;
+                document.getElementById("food-count").textContent = data.food;
 
-                // starvation warning
-                const warning = document.getElementById("starvation-warning");
-                if (data.food <= 0) {
-                    warning.style.display = "block";
-                } else {
-                    warning.style.display = "none";
-                }
+                // Update individual building workers
+                data.buildings.forEach(b => {
+                    const el = document.getElementById(`building-${b.id}-workers`);
+                    if (el) el.textContent = b.workers_assigned;
+                });
 
             } catch (err) {
-                console.error(err);
+                console.error("Stats update error:", err);
             }
-
-            // wait AFTER request finishes
-            setTimeout(pollStats, 3000);
         }
 
-        pollStats();
+        setInterval(updateStats, 3000);
+        updateStats(); // initial call
     </script>
     <%- include('partials/footer.ejs'); -%>

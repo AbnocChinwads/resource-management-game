@@ -18,11 +18,12 @@ if (process.env.NODE_ENV === "development") {
   app.use(tempPlayer);
 }
 app.use(foodTick);
+
 app.use("/", homeRoute);
 app.use("/api/player-stats", playerStatsRoute);
-app.use("/", updateWorkersRoute);
-app.use("/", startRoute);
-app.use("/", completeRoute);
+app.use("/update-workers", updateWorkersRoute);
+app.use("/start-task", startRoute);
+app.use("/complete-task", completeRoute);
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
