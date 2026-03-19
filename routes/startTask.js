@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
       const playerAmount = playerRes.rows[0]?.amount || 0;
       if (playerAmount < resource.amount) {
         await db.query("ROLLBACK");
-        return res.redirect("/?error=NotEnoughResources");
+        return res.json({ success: false, error: "Not Enough Resources"});
       }
     }
 

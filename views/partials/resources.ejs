@@ -6,16 +6,31 @@
         </li>
         <% }) %>
 </ul>
+<!-- Stats display -->
 <h2 class="mt-3">Population</h2>
 <ul class="list-group">
-    <li class="list-group-item">Population: <span id="population-count"> <%= population %> </span>
-    </li>
-    <li class="list-group-item">Workers: <span id="workers-count"> <%= workers %> </span>
+    <li class="list-group-item">
+        <p>Population: <span id="population-count">
+                <%= population %>
+            </span></p>
     </li>
     <li class="list-group-item">
-        Food (total nutrition): <span id="food-count"> <%= food %> </span>
-            <% if (food===0) { %>
-                <span id="starvation-warning" class="text-danger font-weight-bold" style="display:none;"> - Starvation Risk!</span>
-                <% } %>
+        <p>Workers: <span id="worker-count">
+                <%= workers %>
+            </span></p>
+    </li>
+    <li class="list-group-item">
+        <p>Available Workers: <span id="available-workers">
+                <%= workers %>
+            </span></p>
+    </li>
+    <li class="list-group-item">
+        <p>Food: <span id="food-count">
+                <%= food %>
+            </span></p>
+        <% if (food===0) { %>
+            <span id="starvation-warning" class="text-danger font-weight-bold" style="display:none;"> - Starvation
+                Risk!</span>
+            <% } %>
     </li>
 </ul>

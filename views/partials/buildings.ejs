@@ -1,18 +1,17 @@
 <h2 class="mt-4">Your Buildings</h2>
 <ul class="list-group">
-    <% buildings.forEach(building=> { %>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <%= building.name %> (Health: <%= building.health %>/<%= building.max_health %>, Workers:
-                            <span id="building-<%= building.id %>-workers">
-                                <%= building.workers_assigned %>
-                            </span>/<%= building.max_workers %>)
-            </div>
-            <div>
-                <!-- Worker controls -->
-                <button class="btn btn-sm btn-danger" onclick="changeWorkers(<%= building.id %>, -1)">-</button>
-                <button class="btn btn-sm btn-success" onclick="changeWorkers(<%= building.id %>, 1)">+</button>
-            </div>
-        </li>
-        <% }) %>
+  <% buildings.forEach(building => { %>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <%= building.name %> 
+        (Health: <%= building.health %>/<%= building.max_health %>, Workers:
+        <span id="building-<%= building.id %>-workers"><%= building.workers_assigned %></span>/<%= building.max_workers %>)
+      </div>
+      <div>
+        <!-- Worker controls -->
+        <button class="btn btn-sm btn-danger" onclick="changeWorkers(<%= building.id %>, -1)">-</button>
+        <button class="btn btn-sm btn-success" onclick="changeWorkers(<%= building.id %>, 1)">+</button>
+      </div>
+    </li>
+  <% }) %>
 </ul>

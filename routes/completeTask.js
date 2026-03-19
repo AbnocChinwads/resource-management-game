@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
 
     if (result.rows.length === 0) {
       await db.query("ROLLBACK");
-      return res.redirect("/?error=CouldNotComplete");
+      return res.json({ success: false, error: "Could Not Complete"});
     }
 
     const { output_resource_id, output_amount, output_building_id } = result.rows[0];
