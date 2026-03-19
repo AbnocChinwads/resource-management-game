@@ -1,5 +1,6 @@
 import express from "express";
 import session from "express-session";
+import path from "path";
 
 import auth from "./middleware/auth.js";
 
@@ -11,6 +12,10 @@ import completeRoute from "./routes/completeTask.js";
 
 const app = express();
 const port = process.env.APP_PORT || 3000;
+
+// set view engine
+app.set("view engine", "ejs");
+app.set("views", path.join(process.cwd(), "views"));
 
 // SESSION (required for auth)
 app.use(

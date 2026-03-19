@@ -1,9 +1,9 @@
 import express from "express";
 import db from "../db.js";
+import { requireAuth } from "../middleware/authGuard.js";
 const router = express.Router();
 
-// Homepage
-router.get("/", async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
   const playerId = req.playerId;
 
   try {
@@ -41,7 +41,6 @@ router.get("/", async (req, res) => {
       [playerId],
     );
 
-    // Sum all workers assigned
     const totalWorkers = buildingsRes.rows.reduce(
       (sum, b) => sum + b.workers_assigned,
       0,
