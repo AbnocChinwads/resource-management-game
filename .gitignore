@@ -13,6 +13,7 @@ coverage/
 
 # Express
 # Add Express-specific ignores here
+scripts/reset-db.js
 
 # VSCode
 .vscode/*
