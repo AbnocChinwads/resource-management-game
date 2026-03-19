@@ -40,6 +40,7 @@
             try {
                 const res = await fetch("/api/player-stats"); // stats endpoint
                 const data = await res.json();
+                console.log("Data:", data);
 
                 document.getElementById("population-count").textContent = data.population;
                 document.getElementById("worker-count").textContent = data.workers;
@@ -57,7 +58,6 @@
                     const el = document.getElementById(`building-${b.id}-workers`);
                     if (el) el.textContent = b.workers_assigned;
                 });
-
             } catch (err) {
                 console.error("Stats update error:", err);
             }

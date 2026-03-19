@@ -1,5 +1,8 @@
 import express from "express";
-// import db from "./db.js";
+import session from "express-session";
+
+import auth from "./middleware/auth.js";
+
 import homeRoute from "./routes/home.js";
 import playerStatsRoute from "./routes/playerStats.js";
 import updateWorkersRoute from "./routes/updateWorkers.js";
@@ -9,17 +12,31 @@ import completeRoute from "./routes/completeTask.js";
 const app = express();
 const port = process.env.APP_PORT || 3000;
 
-// parse URL-encoded form data
-app.use(express.urlencoded({ extended: true }));
+// SESSION (required for auth)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 
-// parse JSON (needed for fetch requests)
+// parse request bodies
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// serve static files
 app.use(express.static("public"));
+
+/**
+ * AUTH MIDDLEWARE
+ * MUST run before routes that use req.playerId
+ */
+app.use(auth);
 
 // Routes
 app.use("/", homeRoute);
-app.use("/api/player-stats", playerStatsRoute)
+app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);

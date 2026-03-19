@@ -2,7 +2,7 @@ import express from "express";
 import db from "../db.js";
 const router = express.Router();
 
-router.post("/update-workers", async (req, res) => {
+router.post("/", async (req, res) => {
   const playerId = req.playerId;
   const { buildingId, delta } = req.body;
 
@@ -10,9 +10,14 @@ router.post("/update-workers", async (req, res) => {
     await db.query("BEGIN");
 
     const buildingRes = await db.query(
-      `SELECT workers_assigned, max_workers FROM player_buildings
-       WHERE id = $1 AND player_id = $2 FOR UPDATE`,
-      [buildingId, playerId]
+      `SELECT 
+      pb.workers_assigned, 
+      b.max_workers
+      FROM player_buildings pb
+      JOIN buildings b ON pb.building_id = b.id
+      WHERE pb.id = $1 AND pb.player_id = $2
+      FOR UPDATE`,
+      [buildingId, playerId],
     );
 
     if (!buildingRes.rows.length) {
@@ -24,14 +29,14 @@ router.post("/update-workers", async (req, res) => {
 
     const playerRes = await db.query(
       `SELECT population FROM players WHERE id = $1 FOR UPDATE`,
-      [playerId]
+      [playerId],
     );
 
     const population = playerRes.rows[0].population;
 
     const usedWorkersRes = await db.query(
       `SELECT SUM(workers_assigned) AS total FROM player_buildings WHERE player_id = $1`,
-      [playerId]
+      [playerId],
     );
 
     const totalAssigned = usedWorkersRes.rows[0].total || 0;
@@ -50,7 +55,7 @@ router.post("/update-workers", async (req, res) => {
       `UPDATE player_buildings
        SET workers_assigned = $1
        WHERE id = $2 AND player_id = $3`,
-      [newWorkers, buildingId, playerId]
+      [newWorkers, buildingId, playerId],
     );
 
     await db.query("COMMIT");
@@ -59,9 +64,9 @@ router.post("/update-workers", async (req, res) => {
     res.json({
       success: true,
       workers_assigned: newWorkers,
-      availableWorkers: population - (totalAssigned - workers_assigned + newWorkers)
+      availableWorkers:
+        population - (totalAssigned - workers_assigned + newWorkers),
     });
-
   } catch (err) {
     await db.query("ROLLBACK");
     console.error("Error updating workers:", err);

@@ -2,7 +2,7 @@ import express from "express";
 import db from "../db.js";
 const router = express.Router();
 
-router.get("/api/player-stats", async (req, res) => {
+router.get("/", async (req, res) => {
   const playerId = req.playerId;
 
   try {
@@ -33,9 +33,9 @@ router.get("/api/player-stats", async (req, res) => {
     // Calculate available workers
     const availableWorkers = population - totalWorkers;
 
-    // Total food (assuming res.locals.food is calculated elsewhere)
+    // Total food
     const foodRes = await db.query(
-      `SELECT SUM(pr.amount * rt.nutrition) AS total_food
+      `SELECT SUM(pr.amount * rt.nutrition_value) AS total_food
        FROM player_resources pr
        JOIN resource_types rt ON pr.resource_type_id = rt.id
        WHERE pr.player_id = $1`,
