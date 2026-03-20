@@ -2,9 +2,11 @@
 
     <h1>Login</h1>
 
-    <form method="POST" action="/login">
+    <form id="login-form">
         <input type="text" name="username" placeholder="Username" required />
         <button type="submit">Login</button>
     </form>
+
+    <div id="error"></div>
 
     <%- include('partials/footer.ejs'); -%>

@@ -2,7 +2,8 @@ import express from "express";
 import session from "express-session";
 import path from "path";
 
-import auth from "./middleware/auth.js";
+import { resolvePlayer } from "./middleware/auth.js";
+import authRoutes from "./routes/auth.js";
 
 import homeRoute from "./routes/home.js";
 import playerStatsRoute from "./routes/playerStats.js";
@@ -37,15 +38,16 @@ app.use(express.static("public"));
  * AUTH MIDDLEWARE
  * MUST run before routes that use req.playerId
  */
-app.use(auth);
+app.use(resolvePlayer);
 
 // Routes
+app.use("/", authRoutes);
 app.use("/", homeRoute);
 app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
 
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });

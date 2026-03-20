@@ -1,0 +1,175 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+<script>
+    // GLOBAL function
+    window.changeWorkers = async function (buildingId, delta) {
+        console.log("clicked", buildingId, delta);
+        try {
+            const res = await fetch("/update-workers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ buildingId, delta })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById(`building-${buildingId}-workers`).textContent = data.workers_assigned;
+                document.getElementById("available-workers").textContent = data.availableWorkers;
+            } else {
+                alert(data.error || "Cannot change workers");
+            }
+
+        } catch (err) {
+            console.error("Worker assignment error:", err);
+        }
+    };
+
+    // Live stats updater
+    async function updateStats() {
+        try {
+            const res = await fetch("/api/player-stats"); // stats endpoint
+            const data = await res.json();
+            console.log("Data:", data);
+
+            document.getElementById("population-count").textContent = data.population;
+            document.getElementById("worker-count").textContent = data.workers;
+            document.getElementById("available-workers").textContent = data.availableWorkers;
+            document.getElementById("food-count").textContent = data.food;
+
+            // Update player resources
+            data.resources.forEach(r => {
+                const el = document.getElementById(`resource-${r.resource_type_id}`);
+                if (el) el.textContent = r.amount;
+            });
+
+            // Update building workers
+            data.buildings.forEach(b => {
+                const el = document.getElementById(`building-${b.id}-workers`);
+                if (el) el.textContent = b.workers_assigned;
+            });
+        } catch (err) {
+            console.error("Stats update error:", err);
+        }
+    }
+
+    // Poll every 3 seconds
+    setInterval(updateStats, 3000);
+    updateStats(); // initial call
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        let initialLoad = true;
+
+        // Function that updates all progress bars
+        function updateProgress() {
+            const now = Date.now();
+            const bars = document.querySelectorAll(".progress-bar"); // fresh query each time
+
+            bars.forEach(bar => {
+                const startedAt = parseInt(bar.dataset.startedAt);
+                const craftTime = parseInt(bar.dataset.craftTime) * 1000;
+
+                let progress = (now - startedAt) / craftTime;
+                if (progress < 0) progress = 0;
+                if (progress > 1) progress = 1;
+
+                const li = bar.closest("li");
+                const progressContainer = li.querySelector(".progress");
+                const completeContainer = li.querySelector(".complete-container");
+
+                bar.style.width = (progress * 100) + "%";
+
+                if (progress >= 1 && completeContainer) {
+                    if (initialLoad) {
+                        if (progressContainer) progressContainer.remove();
+                        completeContainer.style.display = "block";
+                    }
+                }
+            });
+
+            initialLoad = false;
+        }
+
+        // Run immediately and every 100ms
+        updateProgress();
+        setInterval(updateProgress, 100);
+
+        // Transition listener for bars that fill mid-session
+        document.addEventListener("transitionend", function (event) {
+            if (event.target.classList.contains("progress-bar") && event.propertyName === "width") {
+                const bar = event.target;
+                const width = parseFloat(bar.style.width);
+                if (width >= 100) {
+                    const li = bar.closest("li");
+                    const progressContainer = li.querySelector(".progress");
+                    const completeContainer = li.querySelector(".complete-container");
+
+                    if (progressContainer) progressContainer.remove();
+                    if (completeContainer) completeContainer.style.display = "block";
+                }
+            }
+        });
+
+        // Event delegation for removing completed tasks after form submit
+        document.body.addEventListener("submit", function (e) {
+            const form = e.target.closest("form");
+            if (form && form.closest(".complete-container")) {
+                const li = form.closest("li");
+                setTimeout(() => li.remove(), 50); // remove after submission
+            }
+        });
+
+    });
+</script>
+<script>
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const username = e.target.username.value;
+
+        try {
+            const res = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = "/";
+            } else {
+                document.getElementById("error").textContent =
+                    data.error || "Login failed";
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+        }
+    });
+</script>
+<script>
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+        try {
+            const res = await fetch("/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = "/login";
+            } else {
+                console.error("Logout failed");
+            }
+        } catch (err) {
+            console.error("Logout error:", err);
+        }
+    });
+</script>
