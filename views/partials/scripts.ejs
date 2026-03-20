@@ -9,6 +9,7 @@
             const res = await fetch("/update-workers", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ buildingId, delta })
             });
 
@@ -28,7 +29,9 @@
     // Live stats updater
     async function updateStats() {
         try {
-            const res = await fetch("/api/player-stats"); // stats endpoint
+            const res = await fetch("/api/player-stats", {
+                credentials: "include",
+            }); // stats endpoint
             const data = await res.json();
             console.log("Data:", data);
 
@@ -135,6 +138,7 @@
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({ username }),
             });
 
@@ -158,7 +162,8 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
-                }
+                },
+                credentials: "include",
             });
 
             const data = await res.json();

@@ -2,6 +2,7 @@ import express from "express";
 import session from "express-session";
 import path from "path";
 
+import { requireAuth } from "./middleware/auth.js";
 import { resolvePlayer } from "./middleware/auth.js";
 import authRoutes from "./routes/auth.js";
 
@@ -24,6 +25,10 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie : {
+      secure: false,
+      httpOnly: true,
+    }
   }),
 );
 
@@ -42,6 +47,7 @@ app.use(resolvePlayer);
 
 // Routes
 app.use("/", authRoutes);
+app.use(requireAuth);
 app.use("/", homeRoute);
 app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);

@@ -4,22 +4,6 @@ import db from "../db.js";
 const router = express.Router();
 
 /**
- * AUTH MIDDLEWARE
- * Resolves playerId from session (or sets none)
- */
-export function resolvePlayer(req, res, next) {
-  if (req.session && req.session.playerId) {
-    req.playerId = req.session.playerId;
-  }
-  next();
-}
-
-/**
- * APPLY middleware globally for anything using this router
- */
-router.use(resolvePlayer);
-
-/**
  * LOGIN PAGE
  */
 router.get("/login", (req, res) => {
