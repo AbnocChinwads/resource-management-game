@@ -25,7 +25,7 @@
                     <% } %>
 
                         <div class="complete-container mt-2" style="display: none;">
-                            <form action="/complete-task" method="POST">
+                            <form class="complete-form" action="/complete-task" method="POST">
                                 <input type="hidden" name="taskId" value="<%= task.id %>">
                                 <button type="submit" class="btn btn-success btn-sm">Complete</button>
                             </form>

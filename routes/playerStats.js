@@ -50,36 +50,6 @@ router.get("/", async (req, res) => {
     );
     const food = foodRes.rows[0].total_food || 0;
 
-    // Workers do something
-    for (const building of buildingsRes.rows) {
-      if (building.workers_assigned <= 0) continue;
-      if (!building.production_recipe_id) continue;
-
-      // Count active tasks for this building
-      const taskCountRes = await db.query(
-        `SELECT COUNT(*) 
-        FROM player_tasks
-        WHERE player_id = $1
-        AND player_building_id = $2
-        AND completed = FALSE`,
-        [playerId, building.id],
-      );
-
-      const activeTasks = parseInt(taskCountRes.rows[0].count);
-
-      // Calculate missing tasks (cap at 10 to avoid runaway)
-      const missing = Math.min(building.workers_assigned - activeTasks, 10);
-
-      for (let i = 0; i < missing; i++) {
-        await db.query(
-          `INSERT INTO player_tasks 
-          (player_id, recipe_id, player_building_id, started_at, completed)
-          VALUES ($1, $2, $3, NOW(), FALSE)`,
-          [playerId, building.production_recipe_id, building.id],
-        );
-      }
-    }
-
     res.json({
       population,
       workers: totalWorkers,

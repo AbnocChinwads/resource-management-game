@@ -1,5 +1,6 @@
 import express from "express";
 import db from "../db.js";
+import { maintainBuildingTasks } from "../services/taskService.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -59,6 +60,8 @@ router.post("/", async (req, res) => {
     );
 
     await db.query("COMMIT");
+
+    await maintainBuildingTasks(playerId);
 
     // return JSON
     res.json({
