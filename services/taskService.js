@@ -1,3 +1,5 @@
+import db from "../db.js";
+
 export async function maintainBuildingTasks(playerId) {
   try {
     // Fetch all player buildings that have workers
