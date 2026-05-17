@@ -13,7 +13,7 @@ import startRoute from "./routes/startTask.js";
 import completeRoute from "./routes/completeTask.js";
 
 const app = express();
-const port = process.env.APP_PORT;
+const port = process.env.APP_PORT || 3000;
 
 // set view engine
 app.set("view engine", "ejs");
@@ -54,6 +54,6 @@ app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
 
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
