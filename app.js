@@ -1,6 +1,7 @@
 import express from "express";
 import session from "express-session";
 import path from "path";
+import fs from "fs";
 
 import { requireAuth } from "./middleware/auth.js";
 import { resolvePlayer } from "./middleware/auth.js";
@@ -13,7 +14,6 @@ import startRoute from "./routes/startTask.js";
 import completeRoute from "./routes/completeTask.js";
 
 const app = express();
-const fs = require('fs');
 
 // set view engine
 app.set("view engine", "ejs");

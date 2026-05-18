@@ -1,8 +1,7 @@
 import "dotenv/config";
-import fs from 'fs';
+import fs from "fs";
 import pg from "pg";
 
-const fs = require('fs');
 // Initialise Database connection
 const db = new pg.Pool({
   user: process.env.DB_USER,
