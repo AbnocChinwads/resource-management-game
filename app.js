@@ -13,6 +13,7 @@ import startRoute from "./routes/startTask.js";
 import completeRoute from "./routes/completeTask.js";
 
 const app = express();
+const fs = require('fs');
 
 // set view engine
 app.set("view engine", "ejs");
@@ -21,7 +22,7 @@ app.set("views", path.join(process.cwd(), "views"));
 // SESSION (required for auth)
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: fs.readFileSync('/run/secrets/resource_session_secret', 'utf8').trim(),
     resave: false,
     saveUninitialized: false,
     cookie : {
