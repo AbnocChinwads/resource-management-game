@@ -39,6 +39,14 @@ app.use(express.json());
 // serve static files
 app.use(express.static("public"));
 
+app.get("/health", async (req, res) => {
+  try {
+    res.status(200).json({ status: "ok" });
+  } catch (err) {
+    res.status(500).json({ status: "error" });
+  }
+});
+
 /**
  * AUTH MIDDLEWARE
  * MUST run before routes that use req.playerId

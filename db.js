@@ -10,12 +10,4 @@ const db = new pg.Pool({
   password: fs.readFileSync('/run/secrets/resource_db_password', 'utf8').trim(),
 });
 
-try {
-  await db.query("SELECT 1");
-  console.log("Database connected successfully.");
-} catch (err) {
-  console.error("Database connection error:", err);
-  process.exit(1);
-}
-
 export default db;
