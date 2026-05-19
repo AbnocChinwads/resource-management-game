@@ -15,14 +15,6 @@ import completeRoute from "./routes/completeTask.js";
 
 const app = express();
 
-app.get("/health", async (req, res) => {
-  try {
-    res.status(200).json({ status: "ok" });
-  } catch (err) {
-    res.status(500).json({ status: "error" });
-  }
-});
-
 // set view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "views"));
@@ -52,6 +44,9 @@ app.use(express.static("public"));
  * MUST run before routes that use req.playerId
  */
 app.use(resolvePlayer);
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 // Routes
 app.use("/", authRoutes);

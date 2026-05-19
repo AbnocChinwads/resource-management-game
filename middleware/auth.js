@@ -6,8 +6,6 @@ export function resolvePlayer(req, res, next) {
 }
 
 export function requireAuth(req, res, next) {
-  if (req.path === "/health") return next();
-  
   if (!req.session || !req.session.playerId) {
     // If it's an API request → JSON
     if (req.originalUrl.startsWith("/api") || req.xhr) {
