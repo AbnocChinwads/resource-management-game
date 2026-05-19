@@ -15,6 +15,14 @@ import completeRoute from "./routes/completeTask.js";
 
 const app = express();
 
+app.get("/health", async (req, res) => {
+  try {
+    res.status(200).json({ status: "ok" });
+  } catch (err) {
+    res.status(500).json({ status: "error" });
+  }
+});
+
 // set view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "views"));
@@ -38,14 +46,6 @@ app.use(express.json());
 
 // serve static files
 app.use(express.static("public"));
-
-app.get("/health", async (req, res) => {
-  try {
-    res.status(200).json({ status: "ok" });
-  } catch (err) {
-    res.status(500).json({ status: "error" });
-  }
-});
 
 /**
  * AUTH MIDDLEWARE
