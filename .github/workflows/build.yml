@@ -1,4 +1,4 @@
-name: Build and Push Image
+name: Build + Notify Deploy
 
 on:
   push:
@@ -21,24 +21,20 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            -t ghcr.io/abnocchinwads/resource-management-game:main \
-            -t ghcr.io/abnocchinwads/resource-management-game:${{ github.sha }} \
-            .
+            -t ghcr.io/abnocchinwads/resource-management-game:${{ github.sha }} .
 
       - name: Push image
         run: |
-          docker push ghcr.io/abnocchinwads/resource-management-game:main
           docker push ghcr.io/abnocchinwads/resource-management-game:${{ github.sha }}
-
-      - name: Deploy to server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /opt/apps
-
-            sed -i "s/^RESOURCE_VERSION=.*/RESOURCE_VERSION=${{ github.sha }}/" .env
-
-            ./deploy.sh
+      
+      - name: Trigger home-server deploy
+        run: |
+          curl -X POST https://api.github.com/repos/Abnocchinwads/home-server/dispatches \
+          -H "Authorization: Bearer ${{ secrets.HOME_SERVER_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          -d '{
+            "event_type": "resource-updated",
+            "client_payload": {
+              "sha": "${{ github.sha }}"
+            }
+          }'
