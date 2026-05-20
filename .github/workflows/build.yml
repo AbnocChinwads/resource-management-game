@@ -2,7 +2,7 @@ name: Build and Push Image
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -29,3 +29,16 @@ jobs:
         run: |
           docker push ghcr.io/abnocchinwads/resource-management-game:main
           docker push ghcr.io/abnocchinwads/resource-management-game:${{ github.sha }}
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/apps
+
+            sed -i "s/^RESOURCE_VERSION=.*/RESOURCE_VERSION=${{ github.sha }}/" .env
+
+            ./deploy.sh
