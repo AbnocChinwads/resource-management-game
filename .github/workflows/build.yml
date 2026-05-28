@@ -56,8 +56,8 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.HOME_SERVER_TOKEN }}" \
           -H "Accept: application/vnd.github+json" \
           -d '{
-            "event_type": "'"${REPO}-updated"'",
+            "event_type": "resource-updated",
             "client_payload": {
-              "'"${REPO}_sha"'": "'"${{ github.sha }}"'"
+              "resource_sha": "'"${{ github.sha }}"'"
             }
           }'
