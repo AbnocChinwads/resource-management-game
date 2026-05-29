@@ -7,7 +7,7 @@ const db = new pg.Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
-  password: fs.readFileSync('/run/apps/secrets/resource_db_password', 'utf8').trim(),
+  password: fs.readFileSync('/run/secrets/resource_db_password', 'utf8').trim(),
 });
 
 export default db;
