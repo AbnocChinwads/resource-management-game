@@ -3,6 +3,8 @@ import session from "express-session";
 import path from "path";
 import fs from "fs";
 
+import db from "./db.js";
+
 import { requireAuth } from "./middleware/auth.js";
 import { resolvePlayer } from "./middleware/auth.js";
 import authRoutes from "./routes/auth.js";
@@ -15,43 +17,47 @@ import completeRoute from "./routes/completeTask.js";
 
 const app = express();
 
-// set view engine
+let isReady = false;
+
 app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "views"));
 
-// SESSION (required for auth)
 app.use(
   session({
-    secret: fs.readFileSync('/run/secrets/resource_session_secret', 'utf8').trim(),
+    secret: fs
+      .readFileSync("/run/secrets/resource_session_secret", "utf8")
+      .trim(),
     resave: false,
     saveUninitialized: false,
-    cookie : {
+    cookie: {
       secure: false,
       httpOnly: true,
-    }
-  }),
+    },
+  })
 );
 
-// parse request bodies
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// serve static files
 app.use(express.static("public"));
 
-/**
- * AUTH MIDDLEWARE
- * MUST run before routes that use req.playerId
- */
-app.use(resolvePlayer);
-app.get("/health", async (req, res) => {
+app.get("/health", (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+app.get("/ready", async (req, res) => {
+  if (!isReady) {
+    return res.status(503).json({ ready: false });
+  }
+
   try {
     await db.query("SELECT 1");
-    res.status(200).json({ status: "ok", db: "connected" });
+    return res.status(200).json({ ready: true });
   } catch (err) {
-    res.status(500).json({ status: "error", db: "down" });
+    return res.status(503).json({ ready: false, db: "down" });
   }
 });
+
+app.use(resolvePlayer);
 
 // Routes
 app.use("/", authRoutes);
@@ -62,4 +68,24 @@ app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
 
-app.listen(3000);
+async function start() {
+  try {
+    console.log("Starting resource-management-game...");
+
+    // verify DB is reachable at boot
+    await db.query("SELECT 1");
+
+    isReady = true;
+
+    console.log("Service READY");
+
+    app.listen(3000, () => {
+      console.log("Server listening on port 3000");
+    });
+  } catch (err) {
+    console.error("Startup failure:", err);
+    process.exit(1);
+  }
+}
+
+start();
