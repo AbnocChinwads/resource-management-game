@@ -70,14 +70,17 @@ app.use("/complete-task", completeRoute);
 
 async function start() {
   try {
-    console.log("Starting resource-management-game...");
+    console.log("Starting service...");
 
+    console.log("Connecting database...");
     // verify DB is reachable at boot
     await db.query("SELECT 1");
 
+    console.log("Running startup tasks...");
+
     isReady = true;
 
-    console.log("Service READY");
+    console.log("Service ready.");
 
     app.listen(3000, () => {
       console.log("Server listening on port 3000");
