@@ -44,8 +44,13 @@ app.use(express.static("public"));
  * MUST run before routes that use req.playerId
  */
 app.use(resolvePlayer);
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+app.get("/health", async (req, res) => {
+  try {
+    await db.query("SELECT 1");
+    res.status(200).json({ status: "ok", db: "connected" });
+  } catch (err) {
+    res.status(500).json({ status: "error", db: "down" });
+  }
 });
 
 // Routes
