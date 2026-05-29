@@ -25,7 +25,7 @@ app.set("views", path.join(process.cwd(), "views"));
 app.use(
   session({
     secret: fs
-      .readFileSync("/run/secrets/resource_session_secret", "utf8")
+      .readFileSync("/run/apps/secrets/resource_session_secret", "utf8")
       .trim(),
     resave: false,
     saveUninitialized: false,
