@@ -30,6 +30,8 @@ scripts/reset-db.js
 
 # PostgreSQL
 # Add PostgreSQL-specific ignores here
+*.sql
+*.dump
 
 # Common
 Thumbs.db

@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import express from "express";
 import session from "express-session";
 import path from "path";
@@ -8,6 +10,7 @@ import db from "./db.js";
 import { requireAuth } from "./middleware/auth.js";
 import { resolvePlayer } from "./middleware/auth.js";
 import authRoutes from "./routes/auth.js";
+import betterAuthRoutes from "./routes/betterAuth.js";
 
 import homeRoute from "./routes/home.js";
 import playerStatsRoute from "./routes/playerStats.js";
@@ -57,14 +60,21 @@ app.get("/ready", async (req, res) => {
 
 app.use(resolvePlayer);
 
-// Routes
+/* ROUTES */
+
+app.use("/api/auth", betterAuthRoutes);
 app.use("/", authRoutes);
+
+// protected routes
+
 app.use(requireAuth);
 app.use("/", homeRoute);
 app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
+
+/* END OF ROUTES */
 
 async function start() {
   try {

@@ -1,21 +1,57 @@
-export function resolvePlayer(req, res, next) {
-  if (req.session && req.session.playerId) {
-    req.playerId = req.session.playerId;
-  }
-  next();
-}
+import { auth } from "../lib/auth.js";
+import db from "../db.js";
 
-export function requireAuth(req, res, next) {
-  if (!req.session || !req.session.playerId) {
-    // If it's an API request → JSON
-    if (req.originalUrl.startsWith("/api") || req.xhr) {
-      return res.status(401).json({ error: "not authorised" });
+export async function resolvePlayer(req, res, next) {
+  try {
+    const session = await auth.api.getSession({
+      headers: req.headers,
+    });
+
+    if (session) {
+      const result = await db.query(
+        `
+        SELECT id
+        FROM players
+        WHERE user_id = $1
+        `,
+        [session.user.id]
+      );
+
+      if (result.rows.length > 0) {
+        req.playerId = result.rows[0].id;
+      }
+
+      req.user = session.user;
     }
 
-    // Otherwise → redirect
-    return res.redirect("/login");
+    next();
+  } catch (err) {
+    console.error("Session resolution error:", err);
+    next(err);
   }
+}
 
-  req.playerId = req.session.playerId;
-  next();
+export async function requireAuth(req, res, next) {
+  try {
+    const session = await auth.api.getSession({
+      headers: req.headers,
+    });
+
+    if (!session) {
+      if (req.originalUrl.startsWith("/api") || req.xhr) {
+        return res.status(401).json({
+          error: "not authorised",
+        });
+      }
+
+      return res.redirect("/login");
+    }
+
+    req.user = session.user;
+
+    next();
+  } catch (err) {
+    console.error("Auth check error:", err);
+    next(err);
+  }
 }

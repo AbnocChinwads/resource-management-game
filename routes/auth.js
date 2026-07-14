@@ -1,59 +1,89 @@
-import express from "express";
 import db from "../db.js";
+import express from "express";
+import { auth } from "../lib/auth.js";
 
 const router = express.Router();
 
 /**
  * LOGIN PAGE
  */
-router.get("/login", (req, res) => {
-  if (req.session && req.session.playerId) {
-    return res.json({ success: true, alreadyLoggedIn: true });
-  }
 
-  // Render login page
+router.get("/login", (req, res) => {
   res.render("login");
+});
+
+/**
+ * REGISTER
+ */
+
+router.post("/register", async (req, res) => {
+  const client = await db.connect();
+
+  try {
+    const { email, password, username } = req.body;
+
+    const result = await auth.api.signUpEmail({
+      body: {
+        email,
+        password,
+        name: username,
+      },
+    });
+
+    await client.query("BEGIN");
+
+    await client.query(
+      `
+      INSERT INTO players (
+        user_id,
+        name
+      )
+      VALUES ($1, $2)
+      `,
+      [
+        result.user.id,
+        username,
+      ]
+    );
+
+    await client.query("COMMIT");
+
+    res.json(result);
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+
+    console.error("Registration error:", err);
+
+    res.status(400).json({
+      success: false,
+      error: "Registration failed",
+    });
+  } finally {
+    client.release();
+  }
 });
 
 /**
  * LOGIN
  */
+
 router.post("/login", async (req, res) => {
   try {
-    const { username } = req.body;
+    const { email, password } = req.body;
 
-    if (!username) {
-      return res.status(400).json({
-        success: false,
-        error: "Username required",
-      });
-    }
-
-    let result = await db.query("SELECT id FROM players WHERE name = $1", [
-      username,
-    ]);
-
-    let playerId;
-
-    if (result.rows.length > 0) {
-      playerId = result.rows[0].id;
-    } else {
-      const created = await db.query(
-        "INSERT INTO players (name) VALUES ($1) RETURNING id",
-        [username],
-      );
-      playerId = created.rows[0].id;
-    }
-
-    req.session.playerId = playerId;
-
-    return res.json({
-      success: true,
-      playerId,
+    const result = await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+      },
     });
+
+    res.json(result);
   } catch (err) {
     console.error("Login error:", err);
-    return res.status(500).json({
+
+    res.status(401).json({
       success: false,
       error: "Login failed",
     });
@@ -63,25 +93,14 @@ router.post("/login", async (req, res) => {
 /**
  * LOGOUT
  */
-router.post("/logout", (req, res) => {
-  if (!req.session) {
-    return res.json({ success: true });
-  }
 
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        error: "Logout failed",
-      });
-    }
+router.post("/logout", async (req, res) => {
+  await auth.api.signOut({
+    headers: req.headers,
+  });
 
-    // clear session cookie
-    res.clearCookie("connect.sid");
-
-    res.json({
-      success: true,
-    });
+  res.json({
+    success: true,
   });
 });
 
