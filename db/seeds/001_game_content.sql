@@ -29,18 +29,18 @@ VALUES
     (7, 'Forge Tools', 6, 1, 10, 'craft', NULL),
     (8, 'Chop Logs', 8, 1, 5, 'craft', NULL),
     (9, 'Saw Planks', 9, 1, 10, 'craft', NULL),
-    (11, 'Build Kiln', NULL, NULL, 30, 'build', 1),
-    (12, 'Build Farm', NULL, NULL, 30, 'build', 2),
-    (13, 'Build Mill', NULL, NULL, 30, 'build', 3),
-    (14, 'Build Bakery', NULL, NULL, 30, 'build', 4),
-    (15, 'Build Quarry', NULL, NULL, 30, 'build', 5),
-    (16, 'Build Woodcutters Hut', NULL, NULL, 30, 'build', 6),
-    (17, 'Build Mine', NULL, NULL, 30, 'build', 7),
-    (18, 'Build Blacksmith', NULL, NULL, 30, 'build', 8),
-    (19, 'Build Lumber Camp', NULL, NULL, 30, 'build', 9),
-    (20, 'Build Sawmill', NULL, NULL, 30, 'build', 10),
-    (21, 'Build Hut', NULL, NULL, 30, 'build', 11),
-    (22, 'Build Cottage', NULL, NULL, 30, 'build', 12)
+    (11, 'Build Kiln', NULL, NULL, 30, 'build', NULL),
+    (12, 'Build Farm', NULL, NULL, 30, 'build', NULL),
+    (13, 'Build Mill', NULL, NULL, 30, 'build', NULL),
+    (14, 'Build Bakery', NULL, NULL, 30, 'build', NULL),
+    (15, 'Build Quarry', NULL, NULL, 30, 'build', NULL),
+    (16, 'Build Woodcutters Hut', NULL, NULL, 30, 'build', NULL),
+    (17, 'Build Mine', NULL, NULL, 30, 'build', NULL),
+    (18, 'Build Blacksmith', NULL, NULL, 30, 'build', NULL),
+    (19, 'Build Lumber Camp', NULL, NULL, 30, 'build', NULL),
+    (20, 'Build Sawmill', NULL, NULL, 30, 'build', NULL),
+    (21, 'Build Hut', NULL, NULL, 30, 'build', NULL),
+    (22, 'Build Cottage', NULL, NULL, 30, 'build', NULL)
 ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
     output_resource_id = EXCLUDED.output_resource_id,
@@ -116,3 +116,20 @@ ON CONFLICT (id) DO UPDATE SET
     population_gain = EXCLUDED.population_gain;
 
 SELECT pg_catalog.setval('public.buildings_id_seq', 12, true);
+
+UPDATE public.recipes
+SET output_building_id = CASE id
+    WHEN 11 THEN 1
+    WHEN 12 THEN 2
+    WHEN 13 THEN 3
+    WHEN 14 THEN 4
+    WHEN 15 THEN 5
+    WHEN 16 THEN 6
+    WHEN 17 THEN 7
+    WHEN 18 THEN 8
+    WHEN 19 THEN 9
+    WHEN 20 THEN 10
+    WHEN 21 THEN 11
+    WHEN 22 THEN 12
+END
+WHERE id BETWEEN 11 AND 22;
