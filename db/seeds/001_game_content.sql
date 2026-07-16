@@ -14,7 +14,11 @@ ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
     nutrition_value = EXCLUDED.nutrition_value;
 
-SELECT pg_catalog.setval('public.resources_id_seq', 9, true);
+SELECT setval(
+    pg_get_serial_sequence('public.resource_types', 'id'),
+    (SELECT MAX(id) FROM public.resource_types),
+    true
+);
 
 -- Recipes
 INSERT INTO public.recipes
@@ -49,7 +53,11 @@ ON CONFLICT (id) DO UPDATE SET
     recipe_type = EXCLUDED.recipe_type,
     output_building_id = EXCLUDED.output_building_id;
 
-SELECT pg_catalog.setval('public.recipes_id_seq', 22, true);
+SELECT setval(
+    pg_get_serial_sequence('public.recipes', 'id'),
+    (SELECT MAX(id) FROM public.recipes),
+    true
+);
 
 -- Recipe inputs
 INSERT INTO public.recipe_inputs
@@ -88,7 +96,11 @@ ON CONFLICT (id) DO UPDATE SET
     resource_type_id = EXCLUDED.resource_type_id,
     amount = EXCLUDED.amount;
 
-SELECT pg_catalog.setval('public.recipe_inputs_id_seq', 28, true);
+SELECT setval(
+    pg_get_serial_sequence('public.recipe_inputs', 'id'),
+    (SELECT MAX(id) FROM public.recipe_inputs),
+    true
+);
 
 -- Buildings
 INSERT INTO public.buildings
@@ -115,7 +127,11 @@ ON CONFLICT (id) DO UPDATE SET
     type = EXCLUDED.type,
     population_gain = EXCLUDED.population_gain;
 
-SELECT pg_catalog.setval('public.buildings_id_seq', 12, true);
+SELECT setval(
+    pg_get_serial_sequence('public.buildings', 'id'),
+    (SELECT MAX(id) FROM public.buildings),
+    true
+);
 
 UPDATE public.recipes
 SET output_building_id = CASE id
