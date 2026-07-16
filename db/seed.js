@@ -31,7 +31,7 @@ async function seed() {
 
     for (const file of files) {
       const alreadyApplied = await client.query(
-        "SELECT 1 FROM seed_history WHERE name = $1",
+        "SELECT 1 FROM public.seed_history WHERE name = $1",
         [file]
       );
 
@@ -52,7 +52,7 @@ async function seed() {
       await client.query(sql);
 
       await client.query(
-        "INSERT INTO seed_history (name) VALUES ($1)",
+        "INSERT INTO public.seed_history (name) VALUES ($1)",
         [file]
       );
 

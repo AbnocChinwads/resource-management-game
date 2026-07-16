@@ -24,7 +24,7 @@ async function migrate() {
 
     for (const file of files) {
       const result = await db.query(
-        "SELECT 1 FROM migrations WHERE name = $1",
+        "SELECT 1 FROM public.migrations WHERE name = $1",
         [file]
       );
 
@@ -46,7 +46,7 @@ async function migrate() {
         await db.query(sql);
 
         await db.query(
-          "INSERT INTO migrations(name) VALUES($1)",
+          "INSERT INTO public.migrations(name) VALUES($1)",
           [file]
         );
 
