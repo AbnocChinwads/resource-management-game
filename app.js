@@ -86,12 +86,12 @@ async function start() {
 
     console.log("Running startup tasks...");
 
-    isReady = true;
-
     console.log("Service ready.");
 
     app.listen(3000, () => {
+      isReady = true;
       console.log("Server listening on port 3000");
+      console.log("Service ready.");
     });
   } catch (err) {
     console.error("Startup failure:", err);
