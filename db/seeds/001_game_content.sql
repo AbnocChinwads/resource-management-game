@@ -10,7 +10,9 @@ VALUES
     (7, 'Wood', 0),
     (8, 'Logs', 0),
     (9, 'Planks', 0)
-ON CONFLICT (id) DO UPDATE;
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    nutrition_value = EXCLUDED.nutrition_value;
 
 SELECT pg_catalog.setval('public.resources_id_seq', 9, true);
 
@@ -39,7 +41,13 @@ VALUES
     (20, 'Build Sawmill', NULL, NULL, 30, 'build', 10),
     (21, 'Build Hut', NULL, NULL, 30, 'build', 11),
     (22, 'Build Cottage', NULL, NULL, 30, 'build', 12)
-ON CONFLICT (id) DO UPDATE;
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    output_resource_id = EXCLUDED.output_resource_id,
+    output_amount = EXCLUDED.output_amount,
+    craft_time_seconds = EXCLUDED.craft_time_seconds,
+    recipe_type = EXCLUDED.recipe_type,
+    output_building_id = EXCLUDED.output_building_id;
 
 SELECT pg_catalog.setval('public.recipes_id_seq', 22, true);
 
@@ -75,7 +83,10 @@ VALUES
     (26, 21, 7, 4),
     (27, 22, 4, 4),
     (28, 22, 9, 6)
-ON CONFLICT (id) DO UPDATE;
+ON CONFLICT (id) DO UPDATE SET
+    recipe_id = EXCLUDED.recipe_id,
+    resource_type_id = EXCLUDED.resource_type_id,
+    amount = EXCLUDED.amount;
 
 SELECT pg_catalog.setval('public.recipe_inputs_id_seq', 28, true);
 
@@ -95,6 +106,13 @@ VALUES
     (10, 'Sawmill', 'Converts logs into planks', 2, 100, 9, 'production', 0),
     (11, 'Hut', 'Provides housing for population', 0, 100, NULL, 'housing', 2),
     (12, 'Cottage', 'Larger housing for more population', 0, 150, NULL, 'housing', 5)
-ON CONFLICT (id) DO UPDATE;
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    description = EXCLUDED.description,
+    max_workers = EXCLUDED.max_workers,
+    max_health = EXCLUDED.max_health,
+    production_recipe_id = EXCLUDED.production_recipe_id,
+    type = EXCLUDED.type,
+    population_gain = EXCLUDED.population_gain;
 
 SELECT pg_catalog.setval('public.buildings_id_seq', 12, true);
