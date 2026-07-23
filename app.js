@@ -1,7 +1,6 @@
 import "dotenv/config";
 
 import express from "express";
-import session from "express-session";
 import path from "path";
 import fs from "fs";
 
@@ -24,18 +23,6 @@ let isReady = false;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "views"));
-
-app.use(
-  session({
-    secret: process.env.APP_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-      httpOnly: true,
-    },
-  })
-);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

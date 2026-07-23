@@ -5,6 +5,14 @@ import { auth } from "../lib/auth.js";
 const router = express.Router();
 
 /**
+ * REGISTER PAGE
+ */
+
+router.get("/register", (req, res) => {
+  res.render("register");
+});
+
+/**
  * LOGIN PAGE
  */
 
@@ -62,46 +70,6 @@ router.post("/register", async (req, res) => {
   } finally {
     client.release();
   }
-});
-
-/**
- * LOGIN
- */
-
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const result = await auth.api.signInEmail({
-      body: {
-        email,
-        password,
-      },
-    });
-
-    res.json(result);
-  } catch (err) {
-    console.error("Login error:", err);
-
-    res.status(401).json({
-      success: false,
-      error: "Login failed",
-    });
-  }
-});
-
-/**
- * LOGOUT
- */
-
-router.post("/logout", async (req, res) => {
-  await auth.api.signOut({
-    headers: req.headers,
-  });
-
-  res.json({
-    success: true,
-  });
 });
 
 export default router;

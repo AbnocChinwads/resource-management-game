@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../db.js";
-import { requireAuth } from "../middleware/authGuard.js";
+import { requireAuth } from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/", requireAuth, async (req, res) => {

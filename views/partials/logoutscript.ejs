@@ -1,0 +1,24 @@
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", async () => {
+                try {
+                    const res = await fetch("/api/auth/sign-out", {
+                        method: "POST",
+                        credentials: "include",
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        window.location.href = "/login";
+                    } else {
+                        console.error("Logout failed");
+                    }
+                } catch (err) {
+                    console.error("Logout error:", err);
+                }
+            });
+        }
+    });
+</script>
