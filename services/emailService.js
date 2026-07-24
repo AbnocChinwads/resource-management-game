@@ -85,22 +85,64 @@ export async function sendPasswordChangedEmail(email, username) {
     });
 }
 
-export async function sendEmailChangedEmail(oldEmail, username) {
-    return sendEmail({
-        to: oldEmail,
-        subject: "Your email address has changed",
+export async function sendChangeEmailConfirmation({
+    user,
+    newEmail,
+    url,
+}) {
+    await sendEmail({
+        to: user.email,
+        subject: "Email change requested",
         html: `
-            <h1>Email Changed</h1>
+            <h1>Email change requested</h1>
 
-            <p>Hello ${username},</p>
+            <p>Hello ${user.name},</p>
 
             <p>
-                Your account email address has been changed.
+                A request has been made to change the email address
+                on your Who Ate All The Icecream account.
             </p>
 
             <p>
-                If this wasn't you, please contact support immediately.
+                New email address:
+                ${newEmail}
+            </p>
+
+            <p>
+                If you made this request, you don't need to do anything
+                unless requested by the verification process.
+            </p>
+
+            <p>
+                If you did not request this change, please secure your
+                account immediately.
             </p>
         `,
     });
+
+    return sendEmail({
+        to: newEmail,
+        subject: "Verify your email address",
+        html: `
+            <h1>Verify your new email address</h1>
+
+            <p>Hello ${user.name},</p>
+
+            <p>
+                Please click the link below to verify this email address
+                for your Who Ate All The Icecream account.
+            </p>
+
+            <p>
+                <a href="${url}">
+                    Verify Email
+                </a>
+            </p>
+
+            <p>
+                If you did not request this change, ignore this email.
+            </p>
+        `,
+    });
+
 }
