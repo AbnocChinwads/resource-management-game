@@ -20,6 +20,8 @@ Current Features
 ----------------
 
 -   User registration and login
+-   Change player name
+-   Change password
 -   Persistent player data
 -   Resource gathering
 -   Building construction
@@ -33,9 +35,7 @@ Planned Features
 
 ### Account Management
 
--   Change player name
 -   Change email address
--   Change password
 -   Email verification
 -   Delete account and gameplay data
 
