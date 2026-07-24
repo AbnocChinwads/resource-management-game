@@ -34,6 +34,30 @@
     <%= user.emailVerified ? "Yes" : "No" %>
 </p>
 
+<h2 class="mt-4">Change Email</h2>
+
+<form action="/account/email" method="POST">
+
+    <div class="mb-3">
+        <label for="newEmail" class="form-label">
+            New Email Address
+        </label>
+
+        <input
+            type="email"
+            class="form-control"
+            id="newEmail"
+            name="newEmail"
+            required
+        >
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Change Email
+    </button>
+
+</form>
+
 <h2 class="mt-4">Change Password</h2>
 
 <form action="/account/password" method="POST">

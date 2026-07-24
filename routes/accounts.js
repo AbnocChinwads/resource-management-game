@@ -62,4 +62,25 @@ router.post("/account/password", async (req, res) => {
     }
 });
 
+router.post("/account/email", async (req, res) => {
+    const { newEmail } = req.body;
+
+    try {
+        await auth.api.changeEmail({
+            body: {
+                newEmail,
+                callbackURL: "/account",
+            },
+            headers: req.headers,
+        });
+
+        res.redirect("/account");
+
+    } catch (err) {
+        console.error("Email change failed:", err);
+
+        res.status(400).send("Email change failed");
+    }
+});
+
 export default router;
