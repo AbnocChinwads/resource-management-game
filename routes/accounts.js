@@ -1,5 +1,6 @@
 import express from "express";
 import db from "../db.js";
+import { auth } from "../lib/auth.js";
 
 const router = express.Router();
 
@@ -34,6 +35,31 @@ router.post("/account/name", async (req, res) => {
     );
 
     res.redirect("/account");
+});
+
+router.post("/account/password", async (req, res) => {
+    const {
+        currentPassword,
+        newPassword,
+    } = req.body;
+
+    try {
+        await auth.api.changePassword({
+            body: {
+                currentPassword,
+                newPassword,
+                revokeOtherSessions: false,
+            },
+            headers: req.headers,
+        });
+
+        res.redirect("/account");
+
+    } catch (err) {
+        console.error("Password change failed:", err);
+
+        res.status(400).send("Password change failed");
+    }
 });
 
 export default router;
