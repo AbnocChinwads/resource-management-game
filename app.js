@@ -12,6 +12,7 @@ import authRoutes from "./routes/auth.js";
 import betterAuthRoutes from "./routes/betterAuth.js";
 
 import homeRoute from "./routes/home.js";
+import accountRoute from "./routes/accounts.js";
 import playerStatsRoute from "./routes/playerStats.js";
 import updateWorkersRoute from "./routes/updateWorkers.js";
 import startRoute from "./routes/startTask.js";
@@ -56,6 +57,7 @@ app.use("/", authRoutes);
 
 app.use(requireAuth);
 app.use("/", homeRoute);
+app.use("/", accountRoute);
 app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);

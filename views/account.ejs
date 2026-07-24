@@ -1,0 +1,38 @@
+<%- include('partials/header.ejs'); -%>
+
+<h1>Account</h1>
+
+<h2>Player Profile</h2>
+
+<p>Player Name: <%= player.name %></p>
+
+<form action="/account/name" method="POST">
+    <div class="mb-3">
+        <label for="playerName" class="form-label">Change Player Name</label>
+        <input 
+            type="text" 
+            class="form-control" 
+            id="playerName" 
+            name="playerName"
+            value="<%= player.name %>"
+            required
+        >
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Change Name
+    </button>
+</form>
+
+
+<h2 class="mt-4">Account Details</h2>
+
+<p>Email: <%= user.email %></p>
+
+<p>
+    Email verified:
+    <%= user.emailVerified ? "Yes" : "No" %>
+</p>
+
+<%- include('partials/scripts.ejs'); -%>
+<%- include('partials/footer.ejs'); -%>
