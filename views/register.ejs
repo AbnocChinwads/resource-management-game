@@ -4,19 +4,20 @@
 
     <form id="register-form">
         <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
+            <label for="username" class="form-label">Player Name</label>
             <input type="text" class="form-control" id="username" name="username" required>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email Address</label>
             <input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
+            <p class="alert alert-info mt-2">We use your email for account-related purposes, such as password recovery and important account notifications. We do not use your email for marketing purposes.</p>
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" name="password" id="password" autocomplete="current-password" required>
+            <input type="password" class="form-control" name="password" id="password" autocomplete="new-password" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Create  Account</button>
+        <button type="submit" class="btn btn-primary">Create Account</button>
     </form>
 
     <div id="error" class="text-danger mt-3"></div>
