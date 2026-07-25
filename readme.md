@@ -29,6 +29,7 @@ Current Features
 -   Building construction
 -   Recipe discovery
 -   Worker assignment
+-   Worker automation
 -   Welcome emails on registration
 -   Automated deployment to a self-hosted server
 
@@ -41,7 +42,6 @@ Planned Features
 
 ### Gameplay
 
--   Worker automation
 -   Food consumption and population simulation
 -   Gameplay balancing
 
