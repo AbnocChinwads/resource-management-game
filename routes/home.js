@@ -9,9 +9,12 @@ router.get("/", requireAuth, async (req, res) => {
   try {
     const tasksRes = await db.query(
       `SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, 
-              r.output_resource_id, r.output_amount, r.output_building_id
+              r.output_resource_id, r.output_amount, r.output_building_id,
+              b.name AS building_name
        FROM player_tasks pt
        JOIN recipes r ON pt.recipe_id = r.id
+       LEFT JOIN player_buildings pb ON pt.player_building_id = pb.id
+       LEFT JOIN buildings b ON pb.building_id = b.id
        WHERE pt.player_id = $1 AND pt.completed = FALSE
        ORDER BY pt.id ASC`,
       [playerId],

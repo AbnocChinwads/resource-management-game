@@ -42,7 +42,8 @@ router.post("/", async (req, res) => {
       );
     }
 
-    // Compute task duration based on assigned workers (min 1)
+    /* 
+    Compute task duration based on assigned workers
     const buildingRes = await db.query(
       `SELECT pb.workers_assigned
        FROM buildings b
@@ -53,6 +54,9 @@ router.post("/", async (req, res) => {
     );
     const assignedWorkers = buildingRes.rows[0]?.workers_assigned || 0;
     const durationSeconds = Math.ceil(recipe.craft_time_seconds / Math.max(assignedWorkers, 1));
+    */
+
+    const durationSeconds = recipe.craft_time_seconds;
 
     await db.query(
       `INSERT INTO player_tasks (player_id, recipe_id, started_at, completed, duration_seconds)

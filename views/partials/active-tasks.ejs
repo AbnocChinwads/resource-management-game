@@ -5,6 +5,13 @@
             <strong>
                 <%= task.recipe_name %>
             </strong>
+            <div>
+            <% if (task.player_building_id) { %>
+                <small class="text-muted">Produced by: <%= task.building_name %></small>
+            <% } else { %>
+                <small class="text-muted">Manual Production</small>
+            <% } %>
+            </div>
             <div class="progress" role="progressbar">
                 <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
                     data-craft-time="<%= task.duration_seconds %>"></div>
