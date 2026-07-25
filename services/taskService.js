@@ -48,6 +48,38 @@ export async function maintainBuildingTasks(playerId) {
         recipe.craft_time_seconds / Math.max(building.workers_assigned, 1),
       );
 
+      // Check inputs
+      const resourceRes = await db.query(
+        "SELECT resource_type_id, amount FROM recipe_inputs WHERE recipe_id = $1",
+        [recipe.id],
+      );
+
+      let canProduce = true;
+
+      for (const resource of resourceRes.rows) {
+        const playerRes = await db.query(
+          "SELECT amount FROM player_resources WHERE player_id = $1 AND resource_type_id = $2",
+          [playerId, resource.resource_type_id],
+        );
+
+        const playerAmount = playerRes.rows[0]?.amount || 0;
+        
+        if (playerAmount < resource.amount) {
+          canProduce = false;
+          break;
+        }
+      }
+
+      if (!canProduce) continue;
+
+      // Deduct resources
+      for (const resource of resourceRes.rows) {
+        await db.query(
+          "UPDATE player_resources SET amount = amount - $1 WHERE player_id = $2 AND resource_type_id = $3",
+          [resource.amount, playerId, resource.resource_type_id],
+        );
+      }
+
       //Create new production task
       await db.query(
         `INSERT INTO player_tasks

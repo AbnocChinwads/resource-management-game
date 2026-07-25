@@ -53,7 +53,7 @@ router.get("/", requireAuth, async (req, res) => {
     );
 
     const playerRes = await db.query(
-      `SELECT population, workers fROM players WHERE id = $1;`,
+      `SELECT population, workers FROM players WHERE id = $1;`,
       [playerId],
     );
 
