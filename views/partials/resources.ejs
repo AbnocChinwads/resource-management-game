@@ -21,7 +21,12 @@
     </li>
     <li class="list-group-item">
         <p>Available Workers: <span id="available-workers">
-                <%= workers %>
+                <%= availableWorkers || 0 %>
+            </span></p>
+    </li>
+    <li class="list-group-item">
+        <p>Assigned Workers: <span id="assigned-worker-count">
+                <%= assignedWorkers || 0 %>
             </span></p>
     </li>
     <li class="list-group-item">

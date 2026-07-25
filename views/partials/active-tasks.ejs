@@ -7,7 +7,7 @@
             </strong>
             <div class="progress" role="progressbar">
                 <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
-                    data-craft-time="<%= task.craft_time_seconds %>"></div>
+                    data-craft-time="<%= task.duration_seconds %>"></div>
             </div>
 
             <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>

@@ -41,10 +41,21 @@ router.get("/", requireAuth, async (req, res) => {
       [playerId],
     );
 
+    const playerRes = await db.query(
+      `SELECT population, workers fROM players WHERE id = $1;`,
+      [playerId],
+    );
+
+    const population = playerRes.rows[0].population;
+    const workers = playerRes.rows[0].workers;
+
     const totalWorkers = buildingsRes.rows.reduce(
       (sum, b) => sum + b.workers_assigned,
       0,
     );
+
+    const assignedWorkers = totalWorkers;
+    const availableWorkers = workers - assignedWorkers;
 
     res.render("index.ejs", {
       tasks: tasksRes.rows,
@@ -52,8 +63,10 @@ router.get("/", requireAuth, async (req, res) => {
       recipes: recipesRes.rows,
       recipeInputs: recipeInputsRes.rows,
       buildings: buildingsRes.rows,
-      population: res.locals.population,
-      workers: totalWorkers,
+      population,
+      workers,
+      assignedWorkers,
+      availableWorkers,
       food: res.locals.food,
     });
   } catch (err) {

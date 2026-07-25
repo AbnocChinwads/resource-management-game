@@ -32,13 +32,14 @@ router.get("/", async (req, res) => {
       0,
     );
     const playerRes = await db.query(
-      `SELECT population FROM players WHERE id = $1`,
+      `SELECT population, workers FROM players WHERE id = $1`,
       [playerId],
     );
     const population = playerRes.rows[0].population;
+    const workers = playerRes.rows[0].workers;
 
     // Calculate available workers
-    const availableWorkers = population - totalWorkers;
+    const availableWorkers = workers - totalWorkers;
 
     // Total food
     const foodRes = await db.query(
@@ -52,7 +53,8 @@ router.get("/", async (req, res) => {
 
     res.json({
       population,
-      workers: totalWorkers,
+      workers,
+      assignedWorkers: totalWorkers,
       availableWorkers,
       food,
       resources: resourcesRes.rows,
