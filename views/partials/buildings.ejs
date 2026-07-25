@@ -3,7 +3,7 @@
   <% buildings.forEach(building => { %>
     <li class="list-group-item d-flex justify-content-between align-items-center">
       <div>
-        <%= building.name %> 
+        <%= building.name %><%= building.name ? " #" + building.building_number : "" %>
         (Health: <%= building.health %>/<%= building.max_health %>, Workers:
         <span id="building-<%= building.id %>-workers"><%= building.workers_assigned %></span>/<%= building.max_workers %>)
       </div>

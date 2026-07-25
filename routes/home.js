@@ -9,8 +9,12 @@ router.get("/", requireAuth, async (req, res) => {
   try {
     const tasksRes = await db.query(
       `SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, 
-              r.output_resource_id, r.output_amount, r.output_building_id,
-              b.name AS building_name
+       r.output_resource_id, r.output_amount, r.output_building_id,
+       b.name AS building_name,
+       ROW_NUMBER() OVER (
+        PARTITION BY pb.building_id
+        ORDER BY pb.id ASC
+       ) AS building_number
        FROM player_tasks pt
        JOIN recipes r ON pt.recipe_id = r.id
        LEFT JOIN player_buildings pb ON pt.player_building_id = pb.id
@@ -36,7 +40,11 @@ router.get("/", requireAuth, async (req, res) => {
     );
 
     const buildingsRes = await db.query(
-      `SELECT pb.*, b.name, b.max_workers, b.max_health
+      `SELECT pb.*, b.name, b.max_workers, b.max_health,
+       ROW_NUMBER() OVER (
+        PARTITION BY pb.building_id
+        ORDER BY pb.id ASC
+       ) AS building_number
        FROM player_buildings pb
        JOIN buildings b ON pb.building_id = b.id
        WHERE pb.player_id = $1
