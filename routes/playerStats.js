@@ -1,11 +1,32 @@
 import express from "express";
 import db from "../db.js";
+import { completeTask } from "../services/completeTaskService.js";
+import { getPlayerTasks } from "../services/taskService.js";
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   const playerId = req.playerId;
 
   try {
+    const completedTasksRes = await db.query(
+      `
+       SELECT id
+       FROM player_tasks
+       WHERE player_id = $1
+       AND player_building_id IS NOT NULL
+       AND completed = FALSE
+       AND NOW() >= started_at + duration_seconds * INTERVAL '1 second'
+      `,
+      [playerId],
+    );
+
+    for (const task of completedTasksRes.rows) {
+      await completeTask(playerId, task.id);
+    }
+
+    const tasks = await getPlayerTasks(playerId);
+
     // Resources
     const resourcesRes = await db.query(
       `SELECT pr.*, rt.name
@@ -59,6 +80,7 @@ router.get("/", async (req, res) => {
       food,
       resources: resourcesRes.rows,
       buildings: buildingsRes.rows,
+      tasks,
     });
   } catch (err) {
     console.error("Error fetching player stats:", err);

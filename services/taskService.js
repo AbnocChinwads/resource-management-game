@@ -92,3 +92,24 @@ export async function maintainBuildingTasks(playerId) {
     console.error("Error maintaining building tasks:", err);
   }
 }
+
+export async function getPlayerTasks(playerId) {
+  const tasksRes = await db.query(
+    `SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, 
+     r.output_resource_id, r.output_amount, r.output_building_id,
+     b.name AS building_name,
+     ROW_NUMBER() OVER (
+      PARTITION BY pb.building_id
+      ORDER BY pb.id ASC
+     ) AS building_number
+     FROM player_tasks pt
+     JOIN recipes r ON pt.recipe_id = r.id
+     LEFT JOIN player_buildings pb ON pt.player_building_id = pb.id
+     LEFT JOIN buildings b ON pb.building_id = b.id
+     WHERE pt.player_id = $1 AND pt.completed = FALSE
+     ORDER BY pt.id ASC`,
+    [playerId],
+  );
+
+  return tasksRes.rows;
+}

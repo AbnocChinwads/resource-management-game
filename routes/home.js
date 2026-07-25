@@ -1,28 +1,14 @@
 import express from "express";
 import db from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getPlayerTasks } from "../services/taskService.js";
 const router = express.Router();
 
 router.get("/", requireAuth, async (req, res) => {
   const playerId = req.playerId;
 
   try {
-    const tasksRes = await db.query(
-      `SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, 
-       r.output_resource_id, r.output_amount, r.output_building_id,
-       b.name AS building_name,
-       ROW_NUMBER() OVER (
-        PARTITION BY pb.building_id
-        ORDER BY pb.id ASC
-       ) AS building_number
-       FROM player_tasks pt
-       JOIN recipes r ON pt.recipe_id = r.id
-       LEFT JOIN player_buildings pb ON pt.player_building_id = pb.id
-       LEFT JOIN buildings b ON pb.building_id = b.id
-       WHERE pt.player_id = $1 AND pt.completed = FALSE
-       ORDER BY pt.id ASC`,
-      [playerId],
-    );
+    const tasks = await getPlayerTasks(playerId);
 
     const resourcesRes = await db.query(
       `SELECT pr.*, rt.name
@@ -69,7 +55,7 @@ router.get("/", requireAuth, async (req, res) => {
     const availableWorkers = workers - assignedWorkers;
 
     res.render("index.ejs", {
-      tasks: tasksRes.rows,
+      tasks,
       resources: resourcesRes.rows,
       recipes: recipesRes.rows,
       recipeInputs: recipeInputsRes.rows,

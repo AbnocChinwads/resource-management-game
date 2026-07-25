@@ -118,7 +118,9 @@
 
                 if (progress >= 1 && completeContainer && initialLoad) {
                     if (progressContainer) progressContainer.remove();
-                    completeContainer.style.display = "block";
+                    if (bar.dataset.automated !== "true") {
+                        completeContainer.style.display = "block";
+                    }
                 }
             });
 
@@ -142,7 +144,12 @@
                     const completeContainer = li.querySelector(".complete-container");
 
                     if (progressContainer) progressContainer.remove();
-                    if (completeContainer) completeContainer.style.display = "block";
+                    if (
+                        completeContainer &&
+                        bar.dataset.automated !== "true"
+                    ) {
+                        completeContainer.style.display = "block";
+                    }
                 }
             }
         });

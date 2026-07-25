@@ -6,15 +6,17 @@
                 <%= task.recipe_name %>
             </strong>
             <div>
-            <% if (task.player_building_id) { %>
-                <small class="text-muted">Produced by: <%= task.building_name %> <%= task.building_number %></small>
-            <% } else { %>
-                <small class="text-muted">Manual Production</small>
-            <% } %>
+                <% if (task.player_building_id) { %>
+                    <small class="text-muted">Produced by: <%= task.building_name %>
+                            <%= task.building_number %></small>
+                    <% } else { %>
+                        <small class="text-muted">Manual Production</small>
+                        <% } %>
             </div>
             <div class="progress" role="progressbar">
                 <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
-                    data-craft-time="<%= task.duration_seconds %>"></div>
+                    data-craft-time="<%= task.duration_seconds %>"
+                    data-automated="<%= task.player_building_id ? 'true' : 'false' %>"></div>
             </div>
 
             <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
