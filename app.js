@@ -6,8 +6,7 @@ import fs from "fs";
 
 import db from "./db.js";
 
-import { requireAuth } from "./middleware/auth.js";
-import { resolvePlayer } from "./middleware/auth.js";
+import { requireAuth, resolvePlayer } from "./middleware/auth.js";
 import authRoutes from "./routes/auth.js";
 import betterAuthRoutes from "./routes/betterAuth.js";
 
@@ -53,9 +52,9 @@ app.use(resolvePlayer);
 app.use("/api/auth", betterAuthRoutes);
 app.use("/", authRoutes);
 
-// protected routes
-
 app.use(requireAuth);
+
+// protected routes
 app.use("/", homeRoute);
 app.use("/", accountRoute);
 app.use("/api/player-stats", playerStatsRoute);

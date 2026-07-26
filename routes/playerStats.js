@@ -1,85 +1,20 @@
 import express from "express";
 import db from "../db.js";
-import { completeTask } from "../services/completeTaskService.js";
 import { getPlayerTasks } from "../services/taskService.js";
+import { processSimulationTick } from "../services/simulationService.js";
+import { getPlayerStats } from "../services/playerStatsService.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const playerId = req.playerId;
-
   try {
-    const completedTasksRes = await db.query(
-      `
-       SELECT id
-       FROM player_tasks
-       WHERE player_id = $1
-       AND player_building_id IS NOT NULL
-       AND completed = FALSE
-       AND NOW() >= started_at + duration_seconds * INTERVAL '1 second'
-      `,
-      [playerId],
-    );
+    await processSimulationTick(req.playerId);
 
-    for (const task of completedTasksRes.rows) {
-      await completeTask(playerId, task.id);
-    }
-
-    const tasks = await getPlayerTasks(playerId);
-
-    // Resources
-    const resourcesRes = await db.query(
-      `SELECT pr.*, rt.name
-       FROM player_resources pr
-       JOIN resource_types rt ON pr.resource_type_id = rt.id
-       WHERE pr.player_id = $1
-       ORDER BY pr.resource_type_id ASC`,
-      [playerId],
-    );
-
-    // Buildings
-    const buildingsRes = await db.query(
-      `SELECT pb.id, pb.workers_assigned, b.production_recipe_id
-      FROM player_buildings pb
-      JOIN buildings b ON pb.building_id = b.id
-      WHERE pb.player_id = $1
-      AND b.production_recipe_id IS NOT NULL
-      ORDER BY pb.id ASC`,
-      [playerId],
-    );
-
-    const totalWorkers = buildingsRes.rows.reduce(
-      (sum, b) => sum + b.workers_assigned,
-      0,
-    );
-    const playerRes = await db.query(
-      `SELECT population, workers FROM players WHERE id = $1`,
-      [playerId],
-    );
-    const population = playerRes.rows[0].population;
-    const workers = playerRes.rows[0].workers;
-
-    // Calculate available workers
-    const availableWorkers = workers - totalWorkers;
-
-    // Total food
-    const foodRes = await db.query(
-      `SELECT SUM(pr.amount * rt.nutrition_value) AS total_food
-       FROM player_resources pr
-       JOIN resource_types rt ON pr.resource_type_id = rt.id
-       WHERE pr.player_id = $1`,
-      [playerId],
-    );
-    const food = foodRes.rows[0].total_food || 0;
+    const stats = await getPlayerStats(req.playerId);
+    const tasks = await getPlayerTasks(req.playerId);
 
     res.json({
-      population,
-      workers,
-      assignedWorkers: totalWorkers,
-      availableWorkers,
-      food,
-      resources: resourcesRes.rows,
-      buildings: buildingsRes.rows,
+      stats,
       tasks,
     });
   } catch (err) {

@@ -68,11 +68,30 @@ export async function completeTask(playerId, taskId) {
 
     await db.query("COMMIT");
 
-    await maintainBuildingTasks(playerId);
     return true;
   } catch (err) {
     await db.query("ROLLBACK");
     console.error("Error completing task:", err);
     throw err;
   }
+}
+
+export async function completeFinishedTasks(playerId) {
+  const completedTasksRes = await db.query(
+    `
+    SELECT id
+    FROM player_tasks
+    WHERE player_id = $1
+      AND player_building_id IS NOT NULL
+      AND completed = FALSE
+      AND NOW() >= started_at + duration_seconds * INTERVAL '1 second'
+    `,
+    [playerId],
+  );
+
+  for (const task of completedTasksRes.rows) {
+    await completeTask(playerId, task.id);
+  }
+
+  await maintainBuildingTasks(playerId);
 }
