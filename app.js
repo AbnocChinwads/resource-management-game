@@ -2,7 +2,6 @@ import "dotenv/config";
 
 import express from "express";
 import path from "path";
-import fs from "fs";
 
 import db from "./db.js";
 
@@ -15,6 +14,7 @@ import accountRoute from "./routes/accounts.js";
 import playerStatsRoute from "./routes/playerStats.js";
 import updateWorkersRoute from "./routes/updateWorkers.js";
 import startRoute from "./routes/startTask.js";
+import partialRoutes from "./routes/partials.js";
 import completeRoute from "./routes/completeTask.js";
 
 const app = express();
@@ -57,6 +57,7 @@ app.use(requireAuth);
 // protected routes
 app.use("/", homeRoute);
 app.use("/", accountRoute);
+app.use("/partials", partialRoutes);
 app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);

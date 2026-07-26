@@ -48,7 +48,7 @@
 
             if (data.success) {
                 // Reload to fetch updated tasks/resources
-                window.location.reload();
+                await updateStats();
             } else {
                 console.error(data.error);
             }
@@ -56,6 +56,18 @@
             console.error("Complete task error:", err);
         }
     });
+
+    async function refreshActiveTasks() {
+        const html = await fetch("/partials/active-tasks", {
+            credentials: "include"
+        }).then(r => r.text());
+
+        const container = document.getElementById("active-tasks-container");
+
+        if (container) {
+            container.innerHTML = html;
+        }
+    }
 </script>
 
 <!-- ===========================
@@ -84,18 +96,18 @@
                 const el = document.getElementById(`building-${b.id}-workers`);
                 if (el) el.textContent = b.workers_assigned;
             });
+
+            await refreshActiveTasks();
         } catch (err) {
             console.error("Stats update error:", err);
         }
     }
 
     // Poll every 3 seconds
-    setInterval(updateStats, 1000);
+    setInterval(updateStats, 3000);
     updateStats(); // initial call
 
     function startProgressUpdates() {
-        let initialLoad = true;
-
         function updateProgress() {
             const now = Date.now();
             const bars = document.querySelectorAll(".progress-bar");
