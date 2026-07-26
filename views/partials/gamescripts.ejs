@@ -93,7 +93,7 @@
     setInterval(updateStats, 3000);
     updateStats(); // initial call
 
-    document.addEventListener("DOMContentLoaded", function () {
+    function startProgressUpdates() {
         let initialLoad = true;
 
         function updateProgress() {
@@ -103,55 +103,43 @@
             bars.forEach(bar => {
                 const startedAt = parseInt(bar.dataset.startedAt);
                 const craftTime = parseInt(bar.dataset.craftTime) * 1000;
+
                 if (!startedAt || !craftTime) return;
 
                 let progress = (now - startedAt) / craftTime;
                 progress = Math.min(Math.max(progress, 0), 1);
 
-                const li = bar.closest("li");
-                if (!li) return;
+                bar.style.width = `${progress * 100}%`;
 
-                const progressContainer = li.querySelector(".progress");
-                const completeContainer = li.querySelector(".complete-container");
-
-                bar.style.width = (progress * 100) + "%";
-
-                if (progress >= 1 && completeContainer && initialLoad) {
-                    if (progressContainer) progressContainer.remove();
-                    if (bar.dataset.automated !== "true") {
-                        completeContainer.style.display = "block";
-                    }
-                }
-            });
-
-            initialLoad = false;
-        }
-
-        // Run immediately and every 100ms
-        updateProgress();
-        setInterval(updateProgress, 100);
-
-        // Transition listener for bars filling mid-session
-        document.addEventListener("transitionend", function (event) {
-            if (event.target.classList.contains("progress-bar") && event.propertyName === "width") {
-                const bar = event.target;
-                const width = parseFloat(bar.style.width);
-                if (width >= 100) {
+                if (progress >= 1) {
                     const li = bar.closest("li");
-                    if (!li) return;
+
+                    if (!li) {
+                        console.error("No parent li found", bar);
+                        return;
+                    }
 
                     const progressContainer = li.querySelector(".progress");
                     const completeContainer = li.querySelector(".complete-container");
 
-                    if (progressContainer) progressContainer.remove();
-                    if (
-                        completeContainer &&
-                        bar.dataset.automated !== "true"
-                    ) {
+                    if (progressContainer) {
+                        progressContainer.remove();
+                    }
+
+                    if (completeContainer) {
                         completeContainer.style.display = "block";
                     }
                 }
-            }
-        });
-    });
+            });
+        }
+
+        updateProgress();
+        setInterval(updateProgress, 100);
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", startProgressUpdates);
+    } else {
+        startProgressUpdates();
+    }
 </script>

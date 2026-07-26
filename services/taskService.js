@@ -63,7 +63,7 @@ export async function maintainBuildingTasks(playerId) {
         );
 
         const playerAmount = playerRes.rows[0]?.amount || 0;
-        
+
         if (playerAmount < resource.amount) {
           canProduce = false;
           break;
@@ -95,21 +95,41 @@ export async function maintainBuildingTasks(playerId) {
 
 export async function getPlayerTasks(playerId) {
   const tasksRes = await db.query(
-    `SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, r.recipe_type, 
-     r.output_resource_id, r.output_amount, r.output_building_id,
-     b.name AS building_name,
-     ROW_NUMBER() OVER (
-      PARTITION BY pb.building_id
-      ORDER BY pb.id ASC
-     ) AS building_number
-     FROM player_tasks pt
-     JOIN recipes r ON pt.recipe_id = r.id
-     LEFT JOIN player_buildings pb ON pt.player_building_id = pb.id
-     LEFT JOIN buildings b ON pb.building_id = b.id
-     WHERE pt.player_id = $1 AND pt.completed = FALSE
-     ORDER BY pt.id ASC`,
+    `
+    SELECT pt.*, r.name AS recipe_name, r.craft_time_seconds, 
+    r.recipe_type, r.output_resource_id, r.output_amount, 
+    r.output_building_id, pb.workers_assigned, 
+    b.name AS building_name, 
+    rt.name AS output_resource_name, 
+    ROW_NUMBER() OVER ( 
+    PARTITION BY pb.building_id 
+    ORDER BY pb.id ASC 
+    ) AS building_number 
+    FROM player_tasks pt 
+    JOIN recipes r ON pt.recipe_id = r.id 
+    LEFT JOIN player_buildings pb ON pt.player_building_id = pb.id 
+    LEFT JOIN buildings b ON pb.building_id = b.id
+    LEFT JOIN resource_types rt ON r.output_resource_id = rt.id 
+    WHERE pt.player_id = $1
+    AND pt.completed = FALSE
+    ORDER BY pt.id ASC`,
     [playerId],
   );
+
+  const tasks = tasksRes.rows.map((task) => {
+    if (task.player_building_id) {
+      task.production_per_minute = Number(
+        (
+          (task.output_amount * task.workers_assigned * 60) /
+          task.craft_time_seconds
+        ).toFixed(1),
+      );
+    }
+
+    return task;
+  });
+
+  return tasks;
 
   return tasksRes.rows;
 }

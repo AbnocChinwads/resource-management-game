@@ -1,4 +1,5 @@
 import db from "../db.js";
+import { reconcileWorkers } from "./workerService.js";
 
 export async function processFoodTick(playerId) {
 
@@ -85,6 +86,8 @@ export async function processFoodTick(playerId) {
       const starvation = Math.ceil(totalNutritionNeeded / ticks);
       population = Math.max(population - starvation, 0);
       workers = Math.min(workers, population);
+
+      await reconcileWorkers(playerId, workers);
     }
 
     // Update food amounts in DB

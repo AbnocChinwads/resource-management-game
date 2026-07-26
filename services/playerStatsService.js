@@ -57,6 +57,5 @@ export async function getPlayerStats(playerId) {
     food,
     resources: resourcesRes.rows,
     buildings: buildingsRes.rows,
-    tasks,
   };
 }

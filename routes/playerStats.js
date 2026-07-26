@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
     const tasks = await getPlayerTasks(req.playerId);
 
     res.json({
-      stats,
+      ...stats,
       tasks,
     });
   } catch (err) {

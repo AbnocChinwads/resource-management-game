@@ -2,7 +2,9 @@
 <ul class="list-group">
     <% resources.forEach(resource=> { %>
         <li class="list-group-item">
-            <%= resource.name %>: <%= resource.amount %>
+            <%= resource.name %>: <span id="resource-<%= resource.resource_type_id %>">
+                    <%= resource.amount %>
+                </span>
         </li>
         <% }) %>
 </ul>
