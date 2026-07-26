@@ -66,6 +66,10 @@
 
         if (container) {
             container.innerHTML = html;
+
+            if (window.updateProgressBars) {
+                window.updateProgressBars();
+            }
         }
     }
 </script>
@@ -74,6 +78,9 @@
      2. Live Stats / Progress
 =========================== -->
 <script>
+    let lastTaskState = null;
+    let progressInterval;
+
     async function updateStats() {
         try {
             const res = await fetch("/api/player-stats", { credentials: "include" });
@@ -97,7 +104,12 @@
                 if (el) el.textContent = b.workers_assigned;
             });
 
-            await refreshActiveTasks();
+            const taskState = JSON.stringify(data.tasks);
+
+            if (taskState !== lastTaskState) {
+                lastTaskState = taskState;
+                await refreshActiveTasks();
+            }
         } catch (err) {
             console.error("Stats update error:", err);
         }
@@ -141,7 +153,7 @@
                             if (completeContainer) {
                                 completeContainer.style.display = "block";
                             }
-                        }, 300);
+                        });
                     }
 
                     return;
@@ -152,6 +164,7 @@
         }
 
         updateProgress();
+        window.updateProgressBars = updateProgress;
         setInterval(updateProgress, 250);
     }
 
