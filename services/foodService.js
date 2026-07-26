@@ -86,8 +86,6 @@ export async function processFoodTick(playerId) {
       const starvation = Math.ceil(totalNutritionNeeded / ticks);
       population = Math.max(population - starvation, 0);
       workers = Math.min(workers, population);
-
-      await reconcileWorkers(playerId, workers);
     }
 
     // Update food amounts in DB
@@ -109,6 +107,8 @@ export async function processFoodTick(playerId) {
        WHERE id = $3`,
       [population, workers, playerId],
     );
+
+    await reconcileWorkers(playerId, workers);
 
     const nutritionAfter = foods.reduce(
         (sum, f) => sum + f.amount * f.nutrition_value,

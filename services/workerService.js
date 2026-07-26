@@ -1,16 +1,6 @@
 import db from "../db.js";
 
-export async function reconcileWorkers(playerId) {
-    const playerRes = await db.query(
-        `
-        SELECT workers 
-        FROM players 
-        WHERE id = $1`, 
-        [playerId]
-    );
-
-    const availableWorkers = playerRes.rows[0].workers;
-
+export async function reconcileWorkers(playerId, availableWorkers) {
     const buildingsRes = await db.query(
         `
         SELECT id, workers_assigned 

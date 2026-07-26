@@ -90,7 +90,7 @@
     }
 
     // Poll every 3 seconds
-    setInterval(updateStats, 3000);
+    setInterval(updateStats, 1000);
     updateStats(); // initial call
 
     function startProgressUpdates() {
@@ -109,32 +109,38 @@
                 let progress = (now - startedAt) / craftTime;
                 progress = Math.min(Math.max(progress, 0), 1);
 
-                bar.style.width = `${progress * 100}%`;
-
                 if (progress >= 1) {
-                    const li = bar.closest("li");
+                    bar.style.width = "100%";
 
-                    if (!li) {
-                        console.error("No parent li found", bar);
-                        return;
+                    if (!bar.dataset.completeShown) {
+                        bar.dataset.completeShown = "true";
+
+                        setTimeout(() => {
+                            const li = bar.closest("li");
+                            if (!li) return;
+
+                            const progressContainer = li.querySelector(".progress");
+                            const completeContainer = li.querySelector(".complete-container");
+
+                            if (progressContainer) {
+                                progressContainer.remove();
+                            }
+
+                            if (completeContainer) {
+                                completeContainer.style.display = "block";
+                            }
+                        }, 300);
                     }
 
-                    const progressContainer = li.querySelector(".progress");
-                    const completeContainer = li.querySelector(".complete-container");
-
-                    if (progressContainer) {
-                        progressContainer.remove();
-                    }
-
-                    if (completeContainer) {
-                        completeContainer.style.display = "block";
-                    }
+                    return;
                 }
+
+                bar.style.width = `${progress * 100}%`;
             });
         }
 
         updateProgress();
-        setInterval(updateProgress, 100);
+        setInterval(updateProgress, 250);
     }
 
     if (document.readyState === "loading") {
