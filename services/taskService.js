@@ -129,6 +129,10 @@ export async function getPlayerTasks(playerId) {
       );
     }
 
+    task.is_finished =
+      new Date() >=
+      new Date(task.started_at).getTime() + task.duration_seconds * 1000;
+
     return task;
   });
 

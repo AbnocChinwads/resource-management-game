@@ -14,37 +14,44 @@
                 </div>
                 <div>+ <%= task.production_per_minute %> / minute</div>
                 <% } else { %>
-                    <div>
-                        <small class="text-muted">Manual Production</small>
+                    div>
+                    <small class="text-muted">Manual Production</small>
                     </div>
 
-                    <div class="progress" role="progressbar">
-                        <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
-                            data-craft-time="<%= task.duration_seconds %>">
+                    <% if (task.is_finished) { %>
+
+                        <div class="complete-container mt-2">
+                            <form class="complete-form" action="/complete-task" method="POST">
+                                <input type="hidden" name="taskId" value="<%= task.id %>">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Complete
+                                </button>
+                            </form>
                         </div>
-                    </div>
 
-                    <div class="complete-container mt-2" style="display: none;">
-                        <form class="complete-form" action="/complete-task" method="POST">
-                            <input type="hidden" name="taskId" value="<%= task.id %>">
-                            <button type="submit" class="btn btn-success btn-sm">
-                                Complete
-                            </button>
-                        </form>
-                    </div>
-                    <% } %>
+                        <% } else { %>
 
-                        <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
-                            <% if (inputs.length> 0) { %>
-                                <small>Needs: <% inputs.forEach((input, idx)=> { %>
-                                        <% const resourceName=resources.find(r=> r.resource_type_id ===
-                                            input.resource_type_id)?.name || '?'; %>
-                                            <%= input.amount %>
-                                                <%= resourceName %>
-                                                    <%= idx < inputs.length - 1 ? ', ' : '' %>
-                                                        <% }); %>
-                                </small>
+                            <div class="progress" role="progressbar">
+                                <div class="progress-bar" data-started-at="<%= task.started_at.getTime() %>"
+                                    data-craft-time="<%= task.duration_seconds %>">
+                                </div>
+                            </div>
+
+                            <% } %>
+
                                 <% } %>
+
+                                    <% const inputs=recipeInputs.filter(ri=> ri.recipe_id === task.recipe_id); %>
+                                        <% if (inputs.length> 0) { %>
+                                            <small>Needs: <% inputs.forEach((input, idx)=> { %>
+                                                    <% const resourceName=resources.find(r=> r.resource_type_id ===
+                                                        input.resource_type_id)?.name || '?'; %>
+                                                        <%= input.amount %>
+                                                            <%= resourceName %>
+                                                                <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                                                    <% }); %>
+                                            </small>
+                                            <% } %>
         </li>
         <% }) %>
 </ul>
