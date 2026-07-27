@@ -127,3 +127,7 @@ export async function processFoodTick(playerId) {
     throw err;
   }
 }
+
+export function getFoodConsumptionRate(population, tickRate) {
+  return (population / tickRate) * 60;
+}

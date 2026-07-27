@@ -3,6 +3,7 @@ import db from "../db.js";
 import { getPlayerTasks } from "../services/taskService.js";
 import { processSimulationTick } from "../services/simulationService.js";
 import { getPlayerStats } from "../services/playerStatsService.js";
+import { getFoodConsumptionRate } from "../services/foodService.js";
 
 const router = express.Router();
 
@@ -12,10 +13,15 @@ router.get("/", async (req, res) => {
 
     const stats = await getPlayerStats(req.playerId);
     const tasks = await getPlayerTasks(req.playerId);
+    const foodConsumptionRate = getFoodConsumptionRate(
+      stats.population,
+      stats.foodTickRate
+    );
 
     res.json({
       ...stats,
       tasks,
+      foodConsumptionRate,
     });
   } catch (err) {
     console.error("Error fetching player stats:", err);

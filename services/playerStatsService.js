@@ -28,12 +28,13 @@ export async function getPlayerStats(playerId) {
   );
 
   const playerRes = await db.query(
-    `SELECT population, workers FROM players WHERE id = $1`,
+    `SELECT population, workers, food_tick_rate_seconds FROM players WHERE id = $1`,
     [playerId],
   );
 
   const population = playerRes.rows[0].population;
   const workers = playerRes.rows[0].workers;
+  const foodTickRate = playerRes.rows[0].food_tick_rate_seconds;
 
   // Calculate available workers
   const availableWorkers = Math.max(workers - totalWorkers, 0);
@@ -52,6 +53,7 @@ export async function getPlayerStats(playerId) {
   return {
     population,
     workers,
+    foodTickRate,
     assignedWorkers: totalWorkers,
     availableWorkers,
     food,

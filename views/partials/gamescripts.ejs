@@ -91,6 +91,12 @@
             document.getElementById("assigned-worker-count").textContent = data.assignedWorkers;
             document.getElementById("available-workers").textContent = data.availableWorkers;
             document.getElementById("food-count").textContent = data.food;
+            const foodConsumptionEl = document.getElementById("food-consumption");
+
+            if (foodConsumptionEl) {
+                foodConsumptionEl.textContent =
+                    `${data.foodConsumptionRate.toFixed(1)}/min`;
+            }
 
             // Update player resources
             data.resources.forEach(r => {
