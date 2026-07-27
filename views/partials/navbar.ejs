@@ -1,0 +1,10 @@
+<nav>
+    <a href="/">Game</a>
+    <a href="/account">Account</a>
+
+    <% if (typeof isAdmin !=="undefined" && isAdmin) { %>
+        <a href="/dev">Dev</a>
+        <% } %>
+
+            <button id="logout-btn">Logout</button>
+</nav>

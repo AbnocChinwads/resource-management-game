@@ -17,6 +17,9 @@ import startRoute from "./routes/startTask.js";
 import partialRoutes from "./routes/partials.js";
 import completeRoute from "./routes/completeTask.js";
 
+import { requireAdmin } from "./middleware/admin.js";
+import devRoute from "./routes/dev.js";
+
 const app = express();
 
 let isReady = false;
@@ -47,6 +50,12 @@ app.get("/ready", async (req, res) => {
 
 app.use(resolvePlayer);
 
+app.use((req, res, next) => {
+  res.locals.isAdmin = req.isAdmin || false;
+  res.locals.user = req.user || null;
+  next();
+});
+
 /* ROUTES */
 
 app.use("/api/auth", betterAuthRoutes);
@@ -55,6 +64,8 @@ app.use("/", authRoutes);
 app.use(requireAuth);
 
 // protected routes
+app.use("/dev", requireAdmin , devRoute);
+
 app.use("/", homeRoute);
 app.use("/", accountRoute);
 app.use("/partials", partialRoutes);

@@ -1,0 +1,40 @@
+<%- include('partials/header.ejs'); -%>
+    <h1>Dev Dashboard</h1>
+
+    <h2>Population</h2>
+
+    <ul>
+        <li>Population: <%= stats.population %>
+        </li>
+        <li>Workers: <%= stats.workers %>
+        </li>
+        <li>Assigned Workers: <%= stats.assignedWorkers %>
+        </li>
+        <li>Available Workers: <%= stats.availableWorkers %>
+        </li>
+    </ul>
+
+
+    <h2>Resources</h2>
+
+    <table>
+        <tr>
+            <th>Resource</th>
+            <th>Amount</th>
+        </tr>
+
+        <% stats.resources.forEach(resource=> { %>
+            <tr>
+                <td>
+                    <%= resource.name %>
+                </td>
+                <td>
+                    <%= resource.amount %>
+                </td>
+            </tr>
+            <% }) %>
+    </table>
+
+    <%- include('partials/scripts.ejs'); -%>
+            <%- include('partials/logoutscript.ejs'); -%>
+                <%- include('partials/footer.ejs'); -%>

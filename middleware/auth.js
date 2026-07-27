@@ -22,6 +22,7 @@ export async function resolvePlayer(req, res, next) {
       }
 
       req.user = session.user;
+      req.isAdmin = req.user?.email === process.env.ADMIN_EMAIL;
     }
 
     next();
@@ -48,6 +49,7 @@ export async function requireAuth(req, res, next) {
     }
 
     req.user = session.user;
+    req.isAdmin = req.user?.email === process.env.ADMIN_EMAIL;
 
     next();
   } catch (err) {
