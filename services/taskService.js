@@ -112,7 +112,10 @@ export async function getPlayerTasks(playerId) {
     LEFT JOIN resource_types rt ON r.output_resource_id = rt.id 
     WHERE pt.player_id = $1
     AND pt.completed = FALSE
-    ORDER BY pt.id ASC`,
+    ORDER BY 
+    pb.building_id ASC,
+    pb.id ASC,
+    pt.id ASC`,
     [playerId],
   );
 

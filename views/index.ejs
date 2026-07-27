@@ -8,11 +8,15 @@
             <%- include('partials/active-tasks.ejs'); -%>
         </div>
         <div class="col-4">
-            <%- include('partials/recipes.ejs'); -%>
-            <%- include('partials/buildings.ejs'); -%>
+            <div id="recipes-container">
+                <%- include('partials/recipes.ejs'); -%>
+            </div>
+            <div id="buildings-container">
+                <%- include('partials/buildings.ejs'); -%>
+            </div>
         </div>
     </div>
     <%- include('partials/scripts.ejs'); -%>
-    <%- include('partials/gamescripts.ejs'); -%>
-    <%- include('partials/logoutscript.ejs'); -%>
-    <%- include('partials/footer.ejs'); -%>
+        <%- include('partials/gamescripts.ejs'); -%>
+            <%- include('partials/logoutscript.ejs'); -%>
+                <%- include('partials/footer.ejs'); -%>

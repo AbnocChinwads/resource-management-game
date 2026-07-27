@@ -72,6 +72,27 @@
             }
         }
     }
+
+    async function refreshRecipes() {
+        const res = await fetch("/partials/recipes", {
+            credentials: "include"
+        });
+
+        const html = await res.text();
+
+        document.getElementById("recipes-container").innerHTML = html;
+    }
+
+
+    async function refreshBuildings() {
+        const res = await fetch("/partials/buildings", {
+            credentials: "include"
+        });
+
+        const html = await res.text();
+
+        document.getElementById("buildings-container").innerHTML = html;
+    }
 </script>
 
 <!-- ===========================
@@ -116,6 +137,9 @@
                 lastTaskState = taskState;
                 await refreshActiveTasks();
             }
+
+            await refreshRecipes();
+            await refreshBuildings();
         } catch (err) {
             console.error("Stats update error:", err);
         }
