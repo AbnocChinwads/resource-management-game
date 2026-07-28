@@ -1,0 +1,7 @@
+ALTER TABLE player_buildings
+ALTER COLUMN built_at TYPE TIMESTAMPTZ
+USING built_at AT TIME ZONE 'UTC';
+
+ALTER TABLE players
+ALTER COLUMN last_food_tick TYPE TIMESTAMPTZ
+USING last_food_tick AT TIME ZONE 'UTC';

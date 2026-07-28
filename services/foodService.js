@@ -2,13 +2,12 @@ import db from "../db.js";
 import { reconcileWorkers } from "./workerService.js";
 
 export async function processFoodTick(playerId) {
+  await db.query("BEGIN");
 
-    await db.query("BEGIN");
-
-    try {
+  try {
     // Fetch player info
     const playerRes = await db.query(
-      `SELECT id, population, workers, food_tick_rate_seconds, last_food_tick
+      `SELECT id, population, workers, food_tick_rate_seconds, last_food_tick, starvation_started_at
        FROM players
        WHERE id = $1`,
       [playerId],
@@ -16,8 +15,8 @@ export async function processFoodTick(playerId) {
     const player = playerRes.rows[0];
 
     if (!player) {
-        await db.query("ROLLBACK");
-        throw new Error("Player not found");
+      await db.query("ROLLBACK");
+      throw new Error("Player not found");
     }
 
     const now = new Date();
@@ -26,7 +25,7 @@ export async function processFoodTick(playerId) {
       : now;
     const tickRate = player.food_tick_rate_seconds || 1;
 
-    const secondsPassed = Math.floor((now - lastTick) / 1000);
+    const secondsPassed = Math.max(Math.floor((now - lastTick) / 1000), 0);
     const ticks = Math.floor(secondsPassed / tickRate);
 
     let population = player.population;
@@ -47,18 +46,18 @@ export async function processFoodTick(playerId) {
     // Calculate total nutrition for display before consumption
     const nutritionBefore = foods.reduce(
       (sum, f) => sum + f.amount * f.nutrition_value,
-        0,
+      0,
     );
 
     // Nothing to consume yet
     if (ticks <= 0) {
-        await db.query("COMMIT");
+      await db.query("COMMIT");
 
-        return {
-            food: nutritionBefore,
-            population,
-            workers,
-        };
+      return {
+        food: nutritionBefore,
+        population,
+        workers,
+      };
     }
 
     // Calculate total nutrition needed
@@ -82,20 +81,14 @@ export async function processFoodTick(playerId) {
     }
 
     // Population reduction if deficit
-    if (totalNutritionNeeded > 0) {
-      const starvation = Math.ceil(totalNutritionNeeded / ticks);
-      population = Math.max(population - starvation, 0);
-      workers = Math.min(workers, population);
-    }
+    let starvationStartedAt = player.starvation_started_at;
 
-    // Update food amounts in DB
-    for (let food of foods) {
-      await db.query(
-        `UPDATE player_resources
-         SET amount = $1
-         WHERE player_id = $2 AND resource_type_id = $3`,
-        [food.amount, playerId, food.resource_type_id],
-      );
+    if (totalNutritionNeeded > 0) {
+      if (!starvationStartedAt) {
+        starvationStartedAt = now;
+      }
+    } else {
+      starvationStartedAt = null;
     }
 
     // Update player population & last tick
@@ -103,27 +96,28 @@ export async function processFoodTick(playerId) {
       `UPDATE players
        SET population = $1,
        workers = $2,
-       last_food_tick = NOW()
-       WHERE id = $3`,
-      [population, workers, playerId],
+       last_food_tick = NOW(),
+       starvation_started_at = $3
+       WHERE id = $4`,
+      [population, workers, starvationStartedAt, playerId],
     );
 
     await reconcileWorkers(playerId, workers);
 
     const nutritionAfter = foods.reduce(
-        (sum, f) => sum + f.amount * f.nutrition_value,
-        0
-    )
+      (sum, f) => sum + f.amount * f.nutrition_value,
+      0,
+    );
 
     await db.query("COMMIT");
 
     return {
-        food: nutritionAfter,
-        population,
-        workers,
+      food: nutritionAfter,
+      population,
+      workers,
     };
   } catch (err) {
-        await db.query("ROLLBACK");
+    await db.query("ROLLBACK");
     throw err;
   }
 }

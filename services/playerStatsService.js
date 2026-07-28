@@ -1,4 +1,5 @@
 import db from "../db.js";
+import { getPlayerBuildings } from "./buildingService.js";
 
 export async function getPlayerStats(playerId) {
   // Resources
@@ -12,17 +13,9 @@ export async function getPlayerStats(playerId) {
   );
 
   // Buildings
-  const buildingsRes = await db.query(
-    `SELECT pb.id, pb.workers_assigned, b.production_recipe_id
-      FROM player_buildings pb
-      JOIN buildings b ON pb.building_id = b.id
-      WHERE pb.player_id = $1
-      AND b.production_recipe_id IS NOT NULL
-      ORDER BY pb.id ASC`,
-    [playerId],
-  );
+  const buildings = await getPlayerBuildings(playerId);
 
-  const totalWorkers = buildingsRes.rows.reduce(
+  const totalWorkers = buildings.reduce(
     (sum, b) => sum + b.workers_assigned,
     0,
   );
@@ -58,6 +51,6 @@ export async function getPlayerStats(playerId) {
     availableWorkers,
     food,
     resources: resourcesRes.rows,
-    buildings: buildingsRes.rows,
+    buildings,
   };
 }

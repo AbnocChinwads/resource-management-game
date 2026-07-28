@@ -2,6 +2,7 @@ import express from "express";
 import db from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { getPlayerTasks } from "../services/taskService.js";
+import { getPlayerBuildings } from "../services/buildingService.js";
 const router = express.Router();
 
 router.get("/", requireAuth, async (req, res) => {
@@ -25,18 +26,7 @@ router.get("/", requireAuth, async (req, res) => {
       `SELECT * FROM recipe_inputs ORDER BY recipe_id, resource_type_id`,
     );
 
-    const buildingsRes = await db.query(
-      `SELECT pb.*, b.name, b.max_workers, b.max_health,
-       ROW_NUMBER() OVER (
-        PARTITION BY pb.building_id
-        ORDER BY pb.id ASC
-       ) AS building_number
-       FROM player_buildings pb
-       JOIN buildings b ON pb.building_id = b.id
-       WHERE pb.player_id = $1
-       ORDER BY pb.id ASC`,
-      [playerId],
-    );
+    const buildings = await getPlayerBuildings(playerId);
 
     const playerRes = await db.query(
       `SELECT population, workers FROM players WHERE id = $1;`,
@@ -46,7 +36,7 @@ router.get("/", requireAuth, async (req, res) => {
     const population = playerRes.rows[0].population;
     const workers = playerRes.rows[0].workers;
 
-    const totalWorkers = buildingsRes.rows.reduce(
+    const totalWorkers = buildings.reduce(
       (sum, b) => sum + b.workers_assigned,
       0,
     );
@@ -59,7 +49,7 @@ router.get("/", requireAuth, async (req, res) => {
       resources: resourcesRes.rows,
       recipes: recipesRes.rows,
       recipeInputs: recipeInputsRes.rows,
-      buildings: buildingsRes.rows,
+      buildings,
       population,
       workers,
       assignedWorkers,
