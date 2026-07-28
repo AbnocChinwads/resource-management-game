@@ -21,3 +21,8 @@
 
 ### Reason
 - Reduced time needed to investigate player-reported issues.
+
+### 0.2.7
+
+### Added
+- UI polish for buildings
