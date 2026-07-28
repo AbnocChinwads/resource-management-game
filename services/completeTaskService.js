@@ -40,8 +40,17 @@ export async function completeTask(playerId, taskId) {
 
     if (output_building_id) {
       const insertRes = await db.query(
-        `INSERT INTO player_buildings (player_id, building_id)
-         VALUES ($1, $2) RETURNING id`,
+        `INSERT INTO player_buildings (
+        player_id,
+        building_id,
+        health
+        )
+        SELECT $1,
+        id,
+        max_health
+        FROM buildings
+        WHERE id = $2
+        RETURNING id`,
         [playerId, output_building_id],
       );
       const newBuildingId = insertRes.rows[0].id;
