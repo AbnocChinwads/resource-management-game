@@ -12,3 +12,12 @@
 
 ### Fixed
 - Building health now correctly initialises from `buildings.max_health`.
+
+## 0.2.6
+
+### Added
+- Player inspector on developer dashboard.
+- Clickable player names in feedback reports.
+
+### Reason
+- Reduced time needed to investigate player-reported issues.

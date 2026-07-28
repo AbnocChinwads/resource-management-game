@@ -40,7 +40,17 @@
                                 </td>
 
                                 <td>
-                                    <%= bug.player_name ?? "Unknown" %>
+                                    <% if (bug.player_id) { %>
+
+                                        <a href="/dev?player=<%= bug.player_id %>">
+                                            <%= bug.player_name %>
+                                        </a>
+
+                                        <% } else { %>
+
+                                            Unknown
+
+                                            <% } %>
                                 </td>
 
                                 <td>

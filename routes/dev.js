@@ -11,8 +11,6 @@ router.get("/", async (req, res) => {
     const suggestions = await getSuggestions();
     const players = await getAllPlayers();
 
-    console.log(players);
-
     const inspectedPlayerId = req.query.player || req.playerId;
 
     const stats = await getPlayerStats(inspectedPlayerId);

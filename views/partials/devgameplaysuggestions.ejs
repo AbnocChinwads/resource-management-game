@@ -38,7 +38,17 @@
                                 </td>
 
                                 <td>
-                                    <%= suggestion.player_name ?? "Unknown" %>
+                                    <% if (suggestion.player_id) { %>
+
+                                        <a href="/dev?player=<%= suggestion.player_id %>">
+                                            <%= suggestion.player_name %>
+                                        </a>
+
+                                        <% } else { %>
+
+                                            Unknown
+
+                                            <% } %>
                                 </td>
 
                                 <td>
