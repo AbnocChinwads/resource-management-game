@@ -19,6 +19,7 @@ import completeRoute from "./routes/completeTask.js";
 
 import { requireAdmin } from "./middleware/admin.js";
 import devRoute from "./routes/dev.js";
+import feedbackRoutes from "./routes/feedback.js";
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
+app.use("/feedback", feedbackRoutes);
 
 /* END OF ROUTES */
 
