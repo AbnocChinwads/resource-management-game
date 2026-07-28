@@ -1,0 +1,62 @@
+<div class="card mb-4">
+    <div class="card-header">
+        Gameplay Suggestions
+    </div>
+    <div class="card-body">
+        <% if (suggestions.length===0) { %>
+
+            <p>No gameplay suggestions submitted.</p>
+
+            <% } else { %>
+
+                <table class="table table-sm table-striped table-hover table-bordered">
+
+                    <thead>
+
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Player</th>
+                            <th>Status</th>
+                            <th>Reported</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <% suggestions.forEach(suggestion=> { %>
+
+                            <tr>
+
+                                <td>
+                                    <%= suggestion.title %>
+                                </td>
+
+                                <td>
+                                    <%= suggestion.description %>
+                                </td>
+
+                                <td>
+                                    <%= suggestion.player_name ?? "Unknown" %>
+                                </td>
+
+                                <td>
+                                    <%= suggestion.status %>
+                                </td>
+
+                                <td>
+                                    <%= new Date(suggestion.created_at).toLocaleString("en-GB") %>
+                                </td>
+
+                            </tr>
+
+                            <% }) %>
+
+                    </tbody>
+
+                </table>
+
+                <% } %>
+    </div>
+</div>

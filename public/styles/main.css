@@ -1,3 +1,12 @@
 .progress-bar {
     transition: width 0.25s linear !important;
 }
+
+td {
+    vertical-align: top;
+}
+
+td:nth-child(2) {
+    max-width: 400px;
+    white-space: pre-wrap;
+}

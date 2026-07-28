@@ -1,0 +1,72 @@
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Bug Reports</h5>
+    </div>
+    <div class="card-body">
+        <% if (bugs.length===0) { %>
+
+            <p>No bug reports submitted.</p>
+
+            <% } else { %>
+
+                <table class="table table-sm table-striped table-hover table-bordered">
+
+                    <thead>
+
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Player</th>
+                            <th>Page</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Reported</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <% bugs.forEach(bug=> { %>
+
+                            <tr>
+
+                                <td>
+                                    <%= bug.title %>
+                                </td>
+
+                                <td>
+                                    <%= bug.description %>
+                                </td>
+
+                                <td>
+                                    <%= bug.player_name ?? "Unknown" %>
+                                </td>
+
+                                <td>
+                                    <%= bug.page ?? "-" %>
+                                </td>
+
+                                <td>
+                                    <%= bug.status %>
+                                </td>
+
+                                <td>
+                                    <%= bug.priority %>
+                                </td>
+
+                                <td>
+                                    <%= new Date(bug.created_at).toLocaleString("en-GB") %>
+                                </td>
+
+                            </tr>
+
+                            <% }) %>
+
+                    </tbody>
+
+                </table>
+
+                <% } %>
+    </div>
+</div>

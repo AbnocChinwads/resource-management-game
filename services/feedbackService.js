@@ -49,3 +49,38 @@ export async function createSuggestion(
 
   return result.rows[0].id;
 }
+
+export async function getBugReports() {
+  const result = await db.query(
+    `
+    SELECT
+      br.*,
+      p.name AS player_name
+    FROM bug_reports br
+    LEFT JOIN players p
+      ON br.player_id = p.id
+    ORDER BY br.created_at DESC
+    LIMIT 100
+    `,
+  );
+
+  return result.rows;
+}
+
+
+export async function getSuggestions() {
+  const result = await db.query(
+    `
+    SELECT
+      gs.*,
+      p.name AS player_name
+    FROM gameplay_suggestions gs
+    LEFT JOIN players p
+      ON gs.player_id = p.id
+    ORDER BY gs.created_at DESC
+    LIMIT 100
+    `,
+  );
+
+  return result.rows;
+}
