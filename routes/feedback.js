@@ -7,6 +7,10 @@ import { requireAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
+router.get("/", requireAuth, async (req, res) => {
+  res.render("feedback");
+});
+
 router.post("/bug", requireAuth, async (req, res) => {
   try {
     const { title, description } = req.body;
