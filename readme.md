@@ -68,7 +68,7 @@ Gameplay
 
 -   Population simulation
 
--   Starvation mechanics
+-   Starvation mechanics (under development changes)
 
 -   Persistent game world
 
@@ -112,13 +112,15 @@ Core Gameplay
 
 -[x]   Starvation system
 
--   Gameplay balancing
+-[]    Starvation grace period
 
--   Expanded production chains
+-[]   Gameplay balancing
 
--   Additional buildings
+-[]   Expanded production chains
 
--   Late-game progression
+-[]   Additional buildings
+
+-[]   Late-game progression
 
 Account Management
 ------------------
@@ -129,20 +131,20 @@ Account Management
 
 -[x]   Change account details
 
--   Account deletion
+-[]   Account deletion
 
 User Interface
 --------------
 
--   Navigation improvements
+-[]   Navigation improvements
 
--   Production statistics dashboard
+-[]   Production statistics dashboard
 
--   Better management tools
+-[]   Better management tools
 
--   Visual polish
+-[]   Visual polish
 
--   Accessibility improvements
+-[]   Accessibility improvements
 
 * * * * *
 
