@@ -1,0 +1,15 @@
+<h2>Player Inspector</h2>
+
+<form action="/dev" method="get">
+    <select class="form-select" name="player" onchange="this.form.submit()">
+        <option value="">
+            Select Player
+        </option>
+        <% players.forEach(player => { %>
+            <option value="<%= player.id %>"
+                <%= Number(inspectedPlayerId) === player.id ? "selected" : "" %>>
+                <%= player.name %>
+            </option>
+        <% }) %>
+    </select>
+</form>

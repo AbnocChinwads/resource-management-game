@@ -1,71 +1,51 @@
 <%- include('partials/header.ejs'); -%>
     <h1>Dev Dashboard</h1>
 
+    <%- include('partials/devplayerselector.ejs'); %>
+        <% if (stats) { %>
+            <%- include('partials/devplayerstats.ejs'); %>
+                <% } %>
 
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Population</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            Population: <%= stats.population %>
-                        </li>
-                        <li class="list-group-item">
-                            Workers: <%= stats.workers %>
-                        </li>
-                        <li class="list-group-item">
-                            Assigned Workers: <%= stats.assignedWorkers %>
-                        </li>
-                        <li class="list-group-item">
-                            Available Workers: <%= stats.availableWorkers %>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Resources</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-sm table-striped table-hover table-bordered">
+                    <div class="col-lg-8">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Resources</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-striped table-hover table-bordered">
 
-                        <thead>
-                            <tr>
-                                <th>Resource</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
+                                    <thead>
+                                        <tr>
+                                            <th>Resource</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
 
-                        <tbody>
-                            <% stats.resources.forEach(resource=> { %>
+                                    <tbody>
+                                        <% stats.resources.forEach(resource=> { %>
 
-                                <tr>
-                                    <td>
-                                        <%= resource.name %>
-                                    </td>
-                                    <td>
-                                        <%= resource.amount %>
-                                    </td>
-                                </tr>
+                                            <tr>
+                                                <td>
+                                                    <%= resource.name %>
+                                                </td>
+                                                <td>
+                                                    <%= resource.amount %>
+                                                </td>
+                                            </tr>
 
-                                <% }) %>
-                        </tbody>
+                                            <% }) %>
+                                    </tbody>
 
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
 
-    <%- include('partials/devbugreports.ejs'); -%>
+                    <%- include('partials/devbugreports.ejs'); -%>
 
-        <%- include('partials/devgameplaysuggestions.ejs'); -%>
-            <%- include('partials/footer.ejs'); -%>
-                </body>
+                        <%- include('partials/devgameplaysuggestions.ejs'); -%>
+                            <%- include('partials/footer.ejs'); -%>
+                                </body>
 
-                </html>
+                                </html>

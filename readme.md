@@ -136,7 +136,7 @@ Account Management
 User Interface
 --------------
 
--[]   Navigation improvements
+-[x]   Navigation improvements
 
 -[]   Production statistics dashboard
 
