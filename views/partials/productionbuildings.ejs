@@ -1,9 +1,11 @@
 <div class="table-responsive">
   <h2>Worker Buildings</h2>
-  <table class="table table-striped-columns table-hover table-bordered">
+  <table class="table table-sm table-striped-columns table-hover table-bordered">
       <thead>
           <th class="col">Building</th>
           <th class="col">Health</th>
+          <th class="col">Production</th>
+          <th class="col">Consuming</th>
           <th class="col">Workers</th>
           <th class="col">Add/Remove Workers</th>
       </thead>
@@ -13,6 +15,8 @@
               <tr>
                   <td><%= building.name %><%= building.name ? " #" + building.building_number : "" %></td>
                   <td><%= building.health %>/<%= building.max_health %></td>
+                  <td id="building-<%= building.id %>-production"></td>
+                  <td id="building-<%= building.id %>-consumption"></td>
                   <td><span id="building-<%= building.id %>-workers"><%= building.workers_assigned %></span>/<%= building.max_workers %></td>
                   <td>
                     <div class="btn-group ms-2">

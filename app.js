@@ -4,6 +4,7 @@ import "./services/simulationRunnerService.js";
 
 import express from "express";
 import path from "path";
+import { appVersion } from "./config/appInfo.js";
 
 import db from "./db.js";
 
@@ -33,6 +34,10 @@ app.set("views", path.join(process.cwd(), "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
+app.use((req, res, next) => {
+    res.locals.appVersion = appVersion;
+    next();
+});
 
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });

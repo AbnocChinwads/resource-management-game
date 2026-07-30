@@ -2,6 +2,7 @@ import express from "express";
 import { getPlayerTasks } from "../services/taskService.js";
 import { getPlayerStats } from "../services/playerStatsService.js";
 import { getResourceFlow } from "../services/resourceFlowService.js";
+import { getPlayerBuildings } from "../services/buildingService.js";
 
 const router = express.Router();
 
@@ -10,11 +11,13 @@ router.get("/", async (req, res) => {
     const stats = await getPlayerStats(req.playerId);
     const tasks = await getPlayerTasks(req.playerId);
     const resources = await getResourceFlow(req.playerId);
+    const buildings = await getPlayerBuildings(req.playerId);
 
     res.json({
       ...stats,
       tasks,
       resources,
+      buildings,
     });
 
   } catch (err) {

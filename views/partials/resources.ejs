@@ -1,38 +1,35 @@
-<div class="table-responsive">
+<!-- Stats display -->
+<div class="table-responsive col-6">
     <h2>Resources</h2>
-    <table class="table table-striped-columns table-hover table-bordered">
+    <table class="table table-sm table-striped-columns table-hover table-bordered">
         <thead>
             <th class="col">Resource</th>
-            <th class="col">Storage</th>
-            <th class="col">Production</th>
-            <th class="col">Consumption</th>
-            <th class="col">Net Gain/Loss</th>
+            <th class="col">Amount</th>
+            <th class="col">Flow</th>
         </thead>
         <tbody>
             <% resources.forEach(resource=> { %>
                 <tr>
                     <td><%= resource.name %></td>
                     <td id="resource-<%= resource.resource_type_id %>"></td>
-                    <td id="resource-<%= resource.resource_type_id %>-production"></td>
-                    <td id="resource-<%= resource.resource_type_id %>-consumption"></td>
-                    <td id="resource-<%= resource.resource_type_id %>-net"></td>
+                    <td id="resource-<%= resource.resource_type_id %>-net" aria-live="polite"></td>
                 </tr>
             <% }) %>
         </tbody>
     </table>
 </div>
-<!-- Stats display -->
-<div class="table-responsive">
+<!-- Pop Display -->
+<div class="table-responsive col-6">
     <h2 class="mt-3">Population</h2>
-    <table class="table table-striped-columns table-hover table-bordered">
+    <table class="table table-sm table-striped-columns table-hover table-bordered">
         <thead>
             <tr>
                 <th>Population</th>
                 <th>Workers</th>
                 <th>Available Workers</th>
                 <th>Assigned Workers</th>
-                <th>Food Nutrition</th>
-                <th>Food Consumption</th>
+                <th>Food Stored</th>
+                <th>Food Consumed</th>
             </tr>
         </thead>
         <tbody>

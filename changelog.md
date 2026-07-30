@@ -53,3 +53,11 @@
 
 ### Changed
 - Renamed `active-tasks` to `manual-tasks` to better reflect that player-initiated tasks are separate from automated production simulation.
+
+## [0.3.2]
+
+### Changed
+- Redesigned resource display table to reduce UI clutter.
+- Moved production and consumption rates from resources into production building displays.
+- Added dynamic production and consumption information to production buildings.
+- Improved accessibility of resource flow indicators with screen-reader labels.

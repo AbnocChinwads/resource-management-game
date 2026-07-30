@@ -101,21 +101,82 @@
     let lastTaskState = null;
     let progressInterval;
 
+    /*========================
+        FORMATTING HELPERS
+    ========================*/
     function formatResourceAmount(amount) {
-    return Number(amount).toFixed(2).replace(/\.?0+$/, "");
+        return Number(amount).toFixed(2).replace(/\.?0+$/, "");
     }
+
+    function updateNetFlowElement(element, amount) {
+        const value = Number(amount);
+
+        element.classList.remove("text-success", "text-danger", "text-muted");
+
+        if (value > 0) {
+            element.innerHTML = `<span aria-hidden="true">▲</span><span class="visually-hidden">Increasing by</span> ${value.toFixed(1)}/min<span class="visually-hidden">per minute</span>`;
+            element.classList.add("text-success");
+        } else if (value < 0) {
+            element.innerHTML = `<span aria-hidden="true">▼</span><span class="visually-hidden">Decreasing by</span> ${Math.abs(value).toFixed(1)}/min<span class="visually-hidden">per minute</span>`;
+            element.classList.add("text-danger");
+        } else {
+            element.innerHTML = `<span aria-hidden="true">—</span><span class="visually-hidden">No change</span> 0/min <span class="visually-hidden">per minute</span>`;
+            element.classList.add("text-muted");
+        }
+    }
+
+    function updateProductionElement(element, building) {
+        const value = Number(building.productionRate ?? 0);
+
+        element.classList.remove("text-success", "text-danger", "text-muted");
+
+        if (value > 0) {
+            element.innerHTML = `<span aria-hidden="true">▲</span><span class="visually-hidden">Increasing by</span> ${building.output_resource_name} ${value.toFixed(1)}/min<span class="visually-hidden">per minute</span>`;
+            element.classList.add("text-success");
+        } else if (value < 0) {
+            element.innerHTML = `<span aria-hidden="true">▼</span><span class="visually-hidden">Decreasing by</span> ${building.output_resource_name} ${Math.abs(value).toFixed(1)}/min<span class="visually-hidden">per minute</span>`;
+            element.classList.add("text-danger");
+        } else {
+            element.innerHTML = `<span aria-hidden="true">—</span><span class="visually-hidden">Not producing</span> 0/min`;
+            element.classList.add("text-muted");
+        }
+    }
+
+    function updateConsumptionElement(element, building) {
+        element.classList.remove(
+            "text-danger",
+            "text-muted"
+        );
+
+        if (!building.consumptionRates ||
+            building.consumptionRates.length === 0 || building.workers_assigned === 0) {
+
+            element.innerHTML = `<span aria-hidden="true">—</span><span class="visually-hidden">No inputs</span>`;
+            element.classList.add("text-muted");
+            return;
+        }
+
+        element.innerHTML = building.consumptionRates.map(input => `<span aria-hidden="true">▼</span><span class="visually-hidden">Consuming </span>${input.name} ${Number(input.amount).toFixed(1)} <span class="visually-hidden">per minute</span>`).join("<br>");
+        element.classList.add("text-danger");
+    }
+
+    /*========================
+        FORMATTING HELPERS
+    ========================*/
 
     async function updateStats() {
         try {
             const res = await fetch("/api/player-stats", { credentials: "include" });
             const data = await res.json();
 
+            console.log("Buildings:", data.buildings);
+
             document.getElementById("population-count").textContent = data.population;
             document.getElementById("worker-count").textContent = data.workers;
             document.getElementById("assigned-worker-count").textContent = data.assignedWorkers;
             document.getElementById("available-workers").textContent = data.availableWorkers;
             document.getElementById("food-count").textContent = Number(data.food ?? 0).toFixed(1);
-            
+
             const foodConsumptionEl = document.getElementById("food-consumption");
 
             if (foodConsumptionEl) {
@@ -126,28 +187,32 @@
             // Update player resources
             data.resources.forEach(r => {
                 const amountEl = document.getElementById(`resource-${r.resource_type_id}`);
-                const productionEl = document.getElementById(`resource-${r.resource_type_id}-production`);
-                const consumptionEl = document.getElementById(`resource-${r.resource_type_id}-consumption`);
                 const netEl = document.getElementById(`resource-${r.resource_type_id}-net`);
 
                 if (amountEl) {
                     amountEl.textContent = formatResourceAmount(r.amount);
                 }
 
-                if (productionEl) {
-                    productionEl.textContent = r.producedPerMinute > 0 ? `+${formatResourceAmount(r.producedPerMinute)}/min` : "0/min";
-                }
-
-                if (consumptionEl) {
-                    consumptionEl.textContent = r.consumedPerMinute > 0 ? `+${formatResourceAmount(r.consumedPerMinute)}/min` : "0/min";
-                }
-
                 if (netEl) {
-                    const sign = r.netPerMinute >= 0 ? "+" : "";
-
-                    netEl.textContent = `${sign}${formatResourceAmount(r.netPerMinute)}/min`;
+                    updateNetFlowElement(netEl, r.netPerMinute);
                 }
             });
+
+            //Update player buildings
+            if (data.buildings) {
+                data.buildings.forEach(b => {
+                    const productionEl = document.getElementById(`building-${b.id}-production`);
+                    const consumptionEl = document.getElementById(`building-${b.id}-consumption`);
+
+                    if (productionEl) {
+                        updateProductionElement(productionEl, b);
+                    }
+
+                    if (consumptionEl) {
+                        updateConsumptionElement(consumptionEl, b);
+                    }
+                });
+            }
 
             // Update building workers
             data.buildings.forEach(b => {
