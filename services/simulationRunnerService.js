@@ -5,9 +5,13 @@ import { getActivePlayers } from "./playerService.js";
 let simulationRunning = false;
 
 async function runSimulationTick() {
-    simulationRunning = true;
+  if (simulationRunning) {
+    return;
+  }
 
-    try {
+  simulationRunning = true;
+
+  try {
     const activePlayers = await getActivePlayers();
 
     for (const player of activePlayers) {

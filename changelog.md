@@ -61,3 +61,8 @@
 - Moved production and consumption rates from resources into production building displays.
 - Added dynamic production and consumption information to production buildings.
 - Improved accessibility of resource flow indicators with screen-reader labels.
+
+### [0.3.3]
+
+### Fixed
+- Prevented overlapping simulation ticks to improve stability.
