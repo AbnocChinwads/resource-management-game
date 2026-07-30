@@ -48,3 +48,8 @@
 
 ### Reason
 - Separated automated simulation systems from player-driven actions to provide a cleaner foundation for future gameplay systems.
+
+### [0.3.1]
+
+### Changed
+- Renamed `active-tasks` to `manual-tasks` to better reflect that player-initiated tasks are separate from automated production simulation.

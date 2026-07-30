@@ -57,11 +57,11 @@
     });
 
     async function refreshActiveTasks() {
-        const html = await fetch("/partials/active-tasks", {
+        const html = await fetch("/partials/manual-tasks", {
             credentials: "include"
         }).then(r => r.text());
 
-        const container = document.getElementById("active-tasks-container");
+        const container = document.getElementById("manual-tasks-container");
 
         if (container) {
             container.innerHTML = html;

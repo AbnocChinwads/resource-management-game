@@ -5,7 +5,7 @@ import { getPlayerBuildings } from "../services/buildingService.js";
 
 const router = express.Router();
 
-router.get("/active-tasks", async (req, res) => {
+router.get("/manual-tasks", async (req, res) => {
   const playerId = req.playerId;
 
   try {
@@ -25,7 +25,7 @@ router.get("/active-tasks", async (req, res) => {
              FROM recipe_inputs`,
     );
 
-    res.render("partials/active-tasks", {
+    res.render("partials/manual-tasks", {
       tasks,
       resources: resourcesRes.rows,
       recipeInputs: recipeInputsRes.rows,

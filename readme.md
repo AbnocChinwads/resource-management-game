@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-Alpha v0.3.0
+Alpha v0.3.1
 
 ---
 
