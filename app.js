@@ -4,7 +4,7 @@ import "./services/simulationRunnerService.js";
 
 import express from "express";
 import path from "path";
-import { appVersion } from "./config/appInfo.js";
+import { appVersion } from "./config/appVersion.js";
 
 import db from "./db.js";
 

@@ -47,4 +47,3 @@ Thumbs.db
 .env.local
 .env.*.local
 .localhistory/
-config/appInfo.js
