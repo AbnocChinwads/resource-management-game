@@ -4,7 +4,7 @@ A browser-based resource management game built as a personal learning project.
 
 The goal is to create a resource management game that I would genuinely enjoy playing while using the project to explore game systems, backend development, database design, and long-term project maintenance.
 
-Players begin by manually gathering resources before expanding their settlement through buildings, population growth, and worker automation.
+Players begin by manually gathering resources before expanding their settlement through buildings, population growth, worker automation, and automated production systems.
 
 ## Play Online
 
@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-Alpha v0.2.7
+Alpha v0.3.0
 
 ---
 
@@ -24,29 +24,30 @@ Alpha v0.2.7
 
 ## Account Systems
 
-- Registration and login
-- Email verification
-- Account detail changes
-- Persistent player data
+* Registration and login
+* Email verification
+* Account detail changes
+* Persistent player data
 
 ## Gameplay Systems
 
-- Manual resource gathering
-- Building construction
-- Recipe discovery
-- Worker assignment
-- Automated production
-- Population growth
-- Food consumption
-- Starvation mechanics
-- Persistent game world
+* Manual resource gathering
+* Building construction
+* Recipe discovery
+* Worker assignment
+* Automated production
+* Server-side simulation tick
+* Live resource production and consumption tracking
+* Population growth
+* Food consumption
+* Persistent game world
 
 ## Development Systems
 
-- Bug reporting
-- Gameplay suggestions
-- Developer dashboard
-- Player settlement inspection tools
+* Bug reporting
+* Gameplay suggestions
+* Developer dashboard
+* Player settlement inspection tools
 
 ---
 
@@ -56,10 +57,10 @@ Players begin with limited capabilities and gradually expand their settlement by
 
 The main focus is on:
 
-- Building efficient production chains
-- Managing resources
-- Balancing expansion with sustainability
-- Reducing manual work through automation
+* Building efficient production chains
+* Managing resources
+* Balancing expansion with sustainability
+* Reducing manual work through automation
 
 ---
 
@@ -67,26 +68,37 @@ The main focus is on:
 
 ## Gameplay
 
-- [x] Manual gathering
-- [x] Buildings
-- [x] Worker automation
-- [x] Food consumption
-- [x] Population simulation
-- [x] Starvation system
+* [x] Manual gathering
 
-- [ ] Starvation grace period
-- [ ] Gameplay balancing
-- [ ] Expanded production chains
-- [ ] Additional buildings
-- [ ] Late-game progression
+* [x] Buildings
+
+* [x] Worker automation
+
+* [x] Automated production simulation
+
+* [x] Food consumption
+
+* [x] Population simulation
+
+* [ ] Starvation consequences
+
+* [ ] Starvation grace period
+
+* [ ] Gameplay balancing
+
+* [ ] Expanded production chains
+
+* [ ] Additional buildings
+
+* [ ] Late-game progression
 
 ## Interface
 
-- [x] Navigation improvements
-- [ ] Production statistics dashboard
-- [ ] Improved management tools
-- [ ] Visual polish
-- [ ] Accessibility improvements
+* [x] Navigation improvements
+* [ ] Production statistics dashboard
+* [ ] Improved management tools
+* [ ] Visual polish
+* [ ] Accessibility improvements
 
 ---
 

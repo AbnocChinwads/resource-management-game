@@ -3,7 +3,6 @@
 =========================== -->
 <script>
     window.changeWorkers = async function (buildingId, delta) {
-        console.log("clicked", buildingId, delta);
         try {
             const res = await fetch("/update-workers", {
                 method: "POST",
@@ -85,7 +84,7 @@
 
 
     async function refreshBuildings() {
-        const res = await fetch("/partials/buildings", {
+        const res = await fetch("/partials/populationbuildings", "/partials/productionbuildings", {
             credentials: "include"
         });
 
@@ -102,6 +101,10 @@
     let lastTaskState = null;
     let progressInterval;
 
+    function formatResourceAmount(amount) {
+    return Number(amount).toFixed(2).replace(/\.?0+$/, "");
+    }
+
     async function updateStats() {
         try {
             const res = await fetch("/api/player-stats", { credentials: "include" });
@@ -111,18 +114,39 @@
             document.getElementById("worker-count").textContent = data.workers;
             document.getElementById("assigned-worker-count").textContent = data.assignedWorkers;
             document.getElementById("available-workers").textContent = data.availableWorkers;
-            document.getElementById("food-count").textContent = data.food;
+            document.getElementById("food-count").textContent = Number(data.food ?? 0).toFixed(1);
+            
             const foodConsumptionEl = document.getElementById("food-consumption");
 
             if (foodConsumptionEl) {
                 foodConsumptionEl.textContent =
-                    `${data.foodConsumptionRate.toFixed(1)}/min`;
+                    `${Number(data.foodConsumptionRate ?? 0).toFixed(1)}/min`;
             }
 
             // Update player resources
             data.resources.forEach(r => {
-                const el = document.getElementById(`resource-${r.resource_type_id}`);
-                if (el) el.textContent = r.amount;
+                const amountEl = document.getElementById(`resource-${r.resource_type_id}`);
+                const productionEl = document.getElementById(`resource-${r.resource_type_id}-production`);
+                const consumptionEl = document.getElementById(`resource-${r.resource_type_id}-consumption`);
+                const netEl = document.getElementById(`resource-${r.resource_type_id}-net`);
+
+                if (amountEl) {
+                    amountEl.textContent = formatResourceAmount(r.amount);
+                }
+
+                if (productionEl) {
+                    productionEl.textContent = r.producedPerMinute > 0 ? `+${formatResourceAmount(r.producedPerMinute)}/min` : "0/min";
+                }
+
+                if (consumptionEl) {
+                    consumptionEl.textContent = r.consumedPerMinute > 0 ? `+${formatResourceAmount(r.consumedPerMinute)}/min` : "0/min";
+                }
+
+                if (netEl) {
+                    const sign = r.netPerMinute >= 0 ? "+" : "";
+
+                    netEl.textContent = `${sign}${formatResourceAmount(r.netPerMinute)}/min`;
+                }
             });
 
             // Update building workers

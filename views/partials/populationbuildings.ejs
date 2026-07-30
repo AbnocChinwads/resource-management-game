@@ -1,0 +1,22 @@
+<div class="table-responsive">
+    <table class="table table-striped-columns table-hover table-bordered">
+        <h2>Population Buildings</h2>
+        <thead>
+            <th class="col">Building</th>
+            <th class="col">Health</th>
+            <th class="col">Pop Gain</th>
+        </thead>
+        <tbody>
+            <% buildings.forEach(building=> { %>
+              <% if (building.type==="housing" ) { %>  
+                <tr>
+                    <td><%= building.name %><%= building.name ? " #" + building.building_number : "" %></td>
+                    <td><%= building.health %>/<%= building.max_health %></td>
+                    <td><%= building.population_gain %></td>
+                </tr>
+                <% } %>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+

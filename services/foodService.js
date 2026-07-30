@@ -12,6 +12,7 @@ export async function processFoodTick(playerId) {
        WHERE id = $1`,
       [playerId],
     );
+
     const player = playerRes.rows[0];
 
     if (!player) {
@@ -20,12 +21,15 @@ export async function processFoodTick(playerId) {
     }
 
     const now = new Date();
+
     const lastTick = player.last_food_tick
       ? new Date(player.last_food_tick)
       : now;
+
     const tickRate = player.food_tick_rate_seconds || 1;
 
     const secondsPassed = Math.max(Math.floor((now - lastTick) / 1000), 0);
+
     const ticks = Math.floor(secondsPassed / tickRate);
 
     let population = player.population;
@@ -33,19 +37,23 @@ export async function processFoodTick(playerId) {
 
     // Get all edible resources
     const foodRes = await db.query(
-      `SELECT pr.resource_type_id, pr.amount, rt.nutrition_value
+      `SELECT 
+        pr.resource_type_id,
+        pr.amount,
+        rt.nutrition_value
        FROM player_resources pr
-       JOIN resource_types rt ON pr.resource_type_id = rt.id
-       WHERE pr.player_id = $1 AND rt.nutrition_value > 0
+       JOIN resource_types rt
+         ON pr.resource_type_id = rt.id
+       WHERE pr.player_id = $1
+         AND rt.nutrition_value > 0
        ORDER BY rt.nutrition_value DESC`,
       [playerId],
     );
 
     const foods = foodRes.rows;
 
-    // Calculate total nutrition for display before consumption
     const nutritionBefore = foods.reduce(
-      (sum, f) => sum + f.amount * f.nutrition_value,
+      (sum, food) => sum + food.amount * food.nutrition_value,
       0,
     );
 
@@ -60,27 +68,29 @@ export async function processFoodTick(playerId) {
       };
     }
 
-    // Calculate total nutrition needed
+    // Calculate nutrition required
     let totalNutritionNeeded = population * ticks;
 
-    for (let food of foods) {
-      if (totalNutritionNeeded <= 0) break;
+    for (const food of foods) {
+      if (totalNutritionNeeded <= 0) {
+        break;
+      }
 
-      const foodNutrition = food.amount * food.nutrition_value;
+      const availableNutrition = food.amount * food.nutrition_value;
 
-      if (foodNutrition <= totalNutritionNeeded) {
-        totalNutritionNeeded -= foodNutrition;
+      if (availableNutrition <= totalNutritionNeeded) {
+        totalNutritionNeeded -= availableNutrition;
         food.amount = 0;
       } else {
-        const foodNeeded = Math.ceil(
+        const unitsConsumed = Math.ceil(
           totalNutritionNeeded / food.nutrition_value,
         );
-        food.amount -= foodNeeded;
+
+        food.amount -= unitsConsumed;
         totalNutritionNeeded = 0;
       }
     }
 
-    // Population reduction if deficit
     let starvationStartedAt = player.starvation_started_at;
 
     if (totalNutritionNeeded > 0) {
@@ -91,13 +101,12 @@ export async function processFoodTick(playerId) {
       starvationStartedAt = null;
     }
 
-    // Update player population & last tick
     await db.query(
       `UPDATE players
        SET population = $1,
-       workers = $2,
-       last_food_tick = NOW(),
-       starvation_started_at = $3
+           workers = $2,
+           last_food_tick = NOW(),
+           starvation_started_at = $3
        WHERE id = $4`,
       [population, workers, starvationStartedAt, playerId],
     );
@@ -105,7 +114,7 @@ export async function processFoodTick(playerId) {
     await reconcileWorkers(playerId, workers);
 
     const nutritionAfter = foods.reduce(
-      (sum, f) => sum + f.amount * f.nutrition_value,
+      (sum, food) => sum + food.amount * food.nutrition_value,
       0,
     );
 
@@ -122,6 +131,41 @@ export async function processFoodTick(playerId) {
   }
 }
 
+// Population food demand
 export function getFoodConsumptionRate(population, tickRate) {
   return (population / tickRate) * 60;
+}
+
+// Total nutrition consumption from resource flow
+export function getFoodNutritionConsumption(resources) {
+  return resources.reduce((total, resource) => {
+    if (resource.nutrition_value <= 0) {
+      return total;
+    }
+
+    return total + resource.consumedPerMinute * resource.nutrition_value;
+  }, 0);
+}
+
+// Existing function - leave for now
+export function getFoodConsumptionByResource(population, tickRate, foods) {
+  let remainingNutrition = getFoodConsumptionRate(population, tickRate);
+
+  return foods.map((food) => {
+    if (remainingNutrition <= 0) {
+      return {
+        resource_type_id: food.resource_type_id,
+        consumedPerMinute: 0,
+      };
+    }
+
+    const unitsConsumed = remainingNutrition / food.nutrition_value;
+
+    remainingNutrition = 0;
+
+    return {
+      resource_type_id: food.resource_type_id,
+      consumedPerMinute: unitsConsumed,
+    };
+  });
 }

@@ -1,77 +1,131 @@
 import db from "../db.js";
-import { maintainBuildingTasks } from "../services/taskService.js";
 
 export async function completeTask(playerId, taskId) {
   try {
     await db.query("BEGIN");
 
-    const result = await db.query(
+    const taskRes = await db.query(
       `
-      UPDATE player_tasks pt
-      SET completed = TRUE
-      FROM recipes r
+      SELECT
+        pt.id,
+        pt.recipe_id,
+        r.output_resource_id,
+        r.output_amount,
+        r.output_building_id
+      FROM player_tasks pt
+      JOIN recipes r
+        ON pt.recipe_id = r.id
       WHERE pt.id = $1
         AND pt.player_id = $2
         AND pt.completed = FALSE
-        AND pt.recipe_id = r.id
         AND NOW() >= pt.started_at + pt.duration_seconds * INTERVAL '1 second'
-      RETURNING r.output_resource_id, r.output_amount, r.output_building_id
       `,
       [taskId, playerId],
     );
 
-    if (result.rows.length === 0) {
+    if (taskRes.rows.length === 0) {
       await db.query("ROLLBACK");
-      throw new Error("Could Not Complete: ", Error);
+      throw new Error(`Could Not Complete Task ${taskId}`);
     }
 
     const { output_resource_id, output_amount, output_building_id } =
-      result.rows[0];
+      taskRes.rows[0];
+
+    await db.query(
+      `
+      UPDATE player_tasks
+      SET completed = TRUE
+      WHERE id = $1
+      `,
+      [taskId],
+    );
 
     if (output_resource_id) {
       await db.query(
-        `INSERT INTO player_resources (player_id, resource_type_id, amount)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (player_id, resource_type_id)
-         DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount`,
+        `
+        INSERT INTO player_resources 
+        (player_id, resource_type_id, amount)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (player_id, resource_type_id)
+        DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount
+        `,
         [playerId, output_resource_id, output_amount],
       );
     }
 
     if (output_building_id) {
       const insertRes = await db.query(
-        `INSERT INTO player_buildings (
-        player_id,
-        building_id,
-        health
+        `
+        INSERT INTO player_buildings (
+          player_id,
+          building_id,
+          health
         )
-        SELECT $1,
-        id,
-        max_health
+        SELECT 
+          $1,
+          id,
+          max_health
         FROM buildings
         WHERE id = $2
-        RETURNING id`,
+        RETURNING id
+        `,
         [playerId, output_building_id],
       );
+
       const newBuildingId = insertRes.rows[0].id;
 
-      // Fetch building type & population gain
       const buildingRes = await db.query(
-        `SELECT type, population_gain FROM buildings WHERE id = $1`,
+        `
+        SELECT type, population_gain
+        FROM buildings
+        WHERE id = $1
+        `,
         [output_building_id],
       );
+
       const { type, population_gain } = buildingRes.rows[0];
 
       if (type === "housing") {
         await db.query(
-          `UPDATE players SET population = population + $1, workers = workers + $1 WHERE id = $2`,
+          `
+          UPDATE players
+          SET 
+            population = population + $1,
+            workers = workers + $1
+          WHERE id = $2
+          `,
           [population_gain || 2, playerId],
         );
       } else if (type === "production") {
-        await db.query(
-          `UPDATE player_buildings SET workers_assigned = 1 WHERE id = $1`,
-          [newBuildingId],
+        const workerRes = await db.query(
+          `
+          SELECT
+            workers,
+            (
+              SELECT COALESCE(SUM(workers_assigned), 0)
+              FROM player_buildings
+              WHERE player_id = $1
+            ) AS assigned_workers
+          FROM players
+          WHERE id = $1
+          `,
+          [playerId],
         );
+
+        const { workers, assigned_workers } = workerRes.rows[0];
+
+        const availableWorkers = workers - Number(assigned_workers);
+
+        if (availableWorkers > 0) {
+          await db.query(
+            `
+            UPDATE player_buildings
+            SET workers_assigned = 1
+            WHERE id = $1
+            `,
+            [newBuildingId],
+          );
+        }
       }
     }
 
@@ -91,9 +145,8 @@ export async function completeFinishedTasks(playerId) {
     SELECT id
     FROM player_tasks
     WHERE player_id = $1
-      AND player_building_id IS NOT NULL
-      AND completed = FALSE
-      AND NOW() >= started_at + duration_seconds * INTERVAL '1 second'
+    AND completed = FALSE
+    AND NOW() >= started_at + duration_seconds * INTERVAL '1 second'
     `,
     [playerId],
   );
@@ -101,6 +154,4 @@ export async function completeFinishedTasks(playerId) {
   for (const task of completedTasksRes.rows) {
     await completeTask(playerId, task.id);
   }
-
-  await maintainBuildingTasks(playerId);
 }

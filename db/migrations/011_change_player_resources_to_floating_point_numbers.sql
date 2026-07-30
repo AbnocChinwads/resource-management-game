@@ -1,0 +1,2 @@
+ALTER TABLE player_resources
+ALTER COLUMN amount TYPE NUMERIC;

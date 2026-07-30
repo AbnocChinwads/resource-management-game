@@ -1,46 +1,49 @@
-<h2>Resources</h2>
-<ul class="list-group">
-    <% resources.forEach(resource=> { %>
-        <li class="list-group-item">
-            <%= resource.name %>: <span id="resource-<%= resource.resource_type_id %>">
-                    <%= resource.amount %>
-                </span>
-        </li>
-        <% }) %>
-</ul>
+<div class="table-responsive">
+    <table class="table table-striped-columns table-hover table-bordered">
+        <h2>Resources</h2>
+        <thead>
+            <th class="col">Resource</th>
+            <th class="col">Storage</th>
+            <th class="col">Production</th>
+            <th class="col">Consumption</th>
+            <th class="col">Net Gain/Loss</th>
+        </thead>
+        <tbody>
+            <% resources.forEach(resource=> { %>
+                <tr>
+                    <td><%= resource.name %></td>
+                    <td id="resource-<%= resource.resource_type_id %>"></td>
+                    <td id="resource-<%= resource.resource_type_id %>-production"></td>
+                    <td id="resource-<%= resource.resource_type_id %>-consumption"></td>
+                    <td id="resource-<%= resource.resource_type_id %>-net"></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
 <!-- Stats display -->
-<h2 class="mt-3">Population</h2>
-<ul class="list-group">
-    <li class="list-group-item">
-        <p>Population: <span id="population-count">
-                <%= population %>
-            </span></p>
-    </li>
-    <li class="list-group-item">
-        <p>Workers: <span id="worker-count">
-                <%= workers %>
-            </span></p>
-    </li>
-    <li class="list-group-item">
-        <p>Available Workers: <span id="available-workers">
-                <%= availableWorkers || 0 %>
-            </span></p>
-    </li>
-    <li class="list-group-item">
-        <p>Assigned Workers: <span id="assigned-worker-count">
-                <%= assignedWorkers || 0 %>
-            </span></p>
-    </li>
-    <li class="list-group-item">
-        <p>Food: <span id="food-count">
-                <%= food %>
-            </span></p>
-        <% if (food===0) { %>
-            <span id="starvation-warning" class="text-danger font-weight-bold" style="display:none;"> - Starvation
-                Risk!</span>
-            <% } %>
-    </li>
-    <li class="list-group-item">
-        <p>Food Consumption: <span id="food-consumption"></span></p>
-    </li>
-</ul>
+<div class="table-responsive">
+    <table class="table table-striped-columns table-hover table-bordered">
+        <h2 class="mt-3">Population</h2>
+        <thead>
+            <tr>
+                <th>Population</th>
+                <th>Workers</th>
+                <th>Available Workers</th>
+                <th>Assigned Workers</th>
+                <th>Food Nutrition</th>
+                <th>Food Consumption</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="population-count"></td>
+                <td id="worker-count"></td>
+                <td id="available-workers"></td>
+                <td id="assigned-worker-count"></td>
+                <td id="food-count"></td>
+                <td id="food-consumption"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

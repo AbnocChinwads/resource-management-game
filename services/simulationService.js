@@ -1,8 +1,7 @@
-import db from "../db.js";
+import { processResourceTick } from "./resourceSimulationService.js";
 import { processFoodTick } from "./foodService.js";
-import { completeFinishedTasks } from "./completeTaskService.js";
 
 export async function processSimulationTick(playerId) {
+    await processResourceTick(playerId);
     await processFoodTick(playerId);
-    await completeFinishedTasks(playerId);
 }

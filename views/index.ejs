@@ -1,24 +1,23 @@
-<%- include('partials/header.ejs'); -%>
-    <div class="row mb-4">
-
-        <div class="col-3">
+        <%- include('partials/header.ejs'); -%>
+        <div class="row mb-4">
             <%- include('partials/resources.ejs'); -%>
-        </div>
-        <div class="col-4" id="active-tasks-container">
-            <%- include('partials/active-tasks.ejs'); -%>
-        </div>
-        <div class="col-4">
-            <div id="recipes-container">
+            <div class="col-3" id="buildings-container">
+                <%- include('partials/populationbuildings.ejs'); -%>
+            </div>
+            <div class="col-3" id="buildings-container">
+                <%- include('partials/productionbuildings.ejs'); -%>
+            </div>
+            <div class="col-3" id="recipes-container">
                 <%- include('partials/recipes.ejs'); -%>
             </div>
-            <div id="buildings-container">
-                <%- include('partials/buildings.ejs'); -%>
-            </div>
+            <% if (tasks && tasks.length > 0) { %>
+                <div class="col-3" id="active-tasks-container">
+                    <%- include('partials/active-tasks.ejs'); -%>
+                </div>
+            <% } %>
         </div>
-    </div>
 
-    <%- include('partials/footer.ejs'); -%>
+        <%- include('partials/footer.ejs'); -%>
         <%- include('partials/gamescripts.ejs'); -%>
-                </body>
-
-                </html>
+    </body>
+</html>

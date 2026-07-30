@@ -1,0 +1,28 @@
+<div class="table-responsive">
+    <table class="table table-striped-columns table-hover table-bordered">
+        <h2>Worker Buildings</h2>
+        <thead>
+            <th class="col">Building</th>
+            <th class="col">Health</th>
+            <th class="col">Workers</th>
+            <th class="col">Add/Remove Workers</th>
+        </thead>
+        <tbody>
+            <% buildings.forEach(building=> { %>
+              <% if (building.type==="production" ) { %>
+                <tr>
+                    <td><%= building.name %><%= building.name ? " #" + building.building_number : "" %></td>
+                    <td><%= building.health %>/<%= building.max_health %></td>
+                    <td><span id="building-<%= building.id %>-workers"><%= building.workers_assigned %></span>/<%= building.max_workers %></td>
+                    <td>
+                      <div class="btn-group ms-2">
+                        <button class="btn btn-sm btn-danger" onclick="changeWorkers(<%= building.id %>, -1)">-</button>
+                        <button class="btn btn-sm btn-success" onclick="changeWorkers(<%= building.id %>, 1)">+</button>
+                      </div>
+                    </td>
+                </tr>
+              <% } %>
+            <% }) %>
+        </tbody>
+    </table>
+</div>

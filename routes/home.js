@@ -50,11 +50,6 @@ router.get("/", requireAuth, async (req, res) => {
       recipes: recipesRes.rows,
       recipeInputs: recipeInputsRes.rows,
       buildings,
-      population,
-      workers,
-      assignedWorkers,
-      availableWorkers,
-      food: res.locals.food,
     });
   } catch (err) {
     console.error("Error loading homepage:", err);

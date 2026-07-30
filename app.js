@@ -1,4 +1,6 @@
 import "dotenv/config";
+import "./services/simulationRunnerService.js";
+
 
 import express from "express";
 import path from "path";

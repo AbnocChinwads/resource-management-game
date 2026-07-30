@@ -1,0 +1,1 @@
+export const SIMULATION_TICK_SECONDS = 10;

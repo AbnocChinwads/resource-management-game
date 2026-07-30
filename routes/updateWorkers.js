@@ -1,6 +1,5 @@
 import express from "express";
 import db from "../db.js";
-import { maintainBuildingTasks } from "../services/taskService.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -45,12 +44,11 @@ router.post("/", async (req, res) => {
 
     let newWorkers = workers_assigned + Number(delta);
 
-    if (newWorkers < 0) newWorkers = 0;
-    if (newWorkers > max_workers) newWorkers = max_workers;
+    const maxAllowedByPopulation = workers_assigned + availableWorkers;
 
-    if (delta > 0 && availableWorkers <= 0) {
-      newWorkers = workers_assigned; // no workers available
-    }
+    newWorkers = Math.max(0, newWorkers);
+    newWorkers = Math.min(newWorkers, max_workers);
+    newWorkers = Math.min(newWorkers, maxAllowedByPopulation);
 
     await db.query(
       `UPDATE player_buildings
@@ -60,8 +58,6 @@ router.post("/", async (req, res) => {
     );
 
     await db.query("COMMIT");
-
-    await maintainBuildingTasks(playerId);
 
     // return JSON
     res.json({
