@@ -169,8 +169,6 @@
             const res = await fetch("/api/player-stats", { credentials: "include" });
             const data = await res.json();
 
-            console.log("Buildings:", data.buildings);
-
             document.getElementById("population-count").textContent = data.population;
             document.getElementById("worker-count").textContent = data.workers;
             document.getElementById("assigned-worker-count").textContent = data.assignedWorkers;
