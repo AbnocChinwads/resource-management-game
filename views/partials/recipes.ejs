@@ -33,19 +33,15 @@
                     <% if (inputs.length> 0) { %>
                         <small>
                             Needs:
-                            <% inputs.forEach((input, idx)=> {
-                                const resourceName = resources.find(
-                                r => r.resource_type_id === input.resource_type_id
-                                )?.name || '?';
-                                %>
+                            <% inputs.forEach((input, idx)=> { const resourceName = resources.find(r => r.resource_type_id === input.resource_type_id)?.name || '?'; %>
                                 <%= input.amount %>
-                                    <%= resourceName %>
-                                        <%= idx < inputs.length - 1 ? ', ' : '' %>
-                                            <% }); %>
+                                <%= resourceName %>
+                                <%= idx < inputs.length - 1 ? ', ' : '' %>
+                            <% }); %>
                         </small>
-                        <% } %>
+                    <% } %>
                 </li>
-                <% } %>
+            <% } %>
 
-                    <% }); %>
+        <% }); %>
 </ul>
