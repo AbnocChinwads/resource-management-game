@@ -1,13 +1,15 @@
 <div class="table-responsive">
   <h2>Worker Buildings</h2>
-  <table class="table table-sm table-striped-columns table-hover table-bordered">
+  <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
       <thead>
-          <th class="col">Building</th>
-          <th class="col">Health</th>
-          <th class="col">Production</th>
-          <th class="col">Consuming</th>
-          <th class="col">Workers</th>
-          <th class="col">Add/Remove Workers</th>
+        <tr>
+          <th>Building</th>
+          <th>Health</th>
+          <th class="d-none d-xxl-table-cell">Production</th>
+          <th class="d-none d-xxl-table-cell">Consuming</th>
+          <th>Workers</th>
+          <th></th>
+        </tr>
       </thead>
       <tbody>
           <% buildings.forEach(building=> { %>
@@ -15,13 +17,13 @@
               <tr>
                   <td><%= building.name %><%= building.name ? " #" + building.building_number : "" %></td>
                   <td><%= building.health %>/<%= building.max_health %></td>
-                  <td id="building-<%= building.id %>-production"></td>
-                  <td id="building-<%= building.id %>-consumption"></td>
+                  <td class="d-none d-xxl-table-cell" id="building-<%= building.id %>-production"></td>
+                  <td class="d-none d-xxl-table-cell" id="building-<%= building.id %>-consumption"></td>
                   <td><span id="building-<%= building.id %>-workers"><%= building.workers_assigned %></span>/<%= building.max_workers %></td>
                   <td>
-                    <div class="btn-group ms-2">
-                      <button class="btn btn-sm btn-danger" onclick="changeWorkers(<%= building.id %>, -1)">-</button>
-                      <button class="btn btn-sm btn-success" onclick="changeWorkers(<%= building.id %>, 1)">+</button>
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-danger px-2" aria-label="Remove worker" onclick="changeWorkers(<%= building.id %>, -1)">-</button>
+                      <button class="btn btn-sm btn-success px-2" aria-label="Add worker" onclick="changeWorkers(<%= building.id %>, 1)">+</button>
                     </div>
                   </td>
               </tr>

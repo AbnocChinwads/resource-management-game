@@ -73,3 +73,18 @@
 - Improved game layout responsiveness by restructuring Bootstrap columns.
 - Moved settlement resources into a full-width status section.
 - Updated dashboard sections to stack correctly on smaller screens.
+
+### [0.3.5]
+
+### Changed
+## Frontend / UI
+- Restructured the main game page layout to improve responsive behaviour across desktop, tablet, and mobile screen sizes.
+- Moved the resources and population overview into a full-width status section rather than forcing them into dashboard columns.
+- Updated Bootstrap column usage to allow dashboard sections to stack naturally on smaller screens.
+- Improved production building table responsiveness by hiding lower-priority detail columns at smaller breakpoints while preserving full information on larger displays.
+- Improved table markup consistency and accessibility support.
+- Added clearer screen reader handling for dynamic values and worker controls.
+
+## Notes
+- This update focuses on improving usability and layout stability rather than adding new gameplay systems.
+- The current building tables remain in place, with future plans to introduce grouped/collapsible building management views as the number of buildings and production chains increase.
