@@ -16,13 +16,13 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-Alpha v0.3.5
+Alpha v0.3.6
 
 ---
 
 # Recent Updates
 
-## Alpha v0.3.5 - Responsive Settlement Interface
+## Alpha v0.3.6 - Responsive Settlement Interface
 
 The settlement interface has been improved to provide a better experience across desktop, tablet, and mobile devices.
 
@@ -31,6 +31,7 @@ The settlement interface has been improved to provide a better experience across
 * Updated the main game layout to adapt better across different screen sizes.
 * Improved resource and population overview displays.
 * Improved production building management tables on smaller screens.
+* Improved Recipes & Actions with groupings and collapsible sections.
 * Reduced interface clutter by prioritising important information when space is limited.
 * Improved table structure and readability.
 * Added accessibility improvements for dynamic information and worker controls.

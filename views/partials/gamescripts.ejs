@@ -73,6 +73,11 @@
     }
 
     async function refreshRecipes() {
+        // Remember open accordion sections
+        const openRecipes = [
+            ...document.querySelectorAll("#recipeAccordion .accordion-collapse.show")
+        ].map(el => el.id);
+
         const res = await fetch("/partials/recipes", {
             credentials: "include"
         });
@@ -80,6 +85,23 @@
         const html = await res.text();
 
         document.getElementById("recipes-container").innerHTML = html;
+
+        // Restore open sections
+        openRecipes.forEach(id => {
+            const collapse = document.getElementById(id);
+
+            if (!collapse) return;
+            collapse.classList.add("show");
+
+            const button = document.querySelector(
+                `[data-bs-target="#${id}"]`
+            );
+
+            if (button) {
+                button.classList.remove("collapsed");
+                button.setAttribute("aria-expanded", "true");
+            }
+        });
     }
 
 
@@ -99,6 +121,7 @@
 =========================== -->
 <script>
     let lastTaskState = null;
+    let lastRecipeState = null;
     let progressInterval;
 
     /*========================
@@ -225,7 +248,20 @@
                 await refreshActiveTasks();
             }
 
-            await refreshRecipes();
+            const recipeState = JSON.stringify({
+                resources: data.resources.map(r => ({
+                    id: r.resource_type_id,
+                    amount: r.amount
+                })),
+                buildings: data.buildings.map(b => ({
+                    id: b.building_id
+                }))
+            });
+
+            if (recipeState !== lastRecipeState) {
+                lastRecipeState = recipeState;
+                await refreshRecipes();
+            }
             await refreshBuildings();
         } catch (err) {
             console.error("Stats update error:", err);

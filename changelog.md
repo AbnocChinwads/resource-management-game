@@ -88,3 +88,19 @@
 ## Notes
 - This update focuses on improving usability and layout stability rather than adding new gameplay systems.
 - The current building tables remain in place, with future plans to introduce grouped/collapsible building management views as the number of buildings and production chains increase.
+
+## [0.3.6]
+
+### Changed
+- Reworked recipe display into grouped Bootstrap accordions by recipe type:
+  - Gather
+  - Craft
+  - Build
+- Updated recipe presentation to separate action type from recipe name.
+- Improved recipe list readability on desktop and mobile layouts.
+- Added recipe state tracking to prevent unnecessary recipe list refreshes.
+- Preserved open recipe accordion sections when recipe data updates.
+
+### Fixed
+- Fixed recipe list collapsing during regular simulation updates.
+- Fixed recipe naming display by removing internal action prefixes from player-facing names.

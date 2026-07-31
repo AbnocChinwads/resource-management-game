@@ -1,47 +1,89 @@
-<h2>Available Recipes</h2>
-<ul class="list-group">
-    <% recipes.forEach(recipe=> {
-        const inputs = recipeInputs.filter(ri => ri.recipe_id === recipe.id);
-        let canStart = true;
+<h2>Recipes & Actions</h2>
+    <% const recipeGroups={ gather: recipes.filter(r=> r.recipe_type === "gather"),
+            craft: recipes.filter(r => r.recipe_type === "craft"),
+            build: recipes.filter(r => r.recipe_type === "build")
+        };
+        
+        const recipePrefixes = [
+            "Grow ",
+            "Gather ",
+            "Mine ",
+            "Mill ",
+            "Bake ",
+            "Forge ",
+            "Chop ",
+            "Saw ",
+            "Build "
+        ];
+    %>
+    <div class="accordion" id="recipeAccordion">
+        <% Object.entries(recipeGroups).forEach(([type, group], index)=> { %>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button <%= index !== 0 ? 'collapsed' : '' %>" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#<%= type %>-recipes">
+                        <%= type.charAt(0).toUpperCase() + type.slice(1) %>
+                            (<%= group.length %>)
+                    </button>
+                </h2>
+                <div id="<%= type %>-recipes" class="accordion-collapse collapse <%= index === 0 ? 'show' : '' %>">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group">
+                            <% group.forEach(recipe=> {
+                                const inputs = recipeInputs.filter(ri => ri.recipe_id === recipe.id);
+                                let canStart = true;
 
-        inputs.forEach(input => {
-        const playerAmount = resources.find(
-        r => r.resource_type_id === input.resource_type_id
-        )?.amount || 0;
+                                inputs.forEach(input => {
+                                const playerAmount = resources.find(
+                                r => r.resource_type_id === input.resource_type_id
+                                )?.amount || 0;
 
-        if (playerAmount < input.amount) { canStart=false; } }); if (recipe.required_building_id) { const
-            hasBuilding=buildings.find( b=> b.building_id === recipe.required_building_id
-            );
+                                if (playerAmount < input.amount) { canStart=false; } }); 
+                                if (recipe.required_building_id) { const hasBuilding=buildings.find( b=> b.building_id === recipe.required_building_id);
+                                    if (!hasBuilding) { canStart = false; }
+                                }
 
-            if (!hasBuilding) {
-            canStart = false;
-            }
-            }
+                                const hideRecipe = recipe.hide_until_available && !canStart;
 
-            const hideRecipe = recipe.hide_until_available && !canStart;
-            %>
+                                let displayName = recipe.name;
 
-            <% if (!hideRecipe) { %>
-                <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
-                    <form action="/start-task" method="POST">
-                        <input type="hidden" name="recipeId" value="<%= recipe.id %>">
-                        <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? '' : 'disabled' %>>
-                            Start <%= recipe.name %>
-                        </button>
-                    </form>
+                                for (const prefix of recipePrefixes) {
+                                    if (displayName.startsWith(prefix)) {
+                                        displayName = displayName.replace(prefix, "");
+                                        break;
+                                    }
+                                }
+                            %>
+                                <% if (!hideRecipe) { %>
+                                    <li class="list-group-item <%= canStart ? '' : 'text-muted' %>">
+                                        <form action="/start-task" method="POST">
+                                            <input type="hidden" name="recipeId" value="<%= recipe.id %>">
+                                            <strong class="me-3">
+                                                <%= displayName %>
+                                            </strong>
+                                            <button type="submit" class="btn btn-primary btn-sm" <%=canStart ? ''
+                                                : 'disabled' %>>
+                                                <%= recipe.recipe_type.charAt(0).toUpperCase() +
+                                                    recipe.recipe_type.slice(1) %>
+                                            </button>
+                                        </form>
 
-                    <% if (inputs.length> 0) { %>
-                        <small>
-                            Needs:
-                            <% inputs.forEach((input, idx)=> { const resourceName = resources.find(r => r.resource_type_id === input.resource_type_id)?.name || '?'; %>
-                                <%= input.amount %>
-                                <%= resourceName %>
-                                <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                        <% if (inputs.length> 0) { %>
+                                            <small>
+                                                Needs:
+                                                <% inputs.forEach((input, idx)=> { const resourceName = resources.find(r => r.resource_type_id === input.resource_type_id)?.name || '?'; %>
+                                                    <%= input.amount %>
+                                                    <%= resourceName %>
+                                                    <%= idx < inputs.length - 1 ? ', ' : '' %>
+                                                <% }); %>
+                                            </small>
+                                        <% } %>
+                                    </li>
+                                <% } %>
                             <% }); %>
-                        </small>
-                    <% } %>
-                </li>
-            <% } %>
-
+                        </ul>
+                    </div>
+                </div>
+            </div>
         <% }); %>
-</ul>
+    </div>
