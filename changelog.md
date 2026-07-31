@@ -66,3 +66,10 @@
 
 ### Fixed
 - Prevented overlapping simulation ticks to improve stability.
+
+### [0.3.4]
+
+### Changed
+- Improved game layout responsiveness by restructuring Bootstrap columns.
+- Moved settlement resources into a full-width status section.
+- Updated dashboard sections to stack correctly on smaller screens.
