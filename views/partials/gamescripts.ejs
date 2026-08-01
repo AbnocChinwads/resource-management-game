@@ -87,23 +87,14 @@
         document.getElementById("recipes-container").innerHTML = html;
 
         // Restore open sections
-        openRecipes.forEach(id => {
-            const collapse = document.getElementById(id);
+        
+openRecipes.forEach(id => {
+    const collapse = document.getElementById(id);
 
-            if (!collapse) return;
-            collapse.classList.add("show");
+    if (!collapse) return;
 
-            const button = document.querySelector(
-                `[data-bs-target="#${id}"]`
-            );
-
-            if (button) {
-                button.classList.remove("collapsed");
-                button.setAttribute("aria-expanded", "true");
-            }
-        });
-    }
-
+    bootstrap.Collapse.getOrCreateInstance(collapse).show();
+});
 
     async function refreshBuildings() {
         const res = await fetch("/partials/populationbuildings", "/partials/productionbuildings", {
