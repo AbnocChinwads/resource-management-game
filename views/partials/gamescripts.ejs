@@ -56,6 +56,58 @@
         }
     });
 
+    // Remember accordion position in localStorage
+    document.addEventListener("DOMContentLoaded", () => {
+        const accordion = document.getElementById("recipeAccordion");
+
+        if (!accordion) return;
+
+        // Restore previously open sections
+        const openRecipes = JSON.parse(
+            localStorage.getItem("openRecipeAccordions") || "[]"
+        ).filter(id => document.getElementById(id));
+
+        openRecipes.forEach(id => {
+            const collapse = document.getElementById(id);
+
+            if (collapse) {
+                collapse.classList.add("show");
+
+                const button = document.querySelector(
+                    `[data-bs-target="#${id}"]`
+                );
+
+                if (button) {
+                    button.classList.remove("collapsed");
+                    button.setAttribute("aria-expanded", "true");
+                }
+            }
+        });
+
+        accordion.addEventListener("shown.bs.collapse", () => {
+            saveOpenRecipeAccordions();
+        });
+
+        accordion.addEventListener("hidden.bs.collapse", () => {
+            saveOpenRecipeAccordions();
+        });
+
+        function saveOpenRecipeAccordions() {
+            const openRecipes = [
+                ...document.querySelectorAll(
+                    "#recipeAccordion .accordion-collapse.show"
+                )
+            ].map(el => el.id);
+
+            console.log("Saving accordions:", openRecipes);
+
+            localStorage.setItem(
+                "openRecipeAccordions",
+                JSON.stringify(openRecipes)
+            );
+        }
+    });
+
     async function refreshActiveTasks() {
         const html = await fetch("/partials/manual-tasks", {
             credentials: "include"
@@ -72,38 +124,24 @@
         }
     }
 
-    async function refreshRecipes() {
-        // Remember open accordion sections
-        const openRecipes = [
-            ...document.querySelectorAll("#recipeAccordion .accordion-collapse.show")
-        ].map(el => el.id);
-
-        const res = await fetch("/partials/recipes", {
+    async function refreshPopulationBuildings() {
+        const res = await fetch("/partials/population-buildings", {
             credentials: "include"
         });
 
         const html = await res.text();
 
-        document.getElementById("recipes-container").innerHTML = html;
+        document.getElementById("population-buildings-container").innerHTML = html;
+    }
 
-        // Restore open sections
-        
-openRecipes.forEach(id => {
-    const collapse = document.getElementById(id);
-
-    if (!collapse) return;
-
-    bootstrap.Collapse.getOrCreateInstance(collapse).show();
-});
-
-    async function refreshBuildings() {
-        const res = await fetch("/partials/populationbuildings", "/partials/productionbuildings", {
+    async function refreshProductionBuildings() {
+        const res = await fetch("/partials/production-buildings", {
             credentials: "include"
         });
 
         const html = await res.text();
 
-        document.getElementById("buildings-container").innerHTML = html;
+        document.getElementById("production-buildings-container").innerHTML = html;
     }
 </script>
 
@@ -112,7 +150,6 @@ openRecipes.forEach(id => {
 =========================== -->
 <script>
     let lastTaskState = null;
-    let lastRecipeState = null;
     let progressInterval;
 
     /*========================
@@ -239,21 +276,6 @@ openRecipes.forEach(id => {
                 await refreshActiveTasks();
             }
 
-            const recipeState = JSON.stringify({
-                resources: data.resources.map(r => ({
-                    id: r.resource_type_id,
-                    amount: r.amount
-                })),
-                buildings: data.buildings.map(b => ({
-                    id: b.building_id
-                }))
-            });
-
-            if (recipeState !== lastRecipeState) {
-                lastRecipeState = recipeState;
-                await refreshRecipes();
-            }
-            await refreshBuildings();
         } catch (err) {
             console.error("Stats update error:", err);
         }

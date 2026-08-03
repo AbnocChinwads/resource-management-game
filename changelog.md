@@ -104,3 +104,24 @@
 ### Fixed
 - Fixed recipe list collapsing during regular simulation updates.
 - Fixed recipe naming display by removing internal action prefixes from player-facing names.
+
+## [0.3.7] - Recipe UI Improvements & Building Refactor Fixes
+
+### Added
+- Added recipe accordion state persistence using local storage.
+  - Players now return to the recipe category they were viewing after page updates or actions.
+
+### Changed
+- Reworked recipe display into separate accordion categories:
+  - Gather recipes
+  - Craft recipes
+  - Build recipes
+- Improved recipe names shown to players by removing internal action prefixes (for example, "Gather Wheat" now displays as "Wheat").
+- Separated population buildings and production buildings into different partial renders to prepare for future building expansion and UI improvements.
+
+### Fixed
+- Fixed recipe accordion sections resetting after selecting recipes.
+- Fixed recipe availability updates interfering with the recipe UI state.
+- Fixed production and consumption building information not rendering correctly after the building partial split.
+- Fixed building partial refresh errors caused by incorrect partial routes.
+- Fixed JavaScript errors caused by partial refresh refactoring.

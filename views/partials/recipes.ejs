@@ -1,5 +1,7 @@
 <h2>Recipes & Actions</h2>
-    <% const recipeGroups={ gather: recipes.filter(r=> r.recipe_type === "gather"),
+    <% const recipeGroups=
+        { 
+            gather: recipes.filter(r=> r.recipe_type === "gather"),
             craft: recipes.filter(r => r.recipe_type === "craft"),
             build: recipes.filter(r => r.recipe_type === "build")
         };
@@ -20,13 +22,13 @@
         <% Object.entries(recipeGroups).forEach(([type, group], index)=> { %>
             <div class="accordion-item">
                 <h2 class="accordion-header">
-                    <button class="accordion-button <%= index !== 0 ? 'collapsed' : '' %>" type="button"
+                    <button class="accordion-button collapsed" type="button"
                         data-bs-toggle="collapse" data-bs-target="#<%= type %>-recipes">
                         <%= type.charAt(0).toUpperCase() + type.slice(1) %>
                             (<%= group.length %>)
                     </button>
                 </h2>
-                <div id="<%= type %>-recipes" class="accordion-collapse collapse <%= index === 0 ? 'show' : '' %>">
+                <div id="<%= type %>-recipes" class="accordion-collapse collapse">
                     <div class="accordion-body p-0">
                         <ul class="list-group">
                             <% group.forEach(recipe=> {
