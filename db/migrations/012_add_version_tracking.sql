@@ -1,2 +1,2 @@
 ALTER TABLE players
-ADD COLUMN settlement_version TEXT NOT NULL DEFAULT NULL;
+ADD COLUMN settlement_version TEXT;
