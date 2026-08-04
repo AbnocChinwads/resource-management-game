@@ -1,7 +1,10 @@
         <%- include('partials/header.ejs'); -%>
         <div class="row">
-            <div class="col-12 mb-4">
+            <div class="col-12 mb-4" id="resources-container">
                 <%- include('partials/resources.ejs'); -%>
+            </div>
+            <div class="col-12 mb-4" id="storage-container">
+                <%- include('partials/storage.ejs'); -%>
             </div>
             <div class="col-12 col-xl-4 mb-4" id="population-buildings-container">
                 <%- include('partials/population-buildings.ejs'); -%>
@@ -18,7 +21,7 @@
                 </div>
             <% } %>
         </div>
-
+        <%- include('partials/announcementmodal.ejs'); -%>
         <%- include('partials/footer.ejs'); -%>
         <%- include('partials/gamescripts.ejs'); -%>
     </body>

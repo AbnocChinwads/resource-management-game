@@ -1,8 +1,10 @@
-import express from "express";
 import db from "../db.js";
+import express from "express";
 import { requireAuth } from "../middleware/auth.js";
 import { getPlayerTasks } from "../services/taskService.js";
 import { getPlayerBuildings } from "../services/buildingService.js";
+import { getResourceFlow } from "../services/resourceFlowService.js";
+
 const router = express.Router();
 
 router.get("/", requireAuth, async (req, res) => {
@@ -10,15 +12,6 @@ router.get("/", requireAuth, async (req, res) => {
 
   try {
     const tasks = await getPlayerTasks(playerId);
-
-    const resourcesRes = await db.query(
-      `SELECT pr.*, rt.name
-       FROM player_resources pr
-       JOIN resource_types rt ON pr.resource_type_id = rt.id
-       WHERE pr.player_id = $1
-       ORDER BY pr.resource_type_id ASC`,
-      [playerId],
-    );
 
     const recipesRes = await db.query(`SELECT * FROM recipes ORDER BY id ASC`);
 
@@ -44,12 +37,18 @@ router.get("/", requireAuth, async (req, res) => {
     const assignedWorkers = totalWorkers;
     const availableWorkers = workers - assignedWorkers;
 
+    const resourceFlow = await getResourceFlow(playerId);
+
+    const resources = resourceFlow.resources;
+    const storage = resourceFlow.storage;
+
     res.render("index.ejs", {
       tasks,
-      resources: resourcesRes.rows,
+      resources,
       recipes: recipesRes.rows,
       recipeInputs: recipeInputsRes.rows,
       buildings,
+      storage,
     });
   } catch (err) {
     console.error("Error loading homepage:", err);

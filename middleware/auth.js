@@ -1,4 +1,5 @@
 import { auth } from "../lib/auth.js";
+import { ensureSettlementVersion } from "../services/settlementService.js";
 import db from "../db.js";
 
 export async function resolvePlayer(req, res, next) {
@@ -23,6 +24,7 @@ export async function resolvePlayer(req, res, next) {
 
       if (result.rows.length > 0) {
         req.playerId = result.rows[0].id;
+        await ensureSettlementVersion(req.playerId);
       } else {
         console.warn("User exists but has no player profile:", session.user.id);
       }

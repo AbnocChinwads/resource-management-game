@@ -1,0 +1,7 @@
+CREATE TABLE announcements (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    version TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

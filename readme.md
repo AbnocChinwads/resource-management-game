@@ -16,11 +16,32 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-Alpha v0.3.7
+Alpha v0.4.0
 
 ---
 
 # Recent Updates
+
+## Alpha v0.4.0 - Resource Storage & Settlement Reset Foundation
+
+This update introduces the first major settlement progression infrastructure, adding the foundations required for future expansion of storage, automation, and progression systems.
+
+### Gameplay System Improvements
+
+* Added version-based settlement reset handling for major game updates.
+* Added player announcements for communicating important updates after version changes.
+* Added resource storage categories and capacity tracking.
+* Added storage tracking for player settlements.
+* Improved resource flow handling to separate resource amounts, production, consumption, and storage information.
+* Prepared the game systems for future storage buildings and more complex resource management.
+
+### Interface Improvements
+
+* Added resource storage displays.
+* Added storage category displays with capacity tracking.
+* Added frontend displays for resource storage information.
+
+This update focuses on improving the underlying game architecture and preparing settlements for future expansion rather than adding large amounts of new content.
 
 ## Alpha v0.3.6 - Responsive Settlement Interface
 

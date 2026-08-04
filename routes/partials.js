@@ -2,6 +2,7 @@ import express from "express";
 import { getPlayerTasks } from "../services/taskService.js";
 import db from "../db.js";
 import { getPlayerBuildings } from "../services/buildingService.js";
+import { getResourceFlow } from "../services/resourceFlowService.js";
 
 const router = express.Router();
 
@@ -36,6 +37,18 @@ router.get("/manual-tasks", async (req, res) => {
   }
 });
 
+router.get("/resources", async (req, res) => {
+  const resourceFlow = await getResourceFlow(req.playerId);
+
+  res.render("partials/resources", { resources: resourceFlow.resources });
+});
+
+router.get("/storage", async (req, res) => {
+  const resourceFlow = await getResourceFlow(req.playerId);
+
+  res.render("partials/storage", { storage: resourceFlow.storage });
+});
+
 router.get("/recipes", async (req, res) => {
   try {
     const recipesRes = await db.query(`SELECT * FROM recipes ORDER BY id ASC`);
@@ -67,34 +80,33 @@ router.get("/recipes", async (req, res) => {
 });
 
 router.get("/population-buildings", async (req, res) => {
-    const playerId = req.playerId;
+  const playerId = req.playerId;
 
-    try {
-        const buildings = await getPlayerBuildings(playerId);
+  try {
+    const buildings = await getPlayerBuildings(playerId);
 
-        res.render("partials/population-buildings", {
-            buildings: buildings.filter(b => b.type === "housing")
-        });
-    } catch (err) {
-        console.error("Population buildings partial error:", err);
-        res.status(500).send("Error loading population buildings");
-    }
+    res.render("partials/population-buildings", {
+      buildings: buildings.filter((b) => b.type === "housing"),
+    });
+  } catch (err) {
+    console.error("Population buildings partial error:", err);
+    res.status(500).send("Error loading population buildings");
+  }
 });
 
-
 router.get("/production-buildings", async (req, res) => {
-    const playerId = req.playerId;
+  const playerId = req.playerId;
 
-    try {
-        const buildings = await getPlayerBuildings(playerId);
+  try {
+    const buildings = await getPlayerBuildings(playerId);
 
-        res.render("partials/production-buildings", {
-            buildings: buildings.filter(b => b.type === "production")
-        });
-    } catch (err) {
-        console.error("Production buildings partial error:", err);
-        res.status(500).send("Error loading production buildings");
-    }
+    res.render("partials/production-buildings", {
+      buildings: buildings.filter((b) => b.type === "production"),
+    });
+  } catch (err) {
+    console.error("Production buildings partial error:", err);
+    res.status(500).send("Error loading production buildings");
+  }
 });
 
 export default router;

@@ -1,0 +1,50 @@
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const accordion = document.getElementById("recipeAccordion");
+
+        if (!accordion) return;
+
+        // Restore previously open sections
+        const openRecipes = JSON.parse(
+            localStorage.getItem("openRecipeAccordions") || "[]"
+        ).filter(id => document.getElementById(id));
+
+        openRecipes.forEach(id => {
+            const collapse = document.getElementById(id);
+
+            if (collapse) {
+                collapse.classList.add("show");
+
+                const button = document.querySelector(
+                    `[data-bs-target="#${id}"]`
+                );
+
+                if (button) {
+                    button.classList.remove("collapsed");
+                    button.setAttribute("aria-expanded", "true");
+                }
+            }
+        });
+
+        accordion.addEventListener("shown.bs.collapse", () => {
+            saveOpenRecipeAccordions();
+        });
+
+        accordion.addEventListener("hidden.bs.collapse", () => {
+            saveOpenRecipeAccordions();
+        });
+
+        function saveOpenRecipeAccordions() {
+            const openRecipes = [
+                ...document.querySelectorAll(
+                    "#recipeAccordion .accordion-collapse.show"
+                )
+            ].map(el => el.id);
+
+            localStorage.setItem(
+                "openRecipeAccordions",
+                JSON.stringify(openRecipes)
+            );
+        }
+    });
+</script>

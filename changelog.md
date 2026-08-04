@@ -125,3 +125,34 @@
 - Fixed production and consumption building information not rendering correctly after the building partial split.
 - Fixed building partial refresh errors caused by incorrect partial routes.
 - Fixed JavaScript errors caused by partial refresh refactoring.
+
+## [0.4.0] - Resource Storage Foundation & Settlement Versioning
+
+### Added
+- Added version-based settlement reset handling.
+- Added player announcements system for communicating major updates after version changes.
+- Added resource storage tracking by storage category.
+- Added storage capacity tracking for player settlements.
+- Added storage display showing category capacity and current usage.
+
+### Changed
+- Refactored resource flow handling to separate:
+  - resource amounts
+  - production rates
+  - consumption rates
+  - storage information
+- Refactored resource flow services into separate modules:
+  - resource handling
+  - storage handling
+  - production and consumption calculations
+- Updated player stats responses to include storage information.
+
+### Fixed
+- Fixed resource and storage discovery displays requiring manual page refreshes.
+- Fixed frontend resource partial handling after resource flow refactor.
+- Fixed storage categories displaying incorrectly in the frontend.
+- Fixed storage displays showing unavailable storage categories.
+
+### Reason
+- Established the foundation required for future storage buildings, more complex resource management, and larger settlement progression systems.
+- Improved separation between backend simulation data and frontend presentation logic.

@@ -1,34 +1,11 @@
 import db from "../db.js";
 
-async function getAllResourceTypes() {
-  const result = await db.query(
-    `
-    SELECT
-      id AS resource_type_id,
-      name,
-      nutrition_value
-    FROM resource_types
-    ORDER BY id ASC
-    `,
-  );
+import {
+  getPlayerResourceTypes,
+  getPlayerResources,
+} from "./resourceService.js";
 
-  return result.rows;
-}
-
-async function getPlayerResources(playerId) {
-  const result = await db.query(
-    `
-    SELECT
-      resource_type_id,
-      amount
-    FROM player_resources
-    WHERE player_id = $1
-    `,
-    [playerId],
-  );
-
-  return result.rows;
-}
+import { getPlayerStorage } from "./storageService.js";
 
 async function getResourceProduction(playerId) {
   const result = await db.query(
@@ -44,7 +21,8 @@ async function getResourceProduction(playerId) {
     WHERE pb.player_id = $1
     AND pb.workers_assigned > 0
     GROUP BY r.output_resource_id
-    `, [playerId],
+    `,
+    [playerId],
   );
 
   return result.rows;
@@ -169,19 +147,26 @@ async function getFoodConsumption(playerId) {
 }
 
 export async function getResourceFlow(playerId) {
-  const [resourceTypes, playerResources, production, consumption] =
-    await Promise.all([
-      getAllResourceTypes(),
-      getPlayerResources(playerId),
-      getResourceProduction(playerId),
-      getResourceConsumption(playerId),
-    ]);
+  const [
+    resourceTypes,
+    playerResources,
+    playerStorage,
+    production,
+    consumption,
+  ] = await Promise.all([
+    getPlayerResourceTypes(playerId),
+    getPlayerResources(playerId),
+    getPlayerStorage(playerId),
+    getResourceProduction(playerId),
+    getResourceConsumption(playerId),
+  ]);
 
   const resources = resourceTypes.map((resource) => ({
     resource_type_id: resource.resource_type_id,
     name: resource.name,
     amount: 0,
     nutrition_value: resource.nutrition_value,
+    storageCategory: resource.storage_category,
     producedPerMinute: 0,
     consumedPerMinute: 0,
     netPerMinute: 0,
@@ -197,6 +182,8 @@ export async function getResourceFlow(playerId) {
       resource.amount = Number(stored.amount);
     }
   }
+
+  // Add storage caps
 
   // Add production
   for (const produced of production) {
@@ -231,5 +218,8 @@ export async function getResourceFlow(playerId) {
     );
   }
 
-  return resources;
+  return {
+    resources,
+    storage: playerStorage,
+  };
 }

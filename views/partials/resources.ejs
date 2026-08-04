@@ -1,11 +1,11 @@
 <!-- Stats display -->
 <div class="table-responsive">
-    <h2>Resources</h2>
+    <h2>Resource</h2>
     <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
         <thead>
             <tr>
                 <th>Resource</th>
-                <th>Amount</th>
+                <th>Current</th>
                 <th>Flow</th>
             </tr>
         </thead>
@@ -13,7 +13,7 @@
             <% resources.forEach(resource=> { %>
                 <tr>
                     <td><%= resource.name %></td>
-                    <td id="resource-<%= resource.resource_type_id %>"></td>
+                    <td id="resource-<%= resource.resource_type_id %>-amount"></td>
                     <td id="resource-<%= resource.resource_type_id %>-net" aria-live="polite"></td>
                 </tr>
             <% }) %>

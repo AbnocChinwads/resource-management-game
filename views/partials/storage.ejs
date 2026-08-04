@@ -1,0 +1,22 @@
+<!-- Storage display -->
+<div class="table-responsive">
+    <h2>Storage</h2>
+    <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Stored</th>
+                <th>Capacity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% storage.forEach(item => { %>
+                <tr>
+                    <td><%= item.storage_category %></td>
+                    <td id="storage-<%= item.storage_category %>-used"><%= item.used %></td>
+                    <td id="storage-<%= item.storage_category %>-capacity"><%= item.capacity %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>

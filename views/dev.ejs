@@ -1,51 +1,40 @@
 <%- include('partials/header.ejs'); -%>
-    <h1>Dev Dashboard</h1>
-
-    <%- include('partials/devplayerselector.ejs'); %>
+        <h1>Dev Dashboard</h1>
+        <%- include('partials/devplayerselector.ejs'); %>
         <% if (stats) { %>
             <%- include('partials/devplayerstats.ejs'); %>
-                <% } %>
-
-                    <div class="col-lg-8">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0">Resources</h5>
-                            </div>
-                            <div class="card-body table-responsive">
-                                <table class="table table-sm table-striped table-hover table-bordered">
-
-                                    <thead>
-                                        <tr>
-                                            <th>Resource</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <% stats.resources.forEach(resource=> { %>
-
-                                            <tr>
-                                                <td>
-                                                    <%= resource.name %>
-                                                </td>
-                                                <td>
-                                                    <%= resource.amount %>
-                                                </td>
-                                            </tr>
-
-                                            <% }) %>
-                                    </tbody>
-
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-
-                    <%- include('partials/devbugreports.ejs'); -%>
-
-                        <%- include('partials/devgameplaysuggestions.ejs'); -%>
-                            <%- include('partials/footer.ejs'); -%>
-                                </body>
-
-                                </html>
+        <% } %>
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Resources</h5>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-sm table-striped table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% stats.resources.forEach(resource=> { %>
+                                <tr>
+                                    <td>
+                                        <%= resource.name %>
+                                    </td>
+                                    <td>
+                                        <%= resource.amount %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <%- include('partials/devbugreports.ejs'); -%>
+        <%- include('partials/devgameplaysuggestions.ejs'); -%>
+        <%- include('partials/footer.ejs'); -%>
+    </body>
+</html>

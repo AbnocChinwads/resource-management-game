@@ -1,0 +1,55 @@
+<script>
+    window.changeWorkers = async function (buildingId, delta) {
+        try {
+            const res = await fetch("/update-workers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ buildingId, delta })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById(`building-${buildingId}-workers`).textContent = data.workers_assigned;
+                const availEl = document.getElementById("available-workers");
+                if (availEl) availEl.textContent = data.availableWorkers;
+            } else {
+                alert(data.error || "Cannot change workers");
+            }
+        } catch (err) {
+            console.error("Worker assignment error:", err);
+        }
+    };
+
+    // Complete task handler
+    document.body.addEventListener("submit", async (e) => {
+        const form = e.target;
+
+        if (!form.matches(".complete-form")) return;
+
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const taskId = formData.get("taskId");
+
+        try {
+            const res = await fetch("/complete-task", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ taskId })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Reload to fetch updated tasks/resources
+                await updateStats();
+            } else {
+                console.error(data.error);
+            }
+        } catch (err) {
+            console.error("Complete task error:", err);
+        }
+    });
+</script>

@@ -12,6 +12,7 @@ import { requireAuth, resolvePlayer } from "./middleware/auth.js";
 import authRoutes from "./routes/auth.js";
 import betterAuthRoutes from "./routes/betterAuth.js";
 
+import announcementsRoute from "./routes/announcements.js";
 import homeRoute from "./routes/home.js";
 import accountRoute from "./routes/accounts.js";
 import playerStatsRoute from "./routes/playerStats.js";
@@ -73,6 +74,7 @@ app.use(requireAuth);
 
 // protected routes
 app.use("/dev", requireAdmin , devRoute);
+app.use("/api/announcements", announcementsRoute);
 
 app.use("/", homeRoute);
 app.use("/", accountRoute);

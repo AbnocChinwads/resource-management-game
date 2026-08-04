@@ -35,8 +35,11 @@ export async function getPlayerStats(playerId) {
 
   const availableWorkers = Math.max(workers - assignedWorkers, 0);
 
-  // Resource production / consumption / net flow
-  const resources = await getResourceFlow(playerId);
+  // Resource production / consumption / net flow / storage
+  const resourceFlow = await getResourceFlow(playerId);
+
+  const resources = resourceFlow.resources;
+  const storage = resourceFlow.storage;
 
   // Total stored nutrition
   const food = resources.reduce(
@@ -56,5 +59,6 @@ export async function getPlayerStats(playerId) {
     foodConsumptionRate,
     resources,
     buildings,
+    storage,
   };
 }
