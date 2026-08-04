@@ -156,3 +156,28 @@
 ### Reason
 - Established the foundation required for future storage buildings, more complex resource management, and larger settlement progression systems.
 - Improved separation between backend simulation data and frontend presentation logic.
+
+## [0.4.1] - Settlement Migration System
+
+### Added
+- Added per-player settlement migration system.
+- Added `settlement_migrations` tracking table to record completed settlement updates.
+- Added settlement migration runner to apply only missing player settlement updates.
+- Added initial settlement migration baseline.
+
+### Changed
+- Replaced automatic settlement resets triggered by application version changes.
+- Settlement updates are now handled through incremental migrations rather than full settlement wipes.
+- Separated database migrations from player settlement migrations.
+- Updated settlement update flow to preserve player progress across future releases.
+
+### Removed
+- Removed `players.settlement_version` tracking.
+- Removed application version changes as a trigger for settlement resets.
+
+### Fixed
+- Prevented future application updates from unintentionally resetting player settlements.
+
+### Reason
+- Previous version updates could require destructive settlement resets when new gameplay systems were introduced.
+- The new migration system provides a safer way to evolve settlement data while preserving existing player progress.

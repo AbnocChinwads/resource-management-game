@@ -33,3 +33,34 @@ export async function markAnnouncementSeen(playerId, announcementId) {
     [playerId, announcementId],
   );
 }
+
+export async function assignSettlementAnnouncement(playerId, version) {
+  const announcement = await db.query(
+    `
+        SELECT id
+        FROM announcements
+        WHERE version = $1
+        LIMIT 1
+        `,
+    [version],
+  );
+
+  if (announcement.rows.length === 0) {
+    console.warn(`No announcement found for settlement version ${version}`);
+    return;
+  }
+
+  await db.query(
+    `
+        INSERT INTO player_announcements
+        (
+            player_id,
+            announcement_id
+        )
+        VALUES
+        ($1, $2)
+        ON CONFLICT DO NOTHING
+        `,
+    [playerId, announcement.rows[0].id],
+  );
+}
