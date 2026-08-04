@@ -1,123 +1,32 @@
-<script>
-    let lastTaskState = null;
-    let progressInterval;
-    let knownResources = new Set();
-    let knownStorage = new Set();
+<script type="module">
+    import { fetchGameData } from "/js/api/gameData.js";
+    import { initialiseGameActions } from "/js/game/actions.js";
+    import { checkDiscovery } from "/js/game/discovery.js";
+    import { updatePlayerDisplay } from "/js/game/playerDisplay.js";
+    import { updateResources } from "/js/game/resources.js";
+    import { updateStorage } from "/js/game/storage.js";
+    import { updateBuildings } from "/js/game/buildings.js";
+    import { updateTasks } from "/js/game/tasks.js";
 
     async function updateStats() {
         try {
-            const res = await fetch("/api/player-stats", { credentials: "include" });
-            const data = await res.json();
+            const data = await fetchGameData();
 
-            const resources = data.resources.resources;
-            const storage = data.resources.storage;
+            await checkDiscovery(data);
 
-            const currentKnownResources = new Set(
-                resources.map(r => r.resource_type_id)
-            );
+            updatePlayerDisplay(data);
+            updateResources(data.resources);
+            updateStorage(data.storage);
+            updateBuildings(data.buildings);
 
-            const currentKnownStorage = new Set(
-                data.storage.map(s => s.storage_category)
-            );
-
-            const resourceDiscoveryChanged =
-                currentKnownResources.size !== knownResources.size ||
-                [...currentKnownResources].some(id => !knownResources.has(id));
-
-            const storageDiscoveryChanged =
-                currentKnownStorage.size !== knownStorage.size ||
-                [...currentKnownStorage].some(category => !knownStorage.has(category));
-
-            if (resourceDiscoveryChanged) {
-                await refreshResources();
-                await refreshRecipes();
-                
-                knownResources = currentKnownResources;
-            }
-
-            if (storageDiscoveryChanged) {
-                await refreshStorage();
-                knownStorage = currentKnownStorage;
-            }
-
-            document.getElementById("population-count").textContent = data.population;
-            document.getElementById("worker-count").textContent = data.workers;
-            document.getElementById("assigned-worker-count").textContent = data.assignedWorkers;
-            document.getElementById("available-workers").textContent = data.availableWorkers;
-            document.getElementById("food-count").textContent = Number(data.food ?? 0).toFixed(1);
-
-            const foodConsumptionEl = document.getElementById("food-consumption");
-
-            if (foodConsumptionEl) {
-                foodConsumptionEl.textContent =
-                    `${Number(data.foodConsumptionRate ?? 0).toFixed(1)}/min`;
-            }
-
-            // Update player resources
-            resources.forEach(r => {
-                const amountEl = document.getElementById(`resource-${r.resource_type_id}-amount`);
-                const netEl = document.getElementById(`resource-${r.resource_type_id}-net`);
-
-                if (amountEl) {
-                    amountEl.textContent = formatResourceAmount(r.amount);
-                }
-
-                if (netEl) {
-                    updateNetFlowElement(netEl, r.netPerMinute);
-                }
-            });
-
-            //Update player storage
-            if (storage) {
-                storage.forEach(storage => {
-                    const usedEl = document.getElementById(`storage-${storage.storage_category}-used`);
-
-                    const capacityEl = document.getElementById(`storage-${storage.storage_category}-capacity`);
-
-                    if (usedEl) {
-                        usedEl.textContent = formatResourceAmount(storage.used);
-                    }
-
-                    if (capacityEl) {
-                        capacityEl.textContent = formatResourceAmount(storage.capacity);
-                    }
-                });
-            }
-
-            //Update player buildings
-            if (data.buildings) {
-                data.buildings.forEach(b => {
-                    const productionEl = document.getElementById(`building-${b.id}-production`);
-                    const consumptionEl = document.getElementById(`building-${b.id}-consumption`);
-
-                    if (productionEl) {
-                        updateProductionElement(productionEl, b);
-                    }
-
-                    if (consumptionEl) {
-                        updateConsumptionElement(consumptionEl, b);
-                    }
-                });
-            }
-
-            // Update building workers
-            data.buildings.forEach(b => {
-                const el = document.getElementById(`building-${b.id}-workers`);
-                if (el) el.textContent = b.workers_assigned;
-            });
-
-            const taskState = JSON.stringify(data.tasks);
-
-            if (taskState !== lastTaskState) {
-                lastTaskState = taskState;
-                await refreshActiveTasks();
-            }
+            await updateTasks(data.tasks);
 
         } catch (err) {
             console.error("Stats update error:", err);
         }
     }
 
+    initialiseGameActions(updateStats);
     // Poll every 3 seconds
     setInterval(updateStats, 3000);
     updateStats(); // initial call

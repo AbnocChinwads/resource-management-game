@@ -181,3 +181,33 @@
 ### Reason
 - Previous version updates could require destructive settlement resets when new gameplay systems were introduced.
 - The new migration system provides a safer way to evolve settlement data while preserving existing player progress.
+
+## [0.4.2] - Frontend JavaScript Refactor
+
+### Added
+- Extracted game update logic from EJS script partials into ES modules
+- Added dedicated frontend modules for:
+  - player display updates
+  - resource updates
+  - storage updates
+  - building updates
+  - task updates
+  - player actions
+  - discovery checks
+- Added centralised game data fetching through gameData.js
+
+### Changed
+- Reworked liveStats.ejs to act as the game update coordinator
+- Moved worker assignment and task completion handlers from EJS scripts into actions.js
+- Moved resource, storage, building and player UI update logic into dedicated modules
+- Removed duplicated frontend update logic from liveStats.ejs
+- Improved separation between server-rendered views and client-side behaviour
+
+### Removed
+- Removed gameActions.ejs
+- Removed inline JavaScript dependencies from extracted systems
+
+### Technical
+- Frontend now uses ES module structure for game state updates
+- Reduced reliance on global scripts loaded through partials
+- Prepared frontend architecture for upcoming recipe discovery/UI rewrite
