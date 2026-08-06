@@ -1,15 +1,14 @@
 let knownResources = new Set();
 let knownStorage = new Set();
 
-export async function checkDiscovery(data) {
-  const resources = data.resources;
-  const storage = data.storage;
-
+export function checkDiscovery(data) {
   const currentKnownResources = new Set(
-    resources.map((r) => r.resource_type_id),
+    data.resources.map((r) => r.resource_type_id),
   );
 
-  const currentKnownStorage = new Set(storage.map((s) => s.storage_category));
+  const currentKnownStorage = new Set(
+    data.storage.map((s) => s.storage_category),
+  );
 
   const resourceDiscoveryChanged =
     currentKnownResources.size !== knownResources.size ||
@@ -19,16 +18,10 @@ export async function checkDiscovery(data) {
     currentKnownStorage.size !== knownStorage.size ||
     [...currentKnownStorage].some((category) => !knownStorage.has(category));
 
-  if (resourceDiscoveryChanged) {
-    await refreshResources();
-    await refreshRecipes();
+  const changed = resourceDiscoveryChanged || storageDiscoveryChanged;
 
-    knownResources = currentKnownResources;
-  }
+  knownResources = currentKnownResources;
+  knownStorage = currentKnownStorage;
 
-  if (storageDiscoveryChanged) {
-    await refreshStorage();
-
-    knownStorage = currentKnownStorage;
-  }
+  return changed;
 }

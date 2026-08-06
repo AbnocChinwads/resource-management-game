@@ -1,23 +1,34 @@
 import { formatResourceAmount } from "./helpers.js";
 
 export function updateStorage(storage) {
-    if (!storage) return;
+  const container = document.getElementById("storage-body");
 
-    storage.forEach(item => {
-        const usedEl = document.getElementById(
-            `storage-${item.storage_category}-used`
-        );
+  if (!container) return;
 
-        const capacityEl = document.getElementById(
-            `storage-${item.storage_category}-capacity`
-        );
+  storage.forEach((item) => {
+    let row = container.querySelector(
+      `[data-storage-category="${item.storage_category}"]`,
+    );
 
-        if (usedEl) {
-            usedEl.textContent = formatResourceAmount(item.used);
-        }
+    if (!row) {
+      row = document.createElement("tr");
+      row.dataset.storageCategory = item.storage_category;
 
-        if (capacityEl) {
-            capacityEl.textContent = formatResourceAmount(item.capacity);
-        }
-    });
+      row.innerHTML = `
+        <td>${item.storage_category}</td>
+        <td id="storage-${item.storage_category}-used"></td>
+        <td id="storage-${item.storage_category}-capacity"></td>
+      `;
+
+      container.appendChild(row);
+    }
+
+    document.getElementById(
+      `storage-${item.storage_category}-used`,
+    ).textContent = formatResourceAmount(item.used);
+
+    document.getElementById(
+      `storage-${item.storage_category}-capacity`,
+    ).textContent = formatResourceAmount(item.capacity);
+  });
 }

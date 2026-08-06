@@ -211,3 +211,77 @@
 - Frontend now uses ES module structure for game state updates
 - Reduced reliance on global scripts loaded through partials
 - Prepared frontend architecture for upcoming recipe discovery/UI rewrite
+
+## [0.4.3] - Live State Rebase & Frontend Architecture Completion
+
+### Added
+
+- Added fully client-driven live updates for:
+  - resources
+  - recipes
+  - tasks
+  - buildings
+  - storage
+  - discovery states
+- Added dynamic creation of frontend elements for newly discovered:
+  - resources
+  - recipes
+  - tasks
+  - buildings
+- Added persistent storage category handling.
+  - Storage categories remain available after discovery even when current resource amounts reach zero.
+
+### Changed
+
+- Completed migration away from server-rendered partial refreshes during gameplay.
+- Reworked frontend game state handling so the API now acts as the source of truth.
+- Updated liveStats.ejs to coordinate:
+  - fetching current game data
+  - triggering system updates
+  - handling discovery changes
+  - initialising player actions
+- Reworked frontend modules to update existing DOM state instead of replacing rendered sections.
+
+### Removed
+
+- Removed legacy partial refresh system.
+- Removed unused frontend partial rendering scripts.
+- Removed obsolete refresh routes and dependencies.
+- Removed reliance on page refreshes to display newly unlocked gameplay content.
+
+### Fixed
+
+- Fixed resources requiring manual page refreshes after gathering or production.
+- Fixed recipes displaying unknown resource names after discovering new resources.
+- Fixed recipe availability buttons not updating correctly after resource changes.
+- Fixed completed tasks not updating resources immediately.
+- Fixed newly created buildings only appearing after page reload.
+- Fixed production and population building displays becoming out of sync with server state.
+- Fixed accordion sections collapsing during gameplay updates.
+- Fixed frontend state mismatches caused by partial refresh behaviour.
+
+### Technical
+
+- Frontend game systems now follow a consistent update architecture:
+  API Game State
+  |
+  v
+  Game Update Modules
+  |
+  v
+  DOM Updates
+- Improved separation between:
+  - backend simulation logic
+  - API responses
+  - frontend rendering
+  - player actions
+
+### Reason
+
+- Previous frontend architecture relied on refreshing server-rendered partials whenever game state changed.
+- This caused UI state loss, unnecessary rendering, and delayed discovery updates.
+- The new architecture provides a more stable foundation for future systems including:
+  - expanded storage mechanics
+  - building upgrades
+  - production chains
+  - settlement progression

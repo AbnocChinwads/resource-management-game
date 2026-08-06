@@ -1,0 +1,57 @@
+<script type="module">
+    import { fetchGameData } from "/js/api/gameData.js";
+    import { initialiseGameActions } from "/js/game/actions.js";
+    import { checkDiscovery } from "/js/game/discovery.js";
+    import { checkAnnouncements } from "/js/game/announcements.js";
+    import { updatePlayerDisplay } from "/js/game/playerDisplay.js";
+    import { updateRecipes } from "/js/game/recipes.js";
+    import { updateResources, renderResources } from "/js/game/resources.js";
+    import { updateStorage } from "/js/game/storage.js";
+    import { updateBuildings } from "/js/game/buildings.js";
+    import { updateTasks } from "/js/game/tasks.js";
+    import { startProgressUpdates } from "/js/game/progressBars.js";
+
+
+    async function updateStats() {
+        try {
+            const data = await fetchGameData();
+
+            const discoveryChanged = checkDiscovery(data);
+
+            const updatedData = discoveryChanged
+                ? await fetchGameData()
+                : data;
+
+
+            if (discoveryChanged || document.querySelector("#resource-table-body").children.length === 0) {
+                renderResources(updatedData.resources);
+            }
+
+            updatePlayerDisplay(updatedData);
+            updateResources(updatedData.resources);
+            updateStorage(updatedData.storage);
+            updateBuildings(updatedData.buildings);
+            updateRecipes(updatedData);
+            updateTasks(updatedData.tasks);
+
+        } catch (err) {
+            console.error("Stats update error:", err);
+        }
+    }
+
+
+    async function initialiseGame() {
+        startProgressUpdates();
+
+        await checkAnnouncements();
+
+        initialiseGameActions(updateStats);
+
+        await updateStats();
+
+        setInterval(updateStats, 3000);
+    }
+
+
+    initialiseGame();
+</script>

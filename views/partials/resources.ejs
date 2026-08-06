@@ -9,14 +9,7 @@
                 <th>Flow</th>
             </tr>
         </thead>
-        <tbody>
-            <% resources.forEach(resource=> { %>
-                <tr>
-                    <td><%= resource.name %></td>
-                    <td id="resource-<%= resource.resource_type_id %>-amount"></td>
-                    <td id="resource-<%= resource.resource_type_id %>-net" aria-live="polite"></td>
-                </tr>
-            <% }) %>
+        <tbody id="resource-table-body">
         </tbody>
     </table>
 </div>

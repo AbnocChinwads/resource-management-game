@@ -1,18 +1,78 @@
+import { formatResourceAmount } from "./helpers.js";
+
 export function updateBuildings(buildings) {
   if (!buildings) return;
 
-  buildings.forEach((b) => {
-    const productionEl = document.getElementById(`building-${b.id}-production`);
-    const consumptionEl = document.getElementById(
-      `building-${b.id}-consumption`,
-    );
+  buildings.forEach((building) => {
+    const container =
+      building.type === "housing"
+        ? document.getElementById("population-buildings-body")
+        : document.getElementById("production-buildings-body");
 
-    if (productionEl) {
-      updateProductionElement(productionEl, b);
+    if (!container) return;
+
+    let row = container.querySelector(`[data-building-id="${building.id}"]`);
+
+    if (!row) {
+      row = document.createElement("tr");
+      row.dataset.buildingId = building.id;
+
+      if (building.type === "housing") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td>${building.health}/${building.max_health}</td>
+          <td>${building.population_gain}</td>
+        `;
+      }
+
+      if (building.type === "production") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td>${building.health}/${building.max_health}</td>
+          <td class="d-none d-xxl-table-cell" id="building-${building.id}-production"></td>
+          <td class="d-none d-xxl-table-cell" id="building-${building.id}-consumption"></td>
+          <td>
+            <span id="building-${building.id}-workers">
+              ${building.workers_assigned}
+            </span>/${building.max_workers}
+          </td>
+          <td>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-danger px-2"
+                aria-label="Remove worker"
+                onclick="changeWorkers(${building.id}, -1)">
+                -
+              </button>
+
+              <button class="btn btn-sm btn-success px-2"
+                aria-label="Add worker"
+                onclick="changeWorkers(${building.id}, 1)">
+                +
+              </button>
+            </div>
+          </td>
+        `;
+      }
+
+      container.appendChild(row);
     }
 
-    if (consumptionEl) {
-      updateConsumptionElement(consumptionEl, b);
+    if (building.type === "production") {
+      const productionEl = row.querySelector(
+        `#building-${building.id}-production`,
+      );
+
+      const consumptionEl = row.querySelector(
+        `#building-${building.id}-consumption`,
+      );
+
+      if (productionEl) {
+        updateProductionElement(productionEl, building);
+      }
+
+      if (consumptionEl) {
+        updateConsumptionElement(consumptionEl, building);
+      }
     }
   });
 }
@@ -23,13 +83,24 @@ function updateProductionElement(element, building) {
   element.classList.remove("text-success", "text-danger", "text-muted");
 
   if (value > 0) {
-    element.innerHTML = `<span aria-hidden="true">▲</span><span class="visually-hidden">Increasing by</span> ${building.output_resource_name} ${value.toFixed(1)}/min<span class="visually-hidden">per minute</span>`;
+    element.innerHTML = `
+      <span aria-hidden="true">▲</span>
+      ${building.output_resource_name}
+      ${value.toFixed(1)}/min
+    `;
     element.classList.add("text-success");
   } else if (value < 0) {
-    element.innerHTML = `<span aria-hidden="true">▼</span><span class="visually-hidden">Decreasing by</span> ${building.output_resource_name} ${Math.abs(value).toFixed(1)}/min<span class="visually-hidden">per minute</span>`;
+    element.innerHTML = `
+      <span aria-hidden="true">▼</span>
+      ${building.output_resource_name}
+      ${Math.abs(value).toFixed(1)}/min
+    `;
     element.classList.add("text-danger");
   } else {
-    element.innerHTML = `<span aria-hidden="true">—</span><span class="visually-hidden">Not producing</span> 0/min`;
+    element.innerHTML = `
+      <span aria-hidden="true">—</span>
+      0/min
+    `;
     element.classList.add("text-muted");
   }
 }
@@ -42,7 +113,9 @@ function updateConsumptionElement(element, building) {
     building.consumptionRates.length === 0 ||
     building.workers_assigned === 0
   ) {
-    element.innerHTML = `<span aria-hidden="true">—</span><span class="visually-hidden">No inputs</span>`;
+    element.innerHTML = `
+      <span aria-hidden="true">—</span>
+    `;
     element.classList.add("text-muted");
     return;
   }
@@ -50,8 +123,11 @@ function updateConsumptionElement(element, building) {
   element.innerHTML = building.consumptionRates
     .map(
       (input) =>
-        `<span aria-hidden="true">▼</span><span class="visually-hidden">Consuming </span>${input.name} ${Number(input.amount).toFixed(1)} <span class="visually-hidden">per minute</span>`,
+        `<span aria-hidden="true">▼</span>
+        ${input.name}
+        ${Number(input.amount).toFixed(1)}/min`,
     )
     .join("<br>");
+
   element.classList.add("text-danger");
 }

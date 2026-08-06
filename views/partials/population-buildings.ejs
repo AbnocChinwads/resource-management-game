@@ -3,21 +3,12 @@
     <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
         <thead>
             <tr>
-            <th>Building</th>
-            <th>Health</th>
-            <th>Pop Gain</th>
-        </tr>
+                <th>Building</th>
+                <th>Health</th>
+                <th>Pop Gain</th>
+            </tr>
         </thead>
-        <tbody>
-            <% buildings.forEach(building=> { %>
-              <% if (building.type==="housing" ) { %>  
-                <tr>
-                    <td><%= building.name %><%= building.name ? " #" + building.building_number : "" %></td>
-                    <td><%= building.health %>/<%= building.max_health %></td>
-                    <td><%= building.population_gain %></td>
-                </tr>
-                <% } %>
-            <% }) %>
+        <tbody id="population-buildings-body">
         </tbody>
     </table>
 </div>

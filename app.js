@@ -18,7 +18,6 @@ import accountRoute from "./routes/accounts.js";
 import playerStatsRoute from "./routes/playerStats.js";
 import updateWorkersRoute from "./routes/updateWorkers.js";
 import startRoute from "./routes/startTask.js";
-import partialRoutes from "./routes/partials.js";
 import completeRoute from "./routes/completeTask.js";
 
 import { requireAdmin } from "./middleware/admin.js";
@@ -78,7 +77,6 @@ app.use("/api/announcements", announcementsRoute);
 
 app.use("/", homeRoute);
 app.use("/", accountRoute);
-app.use("/partials", partialRoutes);
 app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);

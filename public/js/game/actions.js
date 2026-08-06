@@ -40,36 +40,66 @@ export function initialiseGameActions(refreshStats) {
   document.body.addEventListener("submit", async (e) => {
     const form = e.target;
 
-    if (!form.matches(".complete-form")) {
+    if (form.matches(".complete-form")) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const taskId = formData.get("taskId");
+
+      try {
+        const res = await fetch("/complete-task", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            taskId,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          await refreshStats();
+        } else {
+          console.error(data.error);
+        }
+      } catch (err) {
+        console.error("Complete task error:", err);
+      }
+
       return;
     }
 
-    e.preventDefault();
+    if (form.matches(".start-task-form")) {
+      e.preventDefault();
 
-    const formData = new FormData(form);
-    const taskId = formData.get("taskId");
+      const formData = new FormData(form);
+      const recipeId = formData.get("recipeId");
 
-    try {
-      const res = await fetch("/complete-task", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          taskId,
-        }),
-      });
+      try {
+        const res = await fetch("/start-task", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            recipeId,
+          }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.success) {
-        await refreshStats();
-      } else {
-        console.error(data.error);
+        if (data.success) {
+          await refreshStats();
+        } else {
+          console.error(data.error);
+        }
+      } catch (err) {
+        console.error("Start task error:", err);
       }
-    } catch (err) {
-      console.error("Complete task error:", err);
     }
   });
 }

@@ -9,14 +9,7 @@
                 <th>Capacity</th>
             </tr>
         </thead>
-        <tbody>
-            <% storage.forEach(item => { %>
-                <tr>
-                    <td><%= item.storage_category %></td>
-                    <td id="storage-<%= item.storage_category %>-used"><%= item.used %></td>
-                    <td id="storage-<%= item.storage_category %>-capacity"><%= item.capacity %></td>
-                </tr>
-            <% }) %>
+        <tbody id="storage-body">
         </tbody>
     </table>
 </div>

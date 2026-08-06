@@ -53,6 +53,39 @@ export async function completeTask(playerId, taskId) {
       );
     }
 
+    // Unlock storage category for newly discovered resources
+    const storageCategoryRes = await db.query(
+      `
+      SELECT storage_category
+      FROM resource_types
+      WHERE id = $1
+      `,
+      [output_resource_id],
+    );
+
+    const storageCategory = storageCategoryRes.rows[0]?.storage_category;
+
+    if (storageCategory) {
+      await db.query(
+        `
+        INSERT INTO player_storage (
+            player_id,
+            storage_category,
+            capacity
+        )
+        SELECT
+            $1,
+            sd.storage_category,
+            sd.default_capacity
+        FROM storage_defaults sd
+        WHERE sd.storage_category = $2
+        ON CONFLICT (player_id, storage_category)
+        DO NOTHING
+        `,
+        [playerId, storageCategory],
+      );
+    }
+
     if (output_building_id) {
       const insertRes = await db.query(
         `

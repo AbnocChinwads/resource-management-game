@@ -15,14 +15,12 @@
             <div class="col-12 col-xl-4 mb-4" id="recipes-container">
                 <%- include('partials/recipes.ejs'); -%>
             </div>
-            <% if (tasks && tasks.length > 0) { %>
-                <div class="col-12 col-xl-4 mb-4" id="manual-tasks-container">
-                    <%- include('partials/manual-tasks.ejs'); -%>
-                </div>
-            <% } %>
+            <div class="col-12 col-xl-4 mb-4" id="manual-tasks-container">
+                <%- include('partials/manual-tasks.ejs'); -%>
+            </div>
         </div>
         <%- include('partials/announcementmodal.ejs'); -%>
         <%- include('partials/footer.ejs'); -%>
-        <%- include('partials/gamescripts.ejs'); -%>
+        <%- include('partials/liveStats.ejs'); -%>
     </body>
 </html>

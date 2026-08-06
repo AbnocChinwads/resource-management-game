@@ -1,6 +1,7 @@
 <div class="table-responsive">
     <h2 class="mt-3">Current Tasks</h2>
-    <table class="table table-striped-columns table-hover table-bordered">
+
+    <table class="table table-sm table-striped-columns table-hover table-bordered">
         <thead>
             <tr>
                 <th>Task</th>
@@ -8,29 +9,8 @@
                 <th>Status</th>
             </tr>
         </thead>
+
         <tbody id="manual-tasks-body">
-            <% tasks.forEach(task => { %>
-                <tr>
-                    <td>
-                        <%= task.recipe_name %>
-                    </td>
-                    <td>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" data-started-at="<%= new Date(task.started_at).getTime() %>" data-craft-time="<%= task.duration_seconds %>" style="width:0%"></div>
-                        </div>
-                    </td>
-                    <td>
-                        <% if (task.is_finished) { %>
-                            <form class="complete-form">
-                                <input type="hidden" name="taskId" value="<%= task.id %>">
-                                <button type="submit" class="btn btn-success">Complete</button>
-                            </form>
-                        <% } else { %>
-                            In Progress
-                        <% } %>
-                    </td>
-                </tr>
-            <% }) %>
         </tbody>
     </table>
 </div>

@@ -2,6 +2,7 @@ import db from "../db.js";
 import { getPlayerBuildings } from "./buildingService.js";
 import { getResourceFlow } from "./resourceFlowService.js";
 import { getFoodNutritionConsumption } from "./foodService.js";
+import { getRecipes } from "./recipeService.js";
 
 export async function getPlayerStats(playerId) {
   // Buildings
@@ -40,6 +41,7 @@ export async function getPlayerStats(playerId) {
 
   const resources = resourceFlow.resources;
   const storage = resourceFlow.storage;
+  const recipeData = await getRecipes(playerId);
 
   // Total stored nutrition
   const food = resources.reduce(
@@ -60,5 +62,7 @@ export async function getPlayerStats(playerId) {
     resources,
     buildings,
     storage,
+    recipes: recipeData.recipes,
+    recipeInputs: recipeData.recipeInputs,
   };
 }
