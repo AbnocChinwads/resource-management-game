@@ -1,4 +1,9 @@
 import db from "../db.js";
+import {
+  canAddPlayerResource,
+  addPlayerResource,
+  getStorageForResource,
+} from "./resourceService.js";
 
 export async function completeTask(playerId, taskId) {
   try {
@@ -41,49 +46,26 @@ export async function completeTask(playerId, taskId) {
     );
 
     if (output_resource_id) {
-      await db.query(
-        `
-        INSERT INTO player_resources 
-        (player_id, resource_type_id, amount)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (player_id, resource_type_id)
-        DO UPDATE SET amount = player_resources.amount + EXCLUDED.amount
-        `,
-        [playerId, output_resource_id, output_amount],
+      const canStore = await canAddPlayerResource(
+        playerId,
+        output_resource_id,
+        output_amount,
       );
-    }
 
-    // Unlock storage category for newly discovered resources
-    const storageCategoryRes = await db.query(
-      `
-      SELECT storage_category
-      FROM resource_types
-      WHERE id = $1
-      `,
-      [output_resource_id],
-    );
+      if (!canStore) {
+        const storage = await getStorageForResource(
+          playerId,
+          output_resource_id,
+        );
 
-    const storageCategory = storageCategoryRes.rows[0]?.storage_category;
+        await db.query("ROLLBACK");
 
-    if (storageCategory) {
-      await db.query(
-        `
-        INSERT INTO player_storage (
-            player_id,
-            storage_category,
-            capacity
-        )
-        SELECT
-            $1,
-            sd.storage_category,
-            sd.default_capacity
-        FROM storage_defaults sd
-        WHERE sd.storage_category = $2
-        ON CONFLICT (player_id, storage_category)
-        DO NOTHING
-        `,
-        [playerId, storageCategory],
-      );
+        throw new Error(
+          `Not Enough Storage: ${storage.storageCategory} storage is full (${storage.used.toFixed(1)}/${storage.capacity})`,
+        );
+      }
+
+      await addPlayerResource(playerId, output_resource_id, output_amount);
     }
 
     if (output_building_id) {
@@ -167,7 +149,6 @@ export async function completeTask(playerId, taskId) {
     return true;
   } catch (err) {
     await db.query("ROLLBACK");
-    console.error("Error completing task:", err);
     throw err;
   }
 }

@@ -9,9 +9,7 @@ router.post("/", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
-
-    res.json({
+    res.status(400).json({
       success: false,
       error: err.message,
     });

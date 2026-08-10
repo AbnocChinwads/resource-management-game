@@ -1,8 +1,8 @@
 # Resource Management Game
 
-A browser-based resource management game built as a personal learning project.
+A browser-based resource management simulation built as a personal learning project.
 
-The goal is to create a resource management game that I would genuinely enjoy playing while using the project to explore game systems, backend development, database design, and long-term project maintenance.
+The goal is to create a resource management game that I would genuinely enjoy playing while using the project to explore game systems, backend development, database design, simulation, frontend architecture, and long-term project maintenance.
 
 Players begin by manually gathering resources before expanding their settlement through buildings, population growth, worker automation, and automated production systems.
 
@@ -16,48 +16,206 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-Alpha v0.4.3
+**Alpha v0.4.4**
 
 ---
 
 # Recent Updates
 
-## Alpha v0.4.0 - Resource Storage & Settlement Reset Foundation
+## Alpha v0.4.4 - Storage Capacity Enforcement
 
-This update introduces the first major settlement progression infrastructure, adding the foundations required for future expansion of storage, automation, and progression systems.
+This update turns the storage foundation introduced in v0.4.0 into an active gameplay mechanic.
 
 ### Gameplay System Improvements
 
-* Added version-based settlement reset handling for major game updates.
-* Added player announcements for communicating important updates after version changes.
-* Added resource storage categories and capacity tracking.
-* Added storage tracking for player settlements.
-* Improved resource flow handling to separate resource amounts, production, consumption, and storage information.
-* Prepared the game systems for future storage buildings and more complex resource management.
+- Resource additions now respect the capacity of their storage category.
+- Manual tasks can no longer complete if their resource output would exceed available storage.
+- Automated production now respects storage capacity.
+- Resource production is prevented when the resulting output cannot be stored.
+- Storage capacity is now treated as a gameplay constraint rather than display-only information.
+- Storage categories remain available after discovery even when their current resource amounts reach zero.
+- Added clearer handling of resources that cannot be added because their storage category is full.
 
 ### Interface Improvements
 
-* Added resource storage displays.
-* Added storage category displays with capacity tracking.
-* Added frontend displays for resource storage information.
+- Added player-facing feedback when a manual task cannot be completed because storage is full.
+- Improved feedback for storage-related resource failures.
 
-This update focuses on improving the underlying game architecture and preparing settlements for future expansion rather than adding large amounts of new content.
+### Notes
+
+- Automated production currently stops when storage is unavailable.
+- Future work will make production buildings explicitly display an **idle** or **blocked** state when storage prevents production.
+- Storage expansion and upgrades will be developed as part of the next major gameplay phase.
+
+This update establishes the basic rules required for storage to become a meaningful part of settlement management.
+
+---
+
+## Alpha v0.4.3 - Live State Rebase & Frontend Architecture Completion
+
+This update completed a major frontend architecture rework, moving the game away from repeatedly refreshing server-rendered sections and towards a client-driven live game state.
+
+### Gameplay & Interface
+
+- Added fully live updates for:
+
+  - resources
+  - recipes
+  - tasks
+  - buildings
+  - storage
+  - discovery states
+
+- Newly discovered resources, recipes, tasks, and buildings can now appear in the interface without requiring a page refresh.
+- Storage categories now persist after discovery even when the player's current amount of a resource reaches zero.
+- Improved live updates for population and production buildings.
+
+### Frontend Architecture
+
+- Completed the migration away from server-rendered partial refreshes during normal gameplay.
+- Centralised live game-state updates around API data.
+- Separated frontend responsibilities into dedicated systems for:
+
+  - resources
+  - recipes
+  - tasks
+  - buildings
+  - storage
+  - discovery
+  - player information
+  - player actions
+
+- Existing interface elements are now updated in place rather than repeatedly replaced.
+
+### Fixed
+
+- Resources no longer require a manual page refresh after being discovered or changed.
+- Newly discovered recipes appear immediately.
+- Newly completed tasks update the resource display immediately.
+- Newly constructed buildings appear without requiring a page refresh.
+- Population and production building displays remain synchronised with live game state.
+- Recipe accordion state is preserved during live updates.
+- Reduced UI inconsistencies caused by the previous partial-refresh architecture.
+
+### Reason
+
+The previous frontend architecture relied heavily on refreshing server-rendered sections whenever game state changed. This worked for early development but became increasingly difficult to maintain as more systems became interconnected.
+
+The new architecture provides a more stable foundation for the next stage of development, particularly storage mechanics, expanded production systems, building improvements, and future settlement progression.
+
+---
+
+## Alpha v0.4.2 - Frontend JavaScript Refactor
+
+### Added
+
+- Extracted game update logic from EJS script partials into ES modules.
+- Added dedicated frontend systems for:
+
+  - player information
+  - resources
+  - storage
+  - buildings
+  - tasks
+  - player actions
+  - discovery states
+
+- Added centralised game data fetching.
+
+### Changed
+
+- Reworked live game updates around a central coordinator.
+- Moved worker assignment and task completion handling into dedicated frontend actions.
+- Moved resource, storage, building, and player update logic into separate modules.
+- Removed duplicated frontend update logic.
+- Improved separation between server-rendered views and client-side behaviour.
+
+### Removed
+
+- Removed the legacy game action script partial.
+- Removed unnecessary inline JavaScript dependencies.
+
+### Reason
+
+This established the frontend architecture required to support increasingly complex live game systems without relying on repeated page or partial refreshes.
+
+---
+
+## Alpha v0.4.1 - Settlement Migration System
+
+### Added
+
+- Added per-player settlement migration support.
+- Added settlement migration tracking.
+- Added a migration runner for applying missing settlement updates.
+- Added an initial settlement migration baseline.
+
+### Changed
+
+- Replaced automatic settlement resets triggered by application version changes.
+- Settlement changes are now handled through incremental migrations.
+- Separated database migrations from player settlement migrations.
+- Player progress is preserved across future game updates.
+
+### Removed
+
+- Removed application-version-based settlement reset handling.
+- Removed settlement version tracking from players.
+
+### Fixed
+
+- Prevented future application updates from unintentionally resetting player settlements.
+
+### Reason
+
+Early development relied on destructive settlement resets when introducing significant gameplay changes. The migration system provides a safer way to evolve the game's database while preserving existing player progress.
+
+---
+
+## Alpha v0.4.0 - Resource Storage Foundation
+
+This update introduced the initial storage infrastructure required for future resource-management mechanics.
+
+### Added
+
+- Added resource storage categories.
+- Added storage capacity tracking for player settlements.
+- Added storage displays showing capacity and current usage.
+- Added player announcements for major game updates.
+- Added initial settlement versioning infrastructure.
+
+### Changed
+
+- Refactored resource flow handling to separate:
+
+  - resource amounts
+  - production
+  - consumption
+  - storage
+
+- Improved separation between simulation data and frontend presentation.
+
+### Reason
+
+This established the foundation for a proper storage system while avoiding prematurely implementing storage buildings and more complex capacity mechanics.
+
+---
 
 ## Alpha v0.3.6 - Responsive Settlement Interface
 
-The settlement interface has been improved to provide a better experience across desktop, tablet, and mobile devices.
+The settlement interface was improved to provide a better experience across desktop, tablet, and mobile devices.
 
 ### Interface Improvements
 
-* Updated the main game layout to adapt better across different screen sizes.
-* Improved resource and population overview displays.
-* Improved production building management tables on smaller screens.
-* Improved Recipes & Actions with groupings and collapsible sections.
-* Reduced interface clutter by prioritising important information when space is limited.
-* Improved table structure and readability.
-* Added accessibility improvements for dynamic information and worker controls.
+- Updated the main game layout to adapt better across different screen sizes.
+- Improved resource and population overview displays.
+- Improved production building management tables on smaller screens.
+- Improved Recipes & Actions with groupings and collapsible sections.
+- Reduced interface clutter by prioritising important information when space is limited.
+- Improved table structure and readability.
+- Added accessibility improvements for dynamic information and worker controls.
 
-This update focuses on improving usability and preparing the interface for future management features as settlements and production systems become more complex.
+This update focused on usability and preparing the interface for future management features as settlements and production systems become more complex.
 
 ---
 
@@ -65,87 +223,206 @@ This update focuses on improving usability and preparing the interface for futur
 
 ## Account Systems
 
-* Registration and login
-* Email verification
-* Account detail changes
-* Persistent player data
+- Registration and login
+- Email verification
+- Account detail changes
+- Persistent player data
 
 ## Gameplay Systems
 
-* Manual resource gathering
-* Building construction
-* Recipe discovery
-* Worker assignment
-* Automated production
-* Server-side simulation tick
-* Live resource production, consumption and flow tracking
-* Population growth
-* Food consumption
-* Persistent game world
+- Manual resource gathering
+- Resource discovery
+- Recipe discovery
+- Building construction
+- Population buildings
+- Worker assignment
+- Worker automation
+- Automated production
+- Server-side simulation ticks
+- Live resource production and consumption
+- Resource flow tracking
+- Resource storage categories
+- Storage capacity enforcement
+- Food consumption
+- Population growth
+- Persistent settlement state
+
+## Interface Systems
+
+- Live resource updates
+- Live population updates
+- Live building updates
+- Live task updates
+- Live recipe updates
+- Live storage updates
+- Dynamic discovery of new gameplay content
+- Responsive settlement interface
+- Grouped and collapsible recipe interface
+- Accessible dynamic status indicators
+- Worker management controls
 
 ## Development Systems
 
-* Bug reporting
-* Gameplay suggestions
-* Developer dashboard
-* Player settlement inspection tools
+- Bug reporting
+- Gameplay suggestions
+- Developer dashboard
+- Player settlement inspection tools
+- Database migrations
+- Per-player settlement migrations
 
 ---
 
 # Gameplay Overview
 
-Players begin with limited capabilities and gradually expand their settlement by discovering new resources, unlocking recipes, constructing buildings, and assigning workers.
+Players begin with a small settlement and a limited selection of resources and actions.
 
-The main focus is on:
+As the settlement develops, players can:
 
-* Building efficient production chains
-* Managing resources
-* Balancing expansion with sustainability
-* Reducing manual work through automation
+- Discover new resources.
+- Unlock new recipes.
+- Gather resources manually.
+- Construct buildings.
+- Increase population.
+- Gain additional workers.
+- Assign workers to production buildings.
+- Automate resource production.
+- Balance resource production against consumption.
+- Manage limited storage capacity.
+- Expand production chains.
+
+The intended gameplay loop is centred around gradually reducing manual work while managing the increasingly complex interactions between resources, production, workers, population, food, and storage.
+
+The game is designed around **persistent settlement progression** rather than a traditional map-based strategy system.
 
 ---
 
 # Development Roadmap
 
-## Gameplay
+The project is being developed incrementally rather than attempting to implement the complete game at once.
 
-* [x] Manual gathering
+## v0.5.x - Storage & Resource Management
 
-* [x] Buildings
+The next major development phase will turn the current storage-capacity foundation into a more complete settlement management system.
 
-* [x] Worker automation
+### Planned
 
-* [x] Automated production simulation
+- [ ] Storage expansion
+- [ ] Storage buildings and upgrades
+- [ ] Improved storage management interface
+- [ ] More meaningful storage categories
+- [ ] Better handling of production when storage is unavailable
+- [ ] Production buildings displaying clear idle or blocked states
+- [ ] Improved player-facing automation feedback
+- [ ] Better interaction between production chains and storage capacity
+- [ ] Further resource-management improvements
 
-* [x] Food consumption
+---
 
-* [x] Population simulation
+## v0.6.x - Tools & Player Automation
 
-* [ ] Starvation consequences
+This phase will expand the player's ability to interact with and automate the settlement.
 
-* [ ] Starvation grace period
+### Planned
 
-* [ ] Gameplay balancing
+- [ ] Rework tools and gathering mechanics
+- [ ] Expand tool progression
+- [ ] Improve manual gathering interactions
+- [ ] Introduce additional automation options
+- [ ] Improve worker management
+- [ ] Improve production building states
+- [ ] Add clearer explanations for why automated systems are idle or blocked
 
-* [ ] Expanded production chains
+---
 
-* [ ] Additional buildings
+## v0.7.x - Production & Settlement Expansion
 
-* [ ] Late-game progression
+### Planned
 
-## Interface
+- [ ] Expand production chains
+- [ ] Add additional buildings
+- [ ] Introduce more resource interactions
+- [ ] Expand population mechanics
+- [ ] Expand food systems
+- [ ] Add additional settlement progression systems
+- [ ] Improve balancing between manual work and automation
 
-* [x] Navigation improvements
+---
 
-* [x] Responsive layout improvements
+## v0.8.x - Progression & Gameplay Depth
 
-* [ ] Production statistics dashboard
+This phase will focus on making the existing systems work together as a more complete resource-management game.
 
-* [ ] Improved management tools
+### Planned
 
-* [ ] Visual polish
+- [ ] More meaningful progression between settlement stages
+- [ ] Additional resource tiers
+- [ ] More complex production chains
+- [ ] More specialised buildings
+- [ ] Expanded worker and population management
+- [ ] More meaningful resource-management decisions
+- [ ] Gameplay balancing
+- [ ] Improved long-term progression
 
-* [ ] Accessibility improvements
+---
+
+## v0.9.x - Reliability & Polish
+
+This phase will focus on making the existing game systems reliable and pleasant to use rather than introducing large new mechanics.
+
+### Planned
+
+- [ ] Improve simulation reliability
+- [ ] Improve handling of interrupted or failed actions
+- [ ] Improve consistency between server state and displayed state
+- [ ] Improve error handling and player-facing feedback
+- [ ] Improve recovery from connection or request failures
+- [ ] Improve database migration reliability
+- [ ] Improve testing coverage for important gameplay systems
+- [ ] Improve interface polish
+- [ ] Accessibility improvements
+- [ ] Performance improvements
+
+---
+
+## v1.0.x - Core Game Release
+
+The first major release will represent a stable, playable version of the core resource-management experience.
+
+### Goals
+
+- [ ] Core gameplay loop is stable.
+- [ ] Resource management is meaningful.
+- [ ] Storage systems are fully implemented.
+- [ ] Production chains are reliable.
+- [ ] Worker automation is reliable.
+- [ ] Population and food systems are balanced.
+- [ ] Progression provides meaningful long-term goals.
+- [ ] Major gameplay systems have appropriate testing and error handling.
+- [ ] Interface is consistent and usable across supported screen sizes.
+- [ ] No major known gameplay-breaking issues.
+
+---
+
+# Future Gameplay Ideas
+
+These ideas are deliberately separate from the core roadmap and may change significantly during development.
+
+## Expeditions
+
+Rather than introducing a traditional overworld or persistent game map, future exploration may be implemented as a **timed expedition system**.
+
+Possible mechanics include:
+
+- Selecting an expedition.
+- Assigning workers or resources.
+- Waiting for a timer to complete.
+- Receiving resources, discoveries, or other rewards.
+- Choosing between safer and more valuable expeditions.
+- Unlocking new expedition opportunities through progression.
+
+This would allow exploration to add strategic depth without turning the game into a traditional map-based strategy game.
+
+The intention is for expeditions to complement the settlement rather than replace it with a conventional world map.
 
 ---
 
@@ -153,6 +430,21 @@ The main focus is on:
 
 The primary goal of this project is to create an enjoyable resource management game while continuing to improve my software development skills.
 
-Rather than recreating an existing game, the focus is on designing and implementing gameplay systems from first principles. Features are developed incrementally, tested, and refined before additional complexity is introduced.
+Rather than recreating an existing game, the focus is on designing and implementing gameplay systems from first principles.
 
-Gameplay always takes priority over presentation. Reliable systems, maintainable code, and enjoyable mechanics are considered more important than visual polish during development.
+Features are developed incrementally, tested, and refined before additional complexity is introduced.
+
+Gameplay takes priority over presentation. Reliable systems, maintainable code, meaningful mechanics, and a clear player experience are considered more important than visual polish during development.
+
+The project is intentionally being built as a **browser-based simulation** rather than a traditional downloadable strategy game. The design therefore focuses on:
+
+- persistent settlement progression
+- live simulation
+- automation
+- resource management
+- production chains
+- population management
+- asynchronous activities
+- timed expeditions
+
+The game does not currently aim to provide a traditional downloadable-game save system or a conventional persistent overworld map. The settlement itself is the persistent game state, while future exploration is intended to be handled through asynchronous expedition-style activities.

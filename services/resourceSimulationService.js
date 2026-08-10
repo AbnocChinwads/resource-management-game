@@ -1,5 +1,6 @@
 import db from "../db.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
+import { canAddPlayerResource, addPlayerResource } from "./resourceService.js";
 
 async function getRecipeInputs(recipeId) {
   const result = await db.query(
@@ -57,29 +58,6 @@ async function consumeInputs(playerId, inputs, workers) {
   }
 }
 
-async function produceOutput(playerId, building) {
-  if (!building.output_resource_id) {
-    return;
-  }
-
-  const amount =
-    Number(building.output_amount) *
-    building.workers_assigned *
-    (SIMULATION_TICK_SECONDS / building.craft_time_seconds);
-
-  await db.query(
-    `
-    INSERT INTO player_resources
-    (player_id, resource_type_id, amount)
-    VALUES ($1,$2,$3)
-    ON CONFLICT (player_id, resource_type_id)
-    DO UPDATE
-    SET amount = player_resources.amount + EXCLUDED.amount
-    `,
-    [playerId, building.output_resource_id, amount],
-  );
-}
-
 export async function processResourceTick(playerId) {
   await db.query("BEGIN");
 
@@ -108,7 +86,6 @@ export async function processResourceTick(playerId) {
     );
 
     for (const building of buildings.rows) {
-
       const inputs = await getRecipeInputs(building.recipe_id);
 
       const canRun = await buildingHasResources(
@@ -121,9 +98,28 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
+      const outputAmount =
+        Number(building.output_amount) *
+        building.workers_assigned *
+        (SIMULATION_TICK_SECONDS / building.craft_time_seconds);
+
+      const canStore = await canAddPlayerResource(
+        playerId,
+        building.output_resource_id,
+        outputAmount,
+      );
+
+      if (!canStore) {
+        continue;
+      }
+
       await consumeInputs(playerId, inputs, building.workers_assigned);
 
-      await produceOutput(playerId, building);
+      await addPlayerResource(
+        playerId,
+        building.output_resource_id,
+        outputAmount,
+      );
     }
 
     await db.query("COMMIT");

@@ -285,3 +285,49 @@
   - building upgrades
   - production chains
   - settlement progression
+
+## [0.4.4] - Storage Capacity Enforcement
+
+### Added
+
+* Added server-side storage capacity enforcement for resource production.
+* Added centralised storage validation when resources are added to a player's settlement.
+* Added storage capacity checks for both manual task completion and automated production.
+* Added player-facing notifications when a manual task cannot be completed because storage is full.
+* Added automatic initialisation of the appropriate player storage category when a resource is first discovered.
+* Added persistent storage categories that remain available after the player's current amount of that resource reaches zero.
+
+### Changed
+
+* Resource additions now pass through storage capacity validation before being committed.
+* Manual resource production now respects the capacity of the resource's storage category.
+* Automated resource production now respects storage capacity rather than continuing to add resources beyond the limit.
+* Expected storage-capacity failures are treated as gameplay conditions rather than application errors.
+
+### Fixed
+
+* Fixed resource production bypassing storage capacity.
+* Fixed automated production repeatedly attempting to add resources when storage was already full.
+* Fixed storage categories requiring frontend-only discovery logic to determine whether they existed.
+* Fixed storage categories disappearing when the player no longer had any resources in that category.
+
+### Technical
+
+* Connected `storage_defaults` with per-player `player_storage` records.
+* Added centralised resource storage validation to the resource service.
+* Updated manual task completion to use the centralised resource addition logic.
+* Updated automated resource production to use the same storage validation.
+* Added database migration support for correcting existing player storage data.
+
+### Notes
+
+* Storage capacity is now an enforced gameplay constraint.
+* Storage buildings and expandable storage capacity are not yet implemented.
+* Automated production does not yet expose an explicit `Idle` state when production is blocked by storage capacity or missing inputs.
+* Existing development settlements may contain resources above their current storage capacity because those resources were accumulated before storage enforcement was introduced.
+
+### Reason
+
+* Move storage from a display-only system into an actual gameplay constraint.
+* Ensure manual and automated resource production use the same storage rules.
+* Establish the backend foundation required for future storage buildings, upgrades, and more complex resource management.

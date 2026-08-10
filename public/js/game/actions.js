@@ -63,10 +63,11 @@ export function initialiseGameActions(refreshStats) {
         if (data.success) {
           await refreshStats();
         } else {
-          console.error(data.error);
+          alert(data.error);
         }
       } catch (err) {
         console.error("Complete task error:", err);
+        alert("Could not complete task.");
       }
 
       return;
