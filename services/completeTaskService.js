@@ -1,9 +1,9 @@
 import db from "../db.js";
+import { addPlayerResource } from "./resourceService.js";
 import {
   canAddPlayerResource,
-  addPlayerResource,
   getStorageForResource,
-} from "./resourceService.js";
+} from "./storageService.js";
 
 export async function completeTask(playerId, taskId) {
   try {

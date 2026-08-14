@@ -1,6 +1,7 @@
 import db from "../db.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
-import { canAddPlayerResource, addPlayerResource } from "./resourceService.js";
+import { getPlayerResources, addPlayerResource } from "./resourceService.js";
+import { canAddPlayerResource } from "./storageService.js";
 
 async function getRecipeInputs(recipeId) {
   const result = await db.query(
@@ -18,22 +19,22 @@ async function getRecipeInputs(recipeId) {
 }
 
 async function buildingHasResources(playerId, inputs, workers) {
-  for (const input of inputs) {
-    const result = await db.query(
-      `
-        SELECT amount
-        FROM player_resources
-        WHERE player_id = $1
-        AND resource_type_id = $2
-        `,
-      [playerId, input.resource_type_id],
-    );
+  const resources = await getPlayerResources(playerId);
 
-    const available = Number(result.rows[0]?.amount ?? 0);
+  const resourceAmounts = new Map(
+    resources.map((resource) => [
+      resource.resource_type_id,
+      Number(resource.amonut),
+    ]),
+  );
+
+  for (const input of inputs) {
+    const availabe = resourceAmounts.get(input.resource_type_id) ?? 0;
+
     const required =
       Number(input.amount) * workers * (SIMULATION_TICK_SECONDS / 60);
 
-    if (available < required) {
+    if (availabe < required) {
       return false;
     }
   }
