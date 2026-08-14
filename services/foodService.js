@@ -76,14 +76,36 @@ export async function processFoodTick(playerId) {
         break;
       }
 
-      const availableNutrition = food.amount * food.nutrition_value;
+      const availableNutrition =
+        Number(food.amount) * Number(food.nutrition_value);
 
       if (availableNutrition <= totalNutritionNeeded) {
         totalNutritionNeeded -= availableNutrition;
+
+        await db.query(
+          `
+          UPDATE player_resources
+          SET amount = 0
+          WHERE player_id =$1
+          AND resource_type_id = $2
+          `,
+          [playerId, food.resource_type_id],
+        );
+
         food.amount = 0;
       } else {
         const unitsConsumed = Math.ceil(
-          totalNutritionNeeded / food.nutrition_value,
+          totalNutritionNeeded / Number(food.nutrition_value),
+        );
+
+        await db.query(
+          `
+          UPDATE player_resources
+          SET amount = amount - $1
+          WHERE player_id = $2
+          AND resource_type_id = $3
+          `,
+          [unitsConsumed, playerId, food.resource_type_id],
         );
 
         food.amount -= unitsConsumed;
