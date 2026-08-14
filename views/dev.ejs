@@ -1,8 +1,8 @@
 <%- include('partials/header.ejs'); -%>
         <h1>Dev Dashboard</h1>
-        <%- include('partials/devplayerselector.ejs'); %>
+        <%- include('partials/devPlayerSelector.ejs'); %>
         <% if (stats) { %>
-            <%- include('partials/devplayerstats.ejs'); %>
+            <%- include('partials/devPlayerStats.ejs'); %>
         <% } %>
         <div class="col-lg-8">
             <div class="card mb-4">
@@ -33,8 +33,8 @@
                 </div>
             </div>
         </div>
-        <%- include('partials/devbugreports.ejs'); -%>
-        <%- include('partials/devgameplaysuggestions.ejs'); -%>
+        <%- include('partials/devBugReports.ejs'); -%>
+        <%- include('partials/devGameplaySuggestions.ejs'); -%>
         <%- include('partials/footer.ejs'); -%>
     </body>
 </html>
