@@ -2,6 +2,7 @@ import db from "../db.js";
 import {
   calculateProductionRate,
   calculateConsumptionRate,
+  getProductionStatus,
 } from "./productionService.js";
 
 export async function getPlayerBuildings(playerId) {
@@ -61,26 +62,33 @@ export async function getPlayerBuildings(playerId) {
     recipeInputsMap.get(input.recipe_id).push(input);
   }
 
-  buildings.forEach((building) => {
-    if (building.recipe_id) {
-      building.productionRate = calculateProductionRate(building);
-
-      const inputs = recipeInputsMap.get(building.recipe_id) || [];
-
-      building.consumptionRates = inputs.map((input) => ({
-        resource_type_id: input.resource_type_id,
-        name: input.name,
-        amount: calculateConsumptionRate(
-          input,
-          building.workers_assigned,
-          building.craft_time_seconds,
-        ),
-      }));
-    } else {
+  for (const building of buildings) {
+    if (!building.recipe_id) {
       building.productionRate = 0;
       building.consumptionRates = [];
+      continue;
     }
-  });
+
+    building.productionRate = calculateProductionRate(building);
+
+    const inputs = recipeInputsMap.get(building.recipe_id) || [];
+
+    building.consumptionRates = inputs.map((input) => ({
+      resource_type_id: input.resource_type_id,
+      name: input.name,
+      amount: calculateConsumptionRate(
+        input,
+        building.workers_assigned,
+        building.craft_time_seconds,
+      ),
+    }));
+
+    building.productionStatus = await getProductionStatus(
+      playerId,
+      building,
+      inputs,
+    );
+  }
 
   return buildings;
 }

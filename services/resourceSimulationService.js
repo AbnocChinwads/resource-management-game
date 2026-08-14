@@ -5,6 +5,7 @@ import { canAddPlayerResource } from "./storageService.js";
 import {
   calculateProductionPerTick,
   calculateConsumptionPerTick,
+  getProductionStatus,
 } from "./productionService.js";
 
 async function getRecipeInputs(recipeId) {
@@ -22,31 +23,7 @@ async function getRecipeInputs(recipeId) {
   return result.rows;
 }
 
-async function buildingHasResources(playerId, inputs, workers) {
-  const resources = await getPlayerResources(playerId);
-
-  const resourceAmounts = new Map(
-    resources.map((resource) => [
-      resource.resource_type_id,
-      Number(resource.amonut),
-    ]),
-  );
-
-  for (const input of inputs) {
-    const availabe = resourceAmounts.get(input.resource_type_id) ?? 0;
-
-    const required =
-      Number(input.amount) * workers * (SIMULATION_TICK_SECONDS / 60);
-
-    if (availabe < required) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-async function consumeInputs(playerId, inputs, workers, craftTimeSeconds,) {
+async function consumeInputs(playerId, inputs, workers, craftTimeSeconds) {
   for (const input of inputs) {
     const amount = calculateConsumptionPerTick(
       input,
@@ -96,29 +73,24 @@ export async function processResourceTick(playerId) {
     for (const building of buildings.rows) {
       const inputs = await getRecipeInputs(building.recipe_id);
 
-      const canRun = await buildingHasResources(
+      const productionStatus = await getProductionStatus(
         playerId,
+        building,
         inputs,
-        building.workers_assigned,
       );
 
-      if (!canRun) {
+      if (productionStatus.status !== "working") {
         continue;
       }
 
       const outputAmount = calculateProductionPerTick(building);
 
-      const canStore = await canAddPlayerResource(
+      await consumeInputs(
         playerId,
-        building.output_resource_id,
-        outputAmount,
+        inputs,
+        building.workers_assigned,
+        building.craft_time_seconds,
       );
-
-      if (!canStore) {
-        continue;
-      }
-
-      await consumeInputs(playerId, inputs, building.workers_assigned, building.craftTimeSeconds,);
 
       await addPlayerResource(
         playerId,
