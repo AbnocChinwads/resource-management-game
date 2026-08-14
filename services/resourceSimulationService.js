@@ -2,6 +2,10 @@ import db from "../db.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 import { getPlayerResources, addPlayerResource } from "./resourceService.js";
 import { canAddPlayerResource } from "./storageService.js";
+import {
+  calculateProductionPerTick,
+  calculateConsumptionPerTick,
+} from "./productionService.js";
 
 async function getRecipeInputs(recipeId) {
   const result = await db.query(
@@ -42,10 +46,13 @@ async function buildingHasResources(playerId, inputs, workers) {
   return true;
 }
 
-async function consumeInputs(playerId, inputs, workers) {
+async function consumeInputs(playerId, inputs, workers, craftTimeSeconds,) {
   for (const input of inputs) {
-    const amount =
-      Number(input.amount) * workers * (SIMULATION_TICK_SECONDS / 60);
+    const amount = calculateConsumptionPerTick(
+      input,
+      workers,
+      craftTimeSeconds,
+    );
 
     await db.query(
       `
@@ -99,10 +106,7 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
-      const outputAmount =
-        Number(building.output_amount) *
-        building.workers_assigned *
-        (SIMULATION_TICK_SECONDS / building.craft_time_seconds);
+      const outputAmount = calculateProductionPerTick(building);
 
       const canStore = await canAddPlayerResource(
         playerId,
@@ -114,7 +118,7 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
-      await consumeInputs(playerId, inputs, building.workers_assigned);
+      await consumeInputs(playerId, inputs, building.workers_assigned, building.craftTimeSeconds,);
 
       await addPlayerResource(
         playerId,

@@ -1,4 +1,8 @@
 import db from "../db.js";
+import {
+  calculateProductionRate,
+  calculateConsumptionRate,
+} from "./productionService.js";
 
 export async function getPlayerBuildings(playerId) {
   const result = await db.query(
@@ -59,18 +63,18 @@ export async function getPlayerBuildings(playerId) {
 
   buildings.forEach((building) => {
     if (building.recipe_id) {
-      building.productionRate =
-        (building.output_amount * building.workers_assigned * 60) /
-        building.craft_time_seconds;
+      building.productionRate = calculateProductionRate(building);
 
       const inputs = recipeInputsMap.get(building.recipe_id) || [];
 
       building.consumptionRates = inputs.map((input) => ({
         resource_type_id: input.resource_type_id,
         name: input.name,
-        amount:
-          (input.amount * building.workers_assigned * 60) /
+        amount: calculateConsumptionRate(
+          input,
+          building.workers_assigned,
           building.craft_time_seconds,
+        ),
       }));
     } else {
       building.productionRate = 0;
