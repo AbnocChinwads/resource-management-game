@@ -6,6 +6,7 @@ import {
   getFoodNutritionConsumption,
 } from "./foodService.js";
 import { getRecipes } from "./recipeService.js";
+import { getPopulation, getPopulationCapacity } from "./populationService.js";
 
 export async function getPlayerStats(playerId) {
   // Buildings
@@ -17,26 +18,12 @@ export async function getPlayerStats(playerId) {
   );
 
   // Player info
-  const playerRes = await db.query(
-    `
-    SELECT 
-      population,
-      workers,
-      food_tick_rate_seconds
-    FROM players
-    WHERE id = $1
-    `,
-    [playerId],
-  );
+  const player = await getPopulation(playerId);
+  const populationCapacity = await getPopulationCapacity(playerId);
 
-  const player = playerRes.rows[0];
-
-  if (!player) {
-    throw new Error("Player not found");
-  }
-
-  const population = player.population;
-  const workers = player.workers;
+  const population = Number(player.population);
+  const workers = Number(player.workers);
+  const historicalMaxPopulation = Number(player.historical_max_population);
 
   const availableWorkers = Math.max(workers - assignedWorkers, 0);
 
@@ -65,6 +52,8 @@ export async function getPlayerStats(playerId) {
   return {
     population,
     workers,
+    historicalMaxPopulation,
+    populationCapacity,
     assignedWorkers,
     availableWorkers,
     food,

@@ -91,27 +91,16 @@ export async function completeTask(playerId, taskId) {
 
       const buildingRes = await db.query(
         `
-        SELECT type, population_gain
+        SELECT type
         FROM buildings
         WHERE id = $1
         `,
         [output_building_id],
       );
 
-      const { type, population_gain } = buildingRes.rows[0];
+      const { type } = buildingRes.rows[0];
 
-      if (type === "housing") {
-        await db.query(
-          `
-          UPDATE players
-          SET 
-            population = population + $1,
-            workers = workers + $1
-          WHERE id = $2
-          `,
-          [population_gain || 2, playerId],
-        );
-      } else if (type === "production") {
+      if (type === "production") {
         const workerRes = await db.query(
           `
           SELECT
