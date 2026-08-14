@@ -1,3 +1,5 @@
+import { updateNetFlowElement } from "./resources.js";
+
 export function updatePlayerDisplay(data) {
   document.getElementById("population-count").textContent = data.population;
 
@@ -13,9 +15,13 @@ export function updatePlayerDisplay(data) {
     data.food ?? 0,
   ).toFixed(1);
 
-  const foodConsumptionEl = document.getElementById("food-consumption");
+  document.getElementById("player-food-required").textContent =
+    `${Number(data.foodRequiredPerMinute).toFixed(1)}/min`;
+  document.getElementById("player-food-supplied").textContent =
+    `${Number(data.foodSuppliedPerMinute).toFixed(1)}/min`;
+  const foodNetEl = document.getElementById("player-food-net");
 
-  if (foodConsumptionEl) {
-    foodConsumptionEl.textContent = `${Number(data.foodConsumptionRate ?? 0).toFixed(1)}/min`;
+  if (foodNetEl) {
+    updateNetFlowElement(foodNetEl, data.foodNetFlowPerMinute ?? 0);
   }
 }

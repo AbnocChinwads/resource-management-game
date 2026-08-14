@@ -1,7 +1,10 @@
 import db from "../db.js";
 import { getPlayerBuildings } from "./buildingService.js";
 import { getResourceFlow } from "./resourceFlowService.js";
-import { getFoodNutritionConsumption } from "./foodService.js";
+import {
+  getFoodConsumptionRate,
+  getFoodNutritionConsumption,
+} from "./foodService.js";
 import { getRecipes } from "./recipeService.js";
 
 export async function getPlayerStats(playerId) {
@@ -18,7 +21,8 @@ export async function getPlayerStats(playerId) {
     `
     SELECT 
       population,
-      workers
+      workers,
+      food_tick_rate_seconds
     FROM players
     WHERE id = $1
     `,
@@ -49,8 +53,14 @@ export async function getPlayerStats(playerId) {
     0,
   );
 
-  // Actual nutrition being consumed per minute
-  const foodConsumptionRate = getFoodNutritionConsumption(resources);
+  const foodRequiredPerMinute = getFoodConsumptionRate(
+    player.population,
+    player.food_tick_rate_seconds,
+  );
+
+  const foodSuppliedPerMinute = getFoodNutritionConsumption(resources);
+
+  const foodNetFlowPerMinute = foodSuppliedPerMinute - foodRequiredPerMinute;
 
   return {
     population,
@@ -58,7 +68,9 @@ export async function getPlayerStats(playerId) {
     assignedWorkers,
     availableWorkers,
     food,
-    foodConsumptionRate,
+    foodRequiredPerMinute,
+    foodSuppliedPerMinute,
+    foodNetFlowPerMinute,
     resources,
     buildings,
     storage,

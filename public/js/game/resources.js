@@ -1,6 +1,6 @@
 import { formatResourceAmount } from "./helpers.js";
 
-function updateNetFlowElement(element, amount) {
+export function updateNetFlowElement(element, amount) {
   const value = Number(amount);
 
   element.classList.remove("text-success", "text-danger", "text-muted");
