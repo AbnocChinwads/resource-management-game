@@ -331,3 +331,52 @@
 * Move storage from a display-only system into an actual gameplay constraint.
 * Ensure manual and automated resource production use the same storage rules.
 * Establish the backend foundation required for future storage buildings, upgrades, and more complex resource management.
+
+## [0.4.5] - Production State
+
+### Added
+
+* Added production status tracking for production buildings.
+* Added `working` and `idle` production states.
+* Added idle reasons for unassigned workers, insufficient inputs, insufficient storage, and damaged buildings.
+* Added storage availability to storage lookups.
+* Added reusable production-rate and consumption-rate calculations.
+* Added centralised production-state evaluation shared by the building data and simulation systems.
+* Added frontend rendering for production building idle states.
+
+### Changed
+
+* Production buildings now determine whether the next production tick can be completed before production proceeds.
+* Production state now considers workers, building health, required inputs, and available output storage.
+* Production buildings return to `working` automatically when the blocking condition is resolved.
+* Production and consumption displays now reflect the building's current production state.
+* Flour was moved from the material storage category to the grain storage category.
+
+### Fixed
+
+* Fixed production buildings displaying normal production or consumption information when production was blocked by storage.
+* Fixed production buildings failing to resume their normal production display after sufficient storage became available.
+* Fixed storage checks relying on storage reaching an exact capacity value when resource amounts are fractional.
+* Fixed the production interface displaying `0/min` without explaining why a production building was not operating.
+
+### Technical
+
+* Extracted storage-related functionality from `resourceService.js` into `storageService.js`.
+* Added reusable storage availability calculations.
+* Extracted production and consumption calculations into `productionService.js`.
+* Centralised production-state evaluation so the simulation and building data use the same production rules.
+* Removed duplicated production and consumption calculations from individual services.
+* Removed duplicated storage eligibility checks from the resource simulation flow.
+* Updated asynchronous building processing to support production-state evaluation.
+
+### Notes
+
+* Production state is currently recalculated as part of normal game-state processing.
+* No player alert is generated simply because a building remains idle.
+* The current frontend displays the idle state directly in the production and consumption columns.
+
+### Reason
+
+* Make production buildings explicitly represent whether they can currently operate.
+* Provide players with a clear explanation when automated production is blocked.
+* Centralise production rules so the simulation and frontend receive the same production state.

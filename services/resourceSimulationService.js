@@ -70,6 +70,8 @@ export async function processResourceTick(playerId) {
       [playerId],
     );
 
+    const resources = await getPlayerResources(playerId);
+
     for (const building of buildings.rows) {
       const inputs = await getRecipeInputs(building.recipe_id);
 
@@ -77,6 +79,7 @@ export async function processResourceTick(playerId) {
         playerId,
         building,
         inputs,
+        resources,
       );
 
       if (productionStatus.status !== "working") {

@@ -4,6 +4,7 @@ import {
   calculateConsumptionRate,
   getProductionStatus,
 } from "./productionService.js";
+import { getPlayerResources } from "./resourceService.js";
 
 export async function getPlayerBuildings(playerId) {
   const result = await db.query(
@@ -62,6 +63,8 @@ export async function getPlayerBuildings(playerId) {
     recipeInputsMap.get(input.recipe_id).push(input);
   }
 
+  const resources = await getPlayerResources(playerId);
+
   for (const building of buildings) {
     if (!building.recipe_id) {
       building.productionRate = 0;
@@ -87,6 +90,7 @@ export async function getPlayerBuildings(playerId) {
       playerId,
       building,
       inputs,
+      resources,
     );
   }
 

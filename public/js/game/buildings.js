@@ -78,6 +78,20 @@ export function updateBuildings(buildings) {
 }
 
 function updateProductionElement(element, building) {
+  if (building.productionStatus?.status === "idle") {
+    const message = getProductionStatusMessage(building);
+
+    element.innerHTML = `
+      <span aria-hidden="true">—</span>
+      Idle — ${message}
+    `;
+
+    element.classList.remove("text-success", "text-danger");
+    element.classList.add("text-muted");
+
+    return;
+  }
+
   const value = Number(building.productionRate ?? 0);
 
   element.classList.remove("text-success", "text-danger", "text-muted");
@@ -106,6 +120,20 @@ function updateProductionElement(element, building) {
 }
 
 function updateConsumptionElement(element, building) {
+  if (building.productionStatus?.status === "idle") {
+    const message = getProductionStatusMessage(building);
+
+    element.innerHTML = `
+      <span aria-hidden="true">—</span>
+      Idle — ${message}
+    `;
+
+    element.classList.remove("text-success", "text-danger");
+    element.classList.add("text-muted");
+
+    return;
+  }
+
   element.classList.remove("text-danger", "text-muted");
 
   if (
@@ -130,4 +158,15 @@ function updateConsumptionElement(element, building) {
     .join("<br>");
 
   element.classList.add("text-danger");
+}
+
+function getProductionStatusMessage(building) {
+  const reasonMessages = {
+    insufficient_storage: "Insufficient storage capacity",
+    insufficient_inputs: "Insufficient resources",
+    no_workers: "No workers assigned",
+    building_damaged: "Building damaged",
+  };
+
+  return reasonMessages[building.productionStatus?.reason] ?? "Not producing";
 }

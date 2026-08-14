@@ -1,6 +1,56 @@
+import db from "../db.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
-import { getPlayerResources } from "./resourceService.js";
 import { canAddPlayerResource } from "./storageService.js";
+import { getPlayerResources } from "./resourceService.js";
+
+async function getProductionBuildings(playerId) {
+  const buildingsResult = await db.query(
+    `
+    SELECT
+      pb.id,
+      pb.workers_assigned,
+      pb.health,
+      r.id AS recipe_id,
+      r.output_resource_id,
+      r.output_amount,
+      r.craft_time_seconds
+    FROM player_buildings pb
+    JOIN buildings b
+      ON b.id = pb.building_id
+    JOIN recipes r
+      ON r.id = b.production_recipe_id
+    WHERE pb.player_id = $1
+    AND pb.workers_assigned > 0
+    AND pb.health > 0
+    `,
+    [playerId],
+  );
+
+  const inputsResult = await db.query(
+    `
+    SELECT
+      ri.recipe_id,
+      ri.resource_type_id,
+      ri.amount
+    FROM recipe_inputs ri
+    `,
+  );
+
+  const inputsMap = new Map();
+
+  for (const input of inputsResult.rows) {
+    if (!inputsMap.has(input.recipe_id)) {
+      inputsMap.set(input.recipe_id, []);
+    }
+
+    inputsMap.get(input.recipe_id).push(input);
+  }
+
+  return buildingsResult.rows.map((building) => ({
+    ...building,
+    inputs: inputsMap.get(building.recipe_id) ?? [],
+  }));
+}
 
 export function calculateProductionRate(building) {
   return (
@@ -27,7 +77,12 @@ export function calculateConsumptionPerTick(input, workers, craftTimeSeconds) {
   );
 }
 
-export async function getProductionStatus(playerId, building, inputs) {
+export async function getProductionStatus(
+  playerId,
+  building,
+  inputs,
+  resources,
+) {
   if (building.workers_assigned <= 0) {
     return {
       status: "idle",
@@ -41,8 +96,6 @@ export async function getProductionStatus(playerId, building, inputs) {
       reason: "building_damaged",
     };
   }
-
-  const resources = await getPlayerResources(playerId);
 
   const resourceAmounts = new Map(
     resources.map((resource) => [
@@ -87,4 +140,26 @@ export async function getProductionStatus(playerId, building, inputs) {
     status: "working",
     reason: null,
   };
+}
+
+export async function getWorkingProductionBuildings(playerId) {
+  const buildings = await getProductionBuildings(playerId);
+  const resources = await getPlayerResources(playerId);
+
+  const workingBuildings = [];
+
+  for (const building of buildings) {
+    const status = await getProductionStatus(
+      playerId,
+      building,
+      building.inputs,
+      resources,
+    );
+
+    if (status.status === "working") {
+      workingBuildings.push(building);
+    }
+  }
+
+  return workingBuildings;
 }

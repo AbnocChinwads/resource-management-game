@@ -1,58 +1,65 @@
 import db from "../db.js";
-
 import {
   getPlayerResourceTypes,
   getPlayerResources,
 } from "./resourceService.js";
-
 import { getPlayerStorage } from "./storageService.js";
+import {
+  calculateProductionRate,
+  calculateConsumptionRate,
+  getWorkingProductionBuildings,
+} from "./productionService.js";
 
 async function getResourceProduction(playerId) {
-  const result = await db.query(
-    `
-    SELECT
-    r.output_resource_id AS resource_type_id,
-    SUM((r.output_amount * pb.workers_assigned * 60)/ r.craft_time_seconds) AS production_per_minute
-    FROM player_buildings pb
-    JOIN buildings b
-    ON b.id = pb.building_id
-    JOIN recipes r
-    ON r.id = b.production_recipe_id
-    WHERE pb.player_id = $1
-    AND pb.workers_assigned > 0
-    GROUP BY r.output_resource_id
-    `,
-    [playerId],
-  );
+  const buildings = await getWorkingProductionBuildings(playerId);
 
-  return result.rows;
+  const productionMap = new Map();
+
+  for (const building of buildings) {
+    const amount = calculateProductionRate(building);
+
+    const existing = productionMap.get(building.output_resource_id);
+
+    if (existing) {
+      existing.production_per_minute += amount;
+    } else {
+      productionMap.set(building.output_resource_id, {
+        resource_type_id: building.output_resource_id,
+        production_per_minute: amount,
+      });
+    }
+  }
+
+  return [...productionMap.values()];
 }
 
 async function getRecipeConsumption(playerId) {
-  const result = await db.query(
-    `
-    SELECT
-    ri.resource_type_id, rt.name,
-    SUM((ri.amount * pb.workers_assigned * 60)/ r.craft_time_seconds) AS consumed_per_minute
-    FROM player_buildings pb
-    JOIN buildings b
-    ON b.id = pb.building_id
-    JOIN recipes r
-    ON r.id = b.production_recipe_id
-    JOIN recipe_inputs ri
-    ON ri.recipe_id = r.id
-    JOIN resource_types rt
-    ON rt.id = ri.resource_type_id
-    WHERE pb.player_id = $1
-    AND pb.workers_assigned > 0
-    GROUP BY
-    ri.resource_type_id,
-    rt.name
-    `,
-    [playerId],
-  );
+  const buildings = await getWorkingProductionBuildings(playerId);
 
-  return result.rows;
+  const consumptionMap = new Map();
+
+  for (const building of buildings) {
+    for (const input of building.inputs) {
+      const amount = calculateConsumptionRate(
+        input,
+        building.workers_assigned,
+        building.craft_time_seconds,
+      );
+
+      const existing = consumptionMap.get(input.resource_type_id);
+
+      if (existing) {
+        existing.consumed_per_minute += amount;
+      } else {
+        consumptionMap.set(input.resource_type_id, {
+          resource_type_id: input.resource_type_id,
+          consumed_per_minute: amount,
+        });
+      }
+    }
+  }
+
+  return [...consumptionMap.values()];
 }
 
 async function getResourceConsumption(playerId) {

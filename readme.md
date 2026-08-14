@@ -16,11 +16,43 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.4.4**
+**Alpha v0.4.5**
 
 ---
 
 # Recent Updates
+
+## Alpha v0.4.5 - Production State
+
+This update builds on the storage capacity enforcement introduced in v0.4.4 by making production buildings explicitly aware of whether they can currently operate.
+
+### Gameplay System Improvements
+
+- Added explicit production states for production buildings.
+- Production buildings can now become idle when:
+  - no workers are assigned
+  - required inputs are unavailable
+  - output storage cannot accept the next production tick
+  - the building is damaged
+
+- Production buildings automatically return to a working state when the condition preventing production is resolved.
+- Storage availability is now evaluated against the amount required by the next production tick, allowing fractional resource production to work correctly.
+
+### Interface Improvements
+
+- Production buildings now display an **Idle** state when they cannot produce.
+- Idle buildings display the reason they are unable to operate.
+- Production and consumption information is replaced by the idle state while production is blocked.
+- Production and consumption displays automatically return when a building becomes productive again.
+
+### Notes
+
+- Production buildings currently recalculate their state as part of the normal live game-state updates.
+- The current idle-state system does not generate player alerts.
+
+This update establishes the production-state foundation required for clearer automation feedback and future game alerts.
+
+---
 
 ## Alpha v0.4.4 - Storage Capacity Enforcement
 
