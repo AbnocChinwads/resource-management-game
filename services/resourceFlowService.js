@@ -7,6 +7,7 @@ import { getPlayerStorage } from "./storageService.js";
 import {
   calculateProductionRate,
   calculateConsumptionRate,
+  getProductionBuildings,
   getWorkingProductionBuildings,
 } from "./productionService.js";
 
@@ -31,6 +32,30 @@ async function getResourceProduction(playerId) {
   }
 
   return [...productionMap.values()];
+}
+
+async function getFoodProductionCapacity(playerId) {
+  const buildings = await getProductionBuildings(playerId);
+
+  const resourceTypes = await getPlayerResourceTypes(playerId);
+
+  let foodProductionCapacity = 0;
+
+  for (const building of buildings) {
+    const resource = resourceTypes.find(
+      (r) => r.resource_type_id === building.output_resource_id,
+    );
+
+    if (!resource || Number(resource.nutrition_value) <= 0) {
+      continue;
+    }
+
+    const production = calculateProductionRate(building);
+
+    foodProductionCapacity += production * Number(resource.nutrition_value);
+  }
+
+  return foodProductionCapacity;
 }
 
 async function getRecipeConsumption(playerId) {
@@ -63,14 +88,10 @@ async function getRecipeConsumption(playerId) {
 }
 
 async function getResourceConsumption(playerId) {
-  const [recipeConsumption, foodConsumption] = await Promise.all([
-    getRecipeConsumption(playerId),
-    getFoodConsumption(playerId),
-  ]);
-
+  const recipeConsumption = await getRecipeConsumption(playerId);
   const consumptionMap = new Map();
 
-  for (const resource of [...recipeConsumption, ...foodConsumption]) {
+  for (const resource of recipeConsumption) {
     const existing = consumptionMap.get(resource.resource_type_id);
 
     if (existing) {
@@ -88,7 +109,6 @@ async function getResourceConsumption(playerId) {
 }
 
 async function getFoodConsumption(playerId) {
-  // Get population and food tick rate
   const playerResult = await db.query(
     `
     SELECT population, food_tick_rate_seconds
@@ -104,53 +124,10 @@ async function getFoodConsumption(playerId) {
     throw new Error("Player not found");
   }
 
-  // Calculate nutrition required per minute
-  const foodNeededPerMinute =
-    (player.population / player.food_tick_rate_seconds) * 60;
+  const foodRequiredPerMinute =
+    (Number(player.population) / Number(player.food_tick_rate_seconds)) * 60;
 
-  // Get available edible resources
-  const foodResult = await db.query(
-    `
-    SELECT
-      pr.resource_type_id,
-      rt.name,
-      pr.amount,
-      rt.nutrition_value
-    FROM player_resources pr
-    JOIN resource_types rt
-      ON pr.resource_type_id = rt.id
-    WHERE pr.player_id = $1
-      AND rt.nutrition_value > 0
-    ORDER BY rt.nutrition_value DESC
-    `,
-    [playerId],
-  );
-
-  let remainingNutrition = foodNeededPerMinute;
-
-  const consumption = [];
-
-  for (const food of foodResult.rows) {
-    if (remainingNutrition <= 0) {
-      break;
-    }
-
-    const nutritionAvailable = food.amount * food.nutrition_value;
-
-    const nutritionUsed = Math.min(nutritionAvailable, remainingNutrition);
-
-    const unitsConsumed = nutritionUsed / food.nutrition_value;
-
-    consumption.push({
-      resource_type_id: food.resource_type_id,
-      name: food.name,
-      consumed_per_minute: Number(unitsConsumed.toFixed(1)),
-    });
-
-    remainingNutrition -= nutritionUsed;
-  }
-
-  return consumption;
+  return foodRequiredPerMinute;
 }
 
 export async function getResourceFlow(playerId) {
@@ -160,12 +137,16 @@ export async function getResourceFlow(playerId) {
     playerStorage,
     production,
     consumption,
+    foodRequiredPerMinute,
+    foodProductionCapacityPerMinute,
   ] = await Promise.all([
     getPlayerResourceTypes(playerId),
     getPlayerResources(playerId),
     getPlayerStorage(playerId),
     getResourceProduction(playerId),
     getResourceConsumption(playerId),
+    getFoodConsumption(playerId),
+    getFoodProductionCapacity(playerId),
   ]);
 
   const resources = resourceTypes.map((resource) => ({
@@ -225,8 +206,34 @@ export async function getResourceFlow(playerId) {
     );
   }
 
+  // Calculate food flow
+  const foodSuppliedPerMinute = resources.reduce((total, resource) => {
+    if (Number(resource.nutrition_value) <= 0) {
+      return total;
+    }
+
+    return (
+      total +
+      Number(resource.producedPerMinute) * Number(resource.nutrition_value)
+    );
+  }, 0);
+
+  const foodNetFlowPerMinute = foodSuppliedPerMinute - foodRequiredPerMinute;
+
+  const foodPotentialBalancePerMinute =
+    foodProductionCapacityPerMinute - foodRequiredPerMinute;
+
   return {
     resources,
     storage: playerStorage,
+    foodRequiredPerMinute: Number(foodRequiredPerMinute.toFixed(1)),
+    foodSuppliedPerMinute: Number(foodSuppliedPerMinute.toFixed(1)),
+    foodNetFlowPerMinute: Number(foodNetFlowPerMinute.toFixed(1)),
+    foodProductionCapacityPerMinute: Number(
+      foodProductionCapacityPerMinute.toFixed(1),
+    ),
+    foodPotentialBalancePerMinute: Number(
+      foodPotentialBalancePerMinute.toFixed(1),
+    ),
   };
 }

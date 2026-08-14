@@ -19,25 +19,41 @@
     <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
         <thead>
             <tr>
-                <th>Pop.</th>
+                <th>Current</th>
+                <th>Max</th>
                 <th>Workers</th>
                 <th>Idle</th>
-                <th class="d-none d-xxl-table-cell">Assigned</th>
-                <th class="d-none d-xxl-table-cell">Food</th>
-                <th>Food Req.</th>
-                <th class="d-none d-xxl-table-cell">Supplied</th>
-                <th>Balance</th>
+                <th>Assigned</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td id="population-count"></td>
+                <td id="population-capacity"></td>
                 <td id="worker-count"></td>
                 <td id="available-workers"></td>
-                <td class="d-none d-xxl-table-cell" id="assigned-worker-count"></td>
-                <td class="d-none d-xxl-table-cell" id="food-count"></td>
+                <td id="assigned-worker-count"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Food Display -->
+<div class="table-responsive">
+    <h2 class="mt-3">Food</h2>
+    <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>Food</th>
+                <th>Required</th>
+                <th>Supplied</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="food-count"></td>
                 <td id="player-food-required"></td>
-                <td class="d-none d-xxl-table-cell" id="player-food-supplied"></td>
+                <td id="player-food-supplied"></td>
                 <td id="player-food-net"></td>
             </tr>
         </tbody>

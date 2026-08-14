@@ -380,3 +380,69 @@
 * Make production buildings explicitly represent whether they can currently operate.
 * Provide players with a clear explanation when automated production is blocked.
 * Centralise production rules so the simulation and frontend receive the same production state.
+
+# 0.4.6 — Population & Food System Overhaul
+
+## Added
+
+* Population capacity is now provided by housing buildings.
+* Added `historical_max_population` tracking to preserve a player's highest population reached.
+* Added population growth based on sustained positive food conditions.
+* Added starvation-based population loss.
+* Population loss is calculated as 10% of current population, rounded up.
+* Added a population floor of 10% of historical maximum population.
+* Added `food_surplus_started_at` to track sustained food surplus.
+* Added separate population and food information to the player stats display.
+* Population display now shows:
+
+  * Current population
+  * Maximum population
+  * Workers
+  * Idle workers
+  * Assigned workers
+* Food display now shows:
+
+  * Food
+  * Food required
+  * Food supplied
+  * Food balance
+* Added food production capacity as a separate concept from actual current food production.
+* Population growth now uses potential food balance, preventing full food storage from incorrectly stopping population growth.
+
+## Changed
+
+* Population and worker management are now separated conceptually:
+
+  * `populationService.js` manages population changes.
+  * `workerService.js` manages worker availability and assignment.
+* Starvation is triggered by actual stored food reaching zero, rather than food balance reaching zero.
+* Food surplus is cancelled when stored food reaches zero.
+* Worker counts are recalculated when population changes.
+* Resource flow now distinguishes between:
+
+  * Actual food production
+  * Food production capacity
+  * Food requirement
+  * Actual food balance
+  * Potential food balance
+* Updated the player statistics frontend to reflect the new population and food systems.
+
+## Database
+
+* Added `historical_max_population` to `players`.
+* Added `starvation_started_at` to `players`.
+* Added `food_surplus_started_at` to `players`.
+
+## Testing
+
+* Tested population capacity increasing when housing is constructed.
+* Tested sustained food surplus causing population growth.
+* Tested population growth updating historical maximum population.
+* Tested starvation causing population loss.
+* Tested the 10% current-population loss rule.
+* Tested the 10% historical-population floor.
+* Tested worker recalculation following population changes.
+* Tested food storage reaching capacity and production stopping.
+* Tested production resuming after food is consumed.
+* Tested that full food storage does not incorrectly prevent population growth.
+* Tested accelerated food/simulation ticks for population growth and starvation.

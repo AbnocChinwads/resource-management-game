@@ -1,10 +1,6 @@
 import db from "../db.js";
 import { getPlayerBuildings } from "./buildingService.js";
 import { getResourceFlow } from "./resourceFlowService.js";
-import {
-  getFoodConsumptionRate,
-  getFoodNutritionConsumption,
-} from "./foodService.js";
 import { getRecipes } from "./recipeService.js";
 import { getPopulation, getPopulationCapacity } from "./populationService.js";
 
@@ -30,8 +26,13 @@ export async function getPlayerStats(playerId) {
   // Resource production / consumption / net flow / storage
   const resourceFlow = await getResourceFlow(playerId);
 
-  const resources = resourceFlow.resources;
-  const storage = resourceFlow.storage;
+  const {
+    resources,
+    storage,
+    foodRequiredPerMinute,
+    foodSuppliedPerMinute,
+    foodNetFlowPerMinute,
+  } = resourceFlow;
   const recipeData = await getRecipes(playerId);
 
   // Total stored nutrition
@@ -39,15 +40,6 @@ export async function getPlayerStats(playerId) {
     (sum, resource) => sum + resource.amount * resource.nutrition_value,
     0,
   );
-
-  const foodRequiredPerMinute = getFoodConsumptionRate(
-    player.population,
-    player.food_tick_rate_seconds,
-  );
-
-  const foodSuppliedPerMinute = getFoodNutritionConsumption(resources);
-
-  const foodNetFlowPerMinute = foodSuppliedPerMinute - foodRequiredPerMinute;
 
   return {
     population,

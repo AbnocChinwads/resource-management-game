@@ -16,11 +16,72 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.4.5**
+**Alpha v0.4.6**
 
 ---
 
 # Recent Updates
+
+# 0.4.6 — Population & Food Overhaul
+
+### Population
+
+Population is now tied directly to the housing available in your settlement.
+
+* **Current** — the number of people currently living in your settlement.
+* **Maximum** — the maximum population your buildings can support.
+* **Workers** — the number of people available to work.
+* **Idle** — workers who aren't currently assigned to a building.
+* **Assigned** — workers currently assigned to production buildings.
+
+Your settlement also remembers the highest population you have reached.
+
+### Growing Your Population
+
+A sustained food surplus will now allow your population to grow.
+
+As long as:
+
+* You have food available.
+* Your settlement has enough food production capacity to meet its population's needs.
+* There is available housing capacity.
+
+your population can gradually increase.
+
+Building additional housing increases your maximum population and gives your settlement room to grow.
+
+### Food
+
+Food is now displayed separately from population, with a clearer breakdown of your settlement's food situation:
+
+* **Food** — your current stored food.
+* **Food Required** — how much food your population needs.
+* **Food Supplied** — how much food your production can supply.
+* **Food Balance** — the difference between food supplied and food required.
+
+Food storage capacity can temporarily stop production when your stores are full. This does not prevent population growth if your settlement has sufficient production capacity and stored food.
+
+### Starvation
+
+Starvation now depends on **actually running out of food**, rather than simply having a food balance of zero.
+
+A food balance of `0` means your settlement is producing exactly enough food to meet its current requirements. It does **not** mean your population is starving.
+
+If your stored food reaches zero and your settlement cannot sustain its population, starvation begins.
+
+During starvation:
+
+* Recovering your food supply stops the starvation process.
+* Once food conditions recover, population can begin rebuilding through the normal growth system.
+
+### Why This Matters
+
+Population, workers and food are now connected systems rather than separate numbers.
+
+Your housing determines how many people you can support, your population determines how much food you need, your workers determine how much production you can maintain, and your food supply determines whether your settlement can continue to grow or begins to starve.
+
+This forms the foundation for the settlement's future population and survival mechanics.
+
 
 ## Alpha v0.4.5 - Production State
 

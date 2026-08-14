@@ -3,7 +3,7 @@ import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 import { canAddPlayerResource } from "./storageService.js";
 import { getPlayerResources } from "./resourceService.js";
 
-async function getProductionBuildings(playerId) {
+export async function getProductionBuildings(playerId) {
   const buildingsResult = await db.query(
     `
     SELECT

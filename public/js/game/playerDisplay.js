@@ -3,6 +3,9 @@ import { updateNetFlowElement } from "./resources.js";
 export function updatePlayerDisplay(data) {
   document.getElementById("population-count").textContent = data.population;
 
+  document.getElementById("population-capacity").textContent =
+    data.populationCapacity;
+
   document.getElementById("worker-count").textContent = data.workers;
 
   document.getElementById("assigned-worker-count").textContent =
@@ -17,8 +20,10 @@ export function updatePlayerDisplay(data) {
 
   document.getElementById("player-food-required").textContent =
     `${Number(data.foodRequiredPerMinute).toFixed(1)}/min`;
+
   document.getElementById("player-food-supplied").textContent =
     `${Number(data.foodSuppliedPerMinute).toFixed(1)}/min`;
+
   const foodNetEl = document.getElementById("player-food-net");
 
   if (foodNetEl) {
