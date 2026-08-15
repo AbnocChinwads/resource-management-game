@@ -393,6 +393,23 @@ The game is designed around **persistent settlement progression** rather than a 
 
 The project is being developed incrementally rather than attempting to implement the complete game at once.
 
+## v0.4.x - Core Systems & Foundations
+
+This phase focuses on establishing the core systems that future settlement-management mechanics will build upon.
+
+### Completed / In Progress
+
+- [x] Core resource management
+- [x] Resource production and consumption
+- [x] Basic storage capacity
+- [x] Worker assignment and availability
+- [x] Population capacity and housing
+- [x] Population growth and starvation mechanics
+- [x] Basic food consumption and production
+- [x] Player-facing population and food information
+- [ ] Further refinement of core settlement systems
+- [ ] Initial gameplay balancing
+
 ## v0.5.x - Storage & Resource Management
 
 The next major development phase will turn the current storage-capacity foundation into a more complete settlement management system.
