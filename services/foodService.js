@@ -180,6 +180,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
         );
 
         population += populationIncrease;
+        workers = population;
 
         foodSurplusStartedAt = now;
       }
@@ -197,6 +198,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
         const populationReduction = await reducePopulation(playerId);
 
         population -= populationReduction;
+        workers = population;
 
         starvationStartedAt = now;
       }

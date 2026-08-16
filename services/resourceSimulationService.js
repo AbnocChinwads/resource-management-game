@@ -8,7 +8,14 @@ import {
   getProductionStatus,
 } from "./productionService.js";
 
-async function consumeInputs(playerId, inputs, workers, craftTimeSeconds) {
+async function consumeInputs(
+  playerId,
+  inputs,
+  workers,
+  craftTimeSeconds,
+  resources,
+  storage,
+) {
   for (const input of inputs) {
     const amount = calculateConsumptionPerTick(
       input,
@@ -18,13 +25,29 @@ async function consumeInputs(playerId, inputs, workers, craftTimeSeconds) {
 
     await db.query(
       `
-        UPDATE player_resources
-        SET amount = amount - $1
-        WHERE player_id = $2
-        AND resource_type_id = $3
-        `,
+      UPDATE player_resources
+      SET amount = amount - $1
+      WHERE player_id = $2
+      AND resource_type_id = $3
+      `,
       [amount, playerId, input.resource_type_id],
     );
+
+    const resource = resources.find(
+      (resource) => resource.resource_type_id === input.resource_type_id,
+    );
+
+    if (resource) {
+      resource.amount -= amount;
+
+      const storageEntry = storage.find(
+        (entry) => entry.storage_category === resource.storage_category,
+      );
+
+      if (storageEntry) {
+        storageEntry.used = Number(storageEntry.used) - amount;
+      }
+    }
   }
 }
 
@@ -99,6 +122,8 @@ export async function processResourceTick(playerId) {
         inputs,
         building.workers_assigned,
         building.craft_time_seconds,
+        resources,
+        storage,
       );
 
       await addPlayerResource(
@@ -106,6 +131,22 @@ export async function processResourceTick(playerId) {
         building.output_resource_id,
         outputAmount,
       );
+
+      const outputResource = resources.find(
+        (resource) => resource.resource_type_id === building.output_resource_id,
+      );
+
+      if (outputResource) {
+        outputResource.amount += outputAmount;
+
+        const storageEntry = storage.find(
+          (entry) => entry.storage_category === outputResource.storage_category,
+        );
+
+        if (storageEntry) {
+          storageEntry.used = Number(storageEntry.used) + outputAmount;
+        }
+      }
     }
 
     await db.query("COMMIT");

@@ -68,8 +68,6 @@ export async function increasePopulation(playerId, amount) {
     [newPopulation, newHistoricalMax, playerId],
   );
 
-  await calculateAvailableWorkers(playerId);
-
   return actualIncrease;
 }
 
@@ -99,8 +97,6 @@ export async function reducePopulation(playerId) {
     `,
     [newPopulation, playerId],
   );
-
-  await calculateAvailableWorkers(playerId);
 
   return actualReduction;
 }
