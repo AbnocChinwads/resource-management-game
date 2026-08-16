@@ -1,7 +1,5 @@
 import db from "../db.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
-import { canAddPlayerResource } from "./storageService.js";
-import { getPlayerResources } from "./resourceService.js";
 
 export async function getProductionBuildings(playerId) {
   const buildingsResult = await db.query(
@@ -77,12 +75,7 @@ export function calculateConsumptionPerTick(input, workers, craftTimeSeconds) {
   );
 }
 
-export async function getProductionStatus(
-  playerId,
-  building,
-  inputs,
-  resources,
-) {
+export function getProductionStatus(building, inputs, resources, storage) {
   if (building.workers_assigned <= 0) {
     return {
       status: "idle",
@@ -123,13 +116,31 @@ export async function getProductionStatus(
 
   const outputAmount = calculateProductionPerTick(building);
 
-  const canStore = await canAddPlayerResource(
-    playerId,
-    building.output_resource_id,
-    outputAmount,
+  const outputResource = resources.find(
+    (resource) => resource.resource_type_id === building.output_resource_id,
   );
 
-  if (!canStore) {
+  if (!outputResource) {
+    return {
+      status: "idle",
+      reason: "output_resource_not_found",
+    };
+  }
+
+  const storageCategory = outputResource.storage_category;
+
+  const storageEntry = storageCategory
+    ? storage.find((entry) => entry.storage_category === storageCategory)
+    : null;
+
+  if (!storageEntry) {
+    return {
+      status: "idle",
+      reason: "storage_not_found",
+    };
+  }
+
+  if (outputAmount > Number(storageEntry.capacity) - Number(storageEntry.used)) {
     return {
       status: "idle",
       reason: "insufficient_storage",
@@ -142,18 +153,15 @@ export async function getProductionStatus(
   };
 }
 
-export async function getWorkingProductionBuildings(playerId) {
-  const buildings = await getProductionBuildings(playerId);
-  const resources = await getPlayerResources(playerId);
-
+export function getWorkingProductionBuildings(buildings, resources, storage) {
   const workingBuildings = [];
 
   for (const building of buildings) {
-    const status = await getProductionStatus(
-      playerId,
+    const status = getProductionStatus(
       building,
       building.inputs,
       resources,
+      storage,
     );
 
     if (status.status === "working") {

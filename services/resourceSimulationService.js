@@ -1,27 +1,12 @@
 import db from "../db.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 import { getPlayerResources, addPlayerResource } from "./resourceService.js";
-import { canAddPlayerResource } from "./storageService.js";
+import { getPlayerStorage } from "./storageService.js";
 import {
   calculateProductionPerTick,
   calculateConsumptionPerTick,
   getProductionStatus,
 } from "./productionService.js";
-
-async function getRecipeInputs(recipeId) {
-  const result = await db.query(
-    `
-    SELECT
-    resource_type_id,
-    amount
-    FROM recipe_inputs
-    WHERE recipe_id = $1
-    `,
-    [recipeId],
-  );
-
-  return result.rows;
-}
 
 async function consumeInputs(playerId, inputs, workers, craftTimeSeconds) {
   for (const input of inputs) {
@@ -47,6 +32,26 @@ export async function processResourceTick(playerId) {
   await db.query("BEGIN");
 
   try {
+    const inputsResult = await db.query(
+      `
+      SELECT
+      recipe_id,
+      resource_type_id,
+      amount
+      FROM recipe_inputs
+      `,
+    );
+
+    const inputsMap = new Map();
+
+    for (const input of inputsResult.rows) {
+      if (!inputsMap.has(input.recipe_id)) {
+        inputsMap.set(input.recipe_id, []);
+      }
+
+      inputsMap.get(input.recipe_id).push(input);
+    }
+
     const buildings = await db.query(
       `
         SELECT
@@ -71,15 +76,16 @@ export async function processResourceTick(playerId) {
     );
 
     const resources = await getPlayerResources(playerId);
+    const storage = await getPlayerStorage(playerId);
 
     for (const building of buildings.rows) {
-      const inputs = await getRecipeInputs(building.recipe_id);
+      const inputs = inputsMap.get(building.recipe_id) ?? [];
 
-      const productionStatus = await getProductionStatus(
-        playerId,
+      const productionStatus = getProductionStatus(
         building,
         inputs,
         resources,
+        storage,
       );
 
       if (productionStatus.status !== "working") {

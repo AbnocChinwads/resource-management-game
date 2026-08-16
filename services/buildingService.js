@@ -5,6 +5,7 @@ import {
   getProductionStatus,
 } from "./productionService.js";
 import { getPlayerResources } from "./resourceService.js";
+import { getPlayerStorage } from "./storageService.js";
 
 export async function getPlayerBuildings(playerId) {
   const result = await db.query(
@@ -64,6 +65,7 @@ export async function getPlayerBuildings(playerId) {
   }
 
   const resources = await getPlayerResources(playerId);
+  const storage = await getPlayerStorage(playerId);
 
   for (const building of buildings) {
     if (!building.recipe_id) {
@@ -87,10 +89,10 @@ export async function getPlayerBuildings(playerId) {
     }));
 
     building.productionStatus = await getProductionStatus(
-      playerId,
       building,
       inputs,
       resources,
+      storage,
     );
   }
 

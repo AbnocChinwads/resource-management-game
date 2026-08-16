@@ -24,10 +24,13 @@ async function getPlayerResources(playerId) {
   const result = await db.query(
     `
     SELECT
-      resource_type_id,
-      amount
-    FROM player_resources
-    WHERE player_id = $1
+    pr.resource_type_id,
+    pr.amount,
+    rt.storage_category
+    FROM player_resources pr
+    JOIN resource_types rt
+    ON rt.id = pr.resource_type_id
+    WHERE pr.player_id = $1
     `,
     [playerId],
   );

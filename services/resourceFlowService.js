@@ -1,4 +1,3 @@
-import db from "../db.js";
 import {
   getPlayerResourceTypes,
   getPlayerResources,
@@ -10,13 +9,12 @@ import {
   getProductionBuildings,
   getWorkingProductionBuildings,
 } from "./productionService.js";
+import { getPopulation } from "./populationService.js";
 
-async function getResourceProduction(playerId) {
-  const buildings = await getWorkingProductionBuildings(playerId);
-
+function getResourceProduction(workingBuildings) {
   const productionMap = new Map();
 
-  for (const building of buildings) {
+  for (const building of workingBuildings) {
     const amount = calculateProductionRate(building);
 
     const existing = productionMap.get(building.output_resource_id);
@@ -34,11 +32,7 @@ async function getResourceProduction(playerId) {
   return [...productionMap.values()];
 }
 
-async function getFoodProductionCapacity(playerId) {
-  const buildings = await getProductionBuildings(playerId);
-
-  const resourceTypes = await getPlayerResourceTypes(playerId);
-
+function getFoodProductionCapacity(buildings, resourceTypes) {
   let foodProductionCapacity = 0;
 
   for (const building of buildings) {
@@ -58,12 +52,10 @@ async function getFoodProductionCapacity(playerId) {
   return foodProductionCapacity;
 }
 
-async function getRecipeConsumption(playerId) {
-  const buildings = await getWorkingProductionBuildings(playerId);
-
+function getRecipeConsumption(workingBuildings) {
   const consumptionMap = new Map();
 
-  for (const building of buildings) {
+  for (const building of workingBuildings) {
     for (const input of building.inputs) {
       const amount = calculateConsumptionRate(
         input,
@@ -87,8 +79,8 @@ async function getRecipeConsumption(playerId) {
   return [...consumptionMap.values()];
 }
 
-async function getResourceConsumption(playerId) {
-  const recipeConsumption = await getRecipeConsumption(playerId);
+function getResourceConsumption(workingBuildings) {
+  const recipeConsumption = getRecipeConsumption(workingBuildings);
   const consumptionMap = new Map();
 
   for (const resource of recipeConsumption) {
@@ -108,46 +100,19 @@ async function getResourceConsumption(playerId) {
   return [...consumptionMap.values()];
 }
 
-async function getFoodConsumption(playerId) {
-  const playerResult = await db.query(
-    `
-    SELECT population, food_tick_rate_seconds
-    FROM players
-    WHERE id = $1
-    `,
-    [playerId],
-  );
-
-  const player = playerResult.rows[0];
-
-  if (!player) {
-    throw new Error("Player not found");
-  }
-
-  const foodRequiredPerMinute =
-    (Number(player.population) / Number(player.food_tick_rate_seconds)) * 60;
-
-  return foodRequiredPerMinute;
+function getFoodConsumption(population, foodTickRateSeconds) {
+  return (Number(population) / Number(foodTickRateSeconds)) * 60;
 }
 
 export async function getResourceFlow(playerId) {
-  const [
-    resourceTypes,
-    playerResources,
-    playerStorage,
-    production,
-    consumption,
-    foodRequiredPerMinute,
-    foodProductionCapacityPerMinute,
-  ] = await Promise.all([
-    getPlayerResourceTypes(playerId),
-    getPlayerResources(playerId),
-    getPlayerStorage(playerId),
-    getResourceProduction(playerId),
-    getResourceConsumption(playerId),
-    getFoodConsumption(playerId),
-    getFoodProductionCapacity(playerId),
-  ]);
+  const [resourceTypes, playerResources, playerStorage, buildings, player] =
+    await Promise.all([
+      getPlayerResourceTypes(playerId),
+      getPlayerResources(playerId),
+      getPlayerStorage(playerId),
+      getProductionBuildings(playerId),
+      getPopulation(playerId),
+    ]);
 
   const resources = resourceTypes.map((resource) => ({
     resource_type_id: resource.resource_type_id,
@@ -171,7 +136,29 @@ export async function getResourceFlow(playerId) {
     }
   }
 
-  // Add storage caps
+  // Calculate working buildings
+  const workingBuildings = getWorkingProductionBuildings(
+    buildings,
+    resources,
+    playerStorage,
+  );
+
+  // Calculate production and consumption
+  const production = getResourceProduction(workingBuildings);
+
+  const consumption = getResourceConsumption(workingBuildings);
+
+  // Calculate food production capacity
+  const foodProductionCapacityPerMinute = getFoodProductionCapacity(
+    buildings,
+    resourceTypes,
+  );
+
+  // Calculate food requirement
+  const foodRequiredPerMinute = getFoodConsumption(
+    player.population,
+    player.food_tick_rate_seconds,
+  );
 
   // Add production
   for (const produced of production) {

@@ -7,7 +7,8 @@ export async function getPopulation(playerId) {
     SELECT
       population,
       workers,
-      historical_max_population
+      historical_max_population,
+      food_tick_rate_seconds
     FROM players
     WHERE id = $1
     `,
