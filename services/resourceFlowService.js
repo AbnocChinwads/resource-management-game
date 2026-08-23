@@ -211,6 +211,7 @@ export async function getResourceFlow(playerId) {
     foodProductionCapacityPerMinute - foodRequiredPerMinute;
 
   return {
+    player,
     resources,
     storage: playerStorage,
     foodRequiredPerMinute: Number(foodRequiredPerMinute.toFixed(1)),

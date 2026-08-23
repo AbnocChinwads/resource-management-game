@@ -1,12 +1,30 @@
 import db from "../db.js";
 import { getPlayerBuildings } from "./buildingService.js";
 import { getResourceFlow } from "./resourceFlowService.js";
-import { getRecipes } from "./recipeService.js";
+import { getRecipeInputs, getRecipes } from "./recipeService.js";
 import { getPopulation, getPopulationCapacity } from "./populationService.js";
 
 export async function getPlayerStats(playerId) {
+  // Resource production / consumption / net flow / storage
+  const resourceFlow = await getResourceFlow(playerId);
+  const {
+    player,
+    resources,
+    storage,
+    foodRequiredPerMinute,
+    foodSuppliedPerMinute,
+    foodNetFlowPerMinute,
+  } = resourceFlow;
+
+  const recipeInputs = await getRecipeInputs();
+
   // Buildings
-  const buildings = await getPlayerBuildings(playerId);
+  const buildings = await getPlayerBuildings(
+    playerId,
+    resources,
+    storage,
+    recipeInputs,
+  );
 
   const assignedWorkers = buildings.reduce(
     (sum, building) => sum + building.workers_assigned,
@@ -14,7 +32,6 @@ export async function getPlayerStats(playerId) {
   );
 
   // Player info
-  const player = await getPopulation(playerId);
   const populationCapacity = await getPopulationCapacity(playerId);
 
   const population = Number(player.population);
@@ -23,17 +40,7 @@ export async function getPlayerStats(playerId) {
 
   const availableWorkers = Math.max(workers - assignedWorkers, 0);
 
-  // Resource production / consumption / net flow / storage
-  const resourceFlow = await getResourceFlow(playerId);
-
-  const {
-    resources,
-    storage,
-    foodRequiredPerMinute,
-    foodSuppliedPerMinute,
-    foodNetFlowPerMinute,
-  } = resourceFlow;
-  const recipeData = await getRecipes(playerId);
+  const recipeData = await getRecipes(recipeInputs);
 
   // Total stored nutrition
   const food = resources.reduce(

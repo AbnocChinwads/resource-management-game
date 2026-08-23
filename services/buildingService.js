@@ -4,10 +4,13 @@ import {
   calculateConsumptionRate,
   getProductionStatus,
 } from "./productionService.js";
-import { getPlayerResources } from "./resourceService.js";
-import { getPlayerStorage } from "./storageService.js";
 
-export async function getPlayerBuildings(playerId) {
+export async function getPlayerBuildings(
+  playerId,
+  resources,
+  storage,
+  recipeInputs,
+) {
   const result = await db.query(
     `
     SELECT 
@@ -42,30 +45,15 @@ export async function getPlayerBuildings(playerId) {
 
   const buildings = result.rows;
 
-  const recipeInputsResult = await db.query(
-    `
-    SELECT
-    ri.recipe_id,
-    ri.resource_type_id,
-    ri.amount,
-    rt.name
-    FROM recipe_inputs ri
-    JOIN resource_types rt
-    ON rt.id = ri.resource_type_id`,
-  );
-
   const recipeInputsMap = new Map();
 
-  for (const input of recipeInputsResult.rows) {
+  for (const input of recipeInputs) {
     if (!recipeInputsMap.has(input.recipe_id)) {
       recipeInputsMap.set(input.recipe_id, []);
     }
 
     recipeInputsMap.get(input.recipe_id).push(input);
   }
-
-  const resources = await getPlayerResources(playerId);
-  const storage = await getPlayerStorage(playerId);
 
   for (const building of buildings) {
     if (!building.recipe_id) {
