@@ -6,6 +6,41 @@ import {
   STARVATION_CONSEQUENCE_TICKS,
 } from "../config/simulation.js";
 
+export function calculateFoodConsumption(foods, nutritionNeeded) {
+  const consumption = new Map();
+
+  let remainingNutrition = nutritionNeeded;
+
+  const sortedFoods = [...foods].sort(
+    (a, b) => Number(b.nutrition_value) - Number(a.nutrition_value),
+  );
+
+  for (const food of sortedFoods) {
+    if (remainingNutrition <= 0) {
+      break;
+    }
+
+    const availableNutrition =
+      Number(food.amount) * Number(food.nutrition_value);
+
+    if (availableNutrition <= remainingNutrition) {
+      consumption.set(food.resource_type_id, Number(food.amount));
+
+      remainingNutrition -= availableNutrition;
+    } else {
+      const unitsConsumed = Math.ceil(
+        remainingNutrition / Number(food.nutrition_value),
+      );
+
+      consumption.set(food.resource_type_id, unitsConsumed);
+
+      remainingNutrition = 0;
+    }
+  }
+
+  return consumption;
+}
+
 export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
   await db.query("BEGIN");
 
@@ -86,51 +121,28 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     }
 
     // Consume nutrition for all elapsed food ticks
-    let totalNutritionNeeded = population * ticks;
+    const totalNutritionNeeded = population * ticks;
+
+    const consumption = calculateFoodConsumption(foods, totalNutritionNeeded);
 
     for (const food of foods) {
-      if (totalNutritionNeeded <= 0) {
-        break;
+      const unitsConsumed = consumption.get(food.resource_type_id) ?? 0;
+
+      if (unitsConsumed <= 0) {
+        continue;
       }
 
-      const availableNutrition =
-        Number(food.amount) * Number(food.nutrition_value);
+      await db.query(
+        `
+        UPDATE player_resources
+        SET amount = amount - $1
+        WHERE player_id = $2
+        AND resource_type_id = $3
+        `,
+        [unitsConsumed, playerId, food.resource_type_id],
+      );
 
-      // Consume the entire resource
-      if (availableNutrition <= totalNutritionNeeded) {
-        totalNutritionNeeded -= availableNutrition;
-
-        await db.query(
-          `
-          UPDATE player_resources
-          SET amount = 0
-          WHERE player_id = $1
-            AND resource_type_id = $2
-          `,
-          [playerId, food.resource_type_id],
-        );
-
-        food.amount = 0;
-      } else {
-        // Consume enough units to satisfy the remaining nutritional requirement.
-        const unitsConsumed = Math.ceil(
-          totalNutritionNeeded / Number(food.nutrition_value),
-        );
-
-        await db.query(
-          `
-          UPDATE player_resources
-          SET amount = amount - $1
-          WHERE player_id = $2
-            AND resource_type_id = $3
-          `,
-          [unitsConsumed, playerId, food.resource_type_id],
-        );
-
-        food.amount -= unitsConsumed;
-
-        totalNutritionNeeded = 0;
-      }
+      food.amount -= unitsConsumed;
     }
 
     // Calculate actual remaining food

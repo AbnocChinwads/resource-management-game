@@ -7,6 +7,7 @@ import {
   getWorkingProductionBuildings,
 } from "./productionService.js";
 import { getPopulation } from "./populationService.js";
+import { calculateFoodConsumption } from "./foodService.js";
 
 function getResourceProduction(workingBuildings) {
   const productionMap = new Map();
@@ -144,6 +145,12 @@ export async function getResourceFlow(playerId) {
     player.food_tick_rate_seconds,
   );
 
+  // Work out which resources will be consumed
+  const foodConsumption = calculateFoodConsumption(
+    resources,
+    foodRequiredPerMinute,
+  );
+
   // Add production
   for (const produced of production) {
     const resource = resources.find(
@@ -172,8 +179,14 @@ export async function getResourceFlow(playerId) {
 
   // Calculate net flow
   for (const resource of resources) {
+    const foodConsumed = foodConsumption.get(resource.resource_type_id) ?? 0;
+
     resource.netPerMinute = Number(
-      (resource.producedPerMinute - resource.consumedPerMinute).toFixed(1),
+      (
+        resource.producedPerMinute -
+        resource.consumedPerMinute -
+        foodConsumed
+      ).toFixed(1),
     );
   }
 
