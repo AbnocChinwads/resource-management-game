@@ -127,7 +127,7 @@ export function getProductionStatus(building, inputs, resources, storage) {
     };
   }
 
-  const storageCategory = outputResource.storage_category;
+  const storageCategory = outputResource.storageCategory;
 
   const storageEntry = storageCategory
     ? storage.find((entry) => entry.storage_category === storageCategory)
