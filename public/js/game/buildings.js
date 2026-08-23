@@ -29,8 +29,7 @@ export function updateBuildings(buildings) {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
           <td>${building.health}/${building.max_health}</td>
-          <td class="d-none d-xxl-table-cell" id="building-${building.id}-production"></td>
-          <td class="d-none d-xxl-table-cell" id="building-${building.id}-consumption"></td>
+          <td class="d-none d-xxl-table-cell" id="building-${building.id}-production-consumption"></td>
           <td>
             <span id="building-${building.id}-workers">
               ${building.workers_assigned}
@@ -58,26 +57,16 @@ export function updateBuildings(buildings) {
     }
 
     if (building.type === "production") {
-      const productionEl = row.querySelector(
-        `#building-${building.id}-production`,
+      const productionConsumptionEl = row.querySelector(
+        `#building-${building.id}-production-consumption`,
       );
 
-      const consumptionEl = row.querySelector(
-        `#building-${building.id}-consumption`,
-      );
-
-      if (productionEl) {
-        updateProductionElement(productionEl, building);
-      }
-
-      if (consumptionEl) {
-        updateConsumptionElement(consumptionEl, building);
-      }
+      updateProductionConsumptionElement(productionConsumptionEl, building);
     }
   });
 }
 
-function updateProductionElement(element, building) {
+function updateProductionConsumptionElement(element, building) {
   if (building.productionStatus?.status === "idle") {
     const message = getProductionStatusMessage(building);
 
@@ -94,70 +83,50 @@ function updateProductionElement(element, building) {
 
   const value = Number(building.productionRate ?? 0);
 
-  element.classList.remove("text-success", "text-danger", "text-muted");
+  let productionHtml = "";
 
   if (value > 0) {
-    element.innerHTML = `
-      <span aria-hidden="true">▲</span>
-      ${building.output_resource_name}
-      ${value.toFixed(1)}/min
+    productionHtml = `
+      <div class="text-success">
+        <span aria-hidden="true">▲</span>
+        ${building.output_resource_name}
+        ${value.toFixed(1)}/min
+      </div>
     `;
-    element.classList.add("text-success");
   } else if (value < 0) {
-    element.innerHTML = `
-      <span aria-hidden="true">▼</span>
-      ${building.output_resource_name}
-      ${Math.abs(value).toFixed(1)}/min
+    productionHtml = `
+      <div class="text-danger">
+        <span aria-hidden="true">▼</span>
+        ${building.output_resource_name}
+        ${Math.abs(value).toFixed(1)}/min
+      </div>
     `;
-    element.classList.add("text-danger");
   } else {
-    element.innerHTML = `
-      <span aria-hidden="true">—</span>
-      0/min
+    productionHtml = `
+      <div class="text-muted">
+        <span aria-hidden="true">—</span>
+        0/min
+      </div>
     `;
-    element.classList.add("text-muted");
-  }
-}
-
-function updateConsumptionElement(element, building) {
-  if (building.productionStatus?.status === "idle") {
-    const message = getProductionStatusMessage(building);
-
-    element.innerHTML = `
-      <span aria-hidden="true">—</span>
-      Idle — ${message}
-    `;
-
-    element.classList.remove("text-success", "text-danger");
-    element.classList.add("text-muted");
-
-    return;
   }
 
-  element.classList.remove("text-danger", "text-muted");
+  let consumptionHtml = "";
 
-  if (
-    !building.consumptionRates ||
-    building.consumptionRates.length === 0 ||
-    building.workers_assigned === 0
-  ) {
-    element.innerHTML = `
-      <span aria-hidden="true">—</span>
-    `;
-    element.classList.add("text-muted");
-    return;
+  if (building.consumptionRates?.length > 0 && building.workers_assigned > 0) {
+    consumptionHtml = building.consumptionRates
+      .map(
+        (input) => `
+          <div class="text-danger">
+            <span aria-hidden="true">▼</span>
+            ${input.name}
+            ${Number(input.amount).toFixed(1)}/min
+          </div>
+        `,
+      )
+      .join("");
   }
 
-  element.innerHTML = building.consumptionRates
-    .map(
-      (input) =>
-        `<span aria-hidden="true">▼</span>
-        ${input.name}
-        ${Number(input.amount).toFixed(1)}/min`,
-    )
-    .join("<br>");
-
-  element.classList.add("text-danger");
+  element.innerHTML = productionHtml + consumptionHtml;
 }
 
 function getProductionStatusMessage(building) {

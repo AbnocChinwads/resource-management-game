@@ -446,3 +446,15 @@
 * Tested production resuming after food is consumed.
 * Tested that full food storage does not incorrectly prevent population growth.
 * Tested accelerated food/simulation ticks for population growth and starvation.
+
+# v0.4.7 — Interface Refinement
+
+## Changed
+
+- Refactored the population table to display idle and assigned workers in a single `Idle / Assigned` column, and current and max population in a single `Current / Max` column.
+- Refactored the food table to display supplied and required nutrition in a single `Supply / Demand` column.
+- Refactored the production building table to display production and consumption in a single `Production / Consumption` column.
+- Refactored the storage table to display stored and capacity values in a single `Stored / Capacity` column.
+- Kept the underlying API/service data unchanged; the changes are limited to frontend presentation.
+- Removed redundant DOM elements and selectors associated with the previous table columns.
+- Retained existing production, consumption, storage, and population calculations.

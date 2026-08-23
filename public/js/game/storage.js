@@ -16,19 +16,15 @@ export function updateStorage(storage) {
 
       row.innerHTML = `
         <td>${item.storage_category}</td>
-        <td id="storage-${item.storage_category}-used"></td>
-        <td id="storage-${item.storage_category}-capacity"></td>
+        <td id="storage-${item.storage_category}-used-capacity"></td>
       `;
 
       container.appendChild(row);
     }
 
-    document.getElementById(
-      `storage-${item.storage_category}-used`,
-    ).textContent = formatResourceAmount(item.used);
-
-    document.getElementById(
-      `storage-${item.storage_category}-capacity`,
-    ).textContent = formatResourceAmount(item.capacity);
+    row.querySelector(
+      `#storage-${item.storage_category}-used-capacity`,
+    ).textContent =
+      `${formatResourceAmount(item.used)} / ${formatResourceAmount(item.capacity)}`;
   });
 }

@@ -19,20 +19,16 @@
     <table class="table table-sm align-middle table-striped-columns table-hover table-bordered">
         <thead>
             <tr>
-                <th>Current</th>
-                <th>Max</th>
+                <th>Current / Max</th>
                 <th>Workers</th>
-                <th>Idle</th>
-                <th>Assigned</th>
+                <th>Idle / Assigned</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td id="population-count"></td>
-                <td id="population-capacity"></td>
+                <td id="population-current-max"></td>
                 <td id="worker-count"></td>
-                <td id="available-workers"></td>
-                <td id="assigned-worker-count"></td>
+                <td id="idle-vs-assigned-workers"></td>
             </tr>
         </tbody>
     </table>
@@ -44,16 +40,14 @@
         <thead>
             <tr>
                 <th>Food</th>
-                <th>Required</th>
-                <th>Supplied</th>
+                <th>Supply / Demand</th>
                 <th>Balance</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td id="food-count"></td>
-                <td id="player-food-required"></td>
-                <td id="player-food-supplied"></td>
+                <td id="player-food-supply-demand"></td>
                 <td id="player-food-net"></td>
             </tr>
         </tbody>
