@@ -1,7 +1,4 @@
-import {
-  getPlayerResourceTypes,
-  getPlayerResources,
-} from "./resourceService.js";
+import { getPlayerResourceState } from "./resourceService.js";
 import { getPlayerStorage } from "./storageService.js";
 import {
   calculateProductionRate,
@@ -32,11 +29,11 @@ function getResourceProduction(workingBuildings) {
   return [...productionMap.values()];
 }
 
-function getFoodProductionCapacity(buildings, resourceTypes) {
+function getFoodProductionCapacity(buildings, resources) {
   let foodProductionCapacity = 0;
 
   for (const building of buildings) {
-    const resource = resourceTypes.find(
+    const resource = resources.find(
       (r) => r.resource_type_id === building.output_resource_id,
     );
 
@@ -105,36 +102,23 @@ function getFoodConsumption(population, foodTickRateSeconds) {
 }
 
 export async function getResourceFlow(playerId) {
-  const [resourceTypes, playerResources, playerStorage, buildings, player] =
-    await Promise.all([
-      getPlayerResourceTypes(playerId),
-      getPlayerResources(playerId),
-      getPlayerStorage(playerId),
-      getProductionBuildings(playerId),
-      getPopulation(playerId),
-    ]);
+  const [resourceState, playerStorage, buildings, player] = await Promise.all([
+    getPlayerResourceState(playerId),
+    getPlayerStorage(playerId),
+    getProductionBuildings(playerId),
+    getPopulation(playerId),
+  ]);
 
-  const resources = resourceTypes.map((resource) => ({
+  const resources = resourceState.map((resource) => ({
     resource_type_id: resource.resource_type_id,
     name: resource.name,
-    amount: 0,
+    amount: Number(resource.amount),
     nutrition_value: resource.nutrition_value,
     storageCategory: resource.storage_category,
     producedPerMinute: 0,
     consumedPerMinute: 0,
     netPerMinute: 0,
   }));
-
-  // Add current stockpiles
-  for (const stored of playerResources) {
-    const resource = resources.find(
-      (r) => r.resource_type_id === stored.resource_type_id,
-    );
-
-    if (resource) {
-      resource.amount = Number(stored.amount);
-    }
-  }
 
   // Calculate working buildings
   const workingBuildings = getWorkingProductionBuildings(
@@ -151,7 +135,7 @@ export async function getResourceFlow(playerId) {
   // Calculate food production capacity
   const foodProductionCapacityPerMinute = getFoodProductionCapacity(
     buildings,
-    resourceTypes,
+    resourceState,
   );
 
   // Calculate food requirement

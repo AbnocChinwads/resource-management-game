@@ -2,7 +2,7 @@ import db from "../db.js";
 import { getPlayerBuildings } from "./buildingService.js";
 import { getResourceFlow } from "./resourceFlowService.js";
 import { getRecipeInputs, getRecipes } from "./recipeService.js";
-import { getPopulation, getPopulationCapacity } from "./populationService.js";
+import { getPopulationCapacity } from "./populationService.js";
 
 export async function getPlayerStats(playerId) {
   // Resource production / consumption / net flow / storage

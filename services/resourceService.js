@@ -1,26 +1,6 @@
 import db from "../db.js";
 
-async function getPlayerResourceTypes(playerId) {
-  const result = await db.query(
-    `
-    SELECT
-      rt.id AS resource_type_id,
-      rt.name,
-      rt.nutrition_value,
-      rt.storage_category
-    FROM player_resources pr
-    JOIN resource_types rt
-      ON rt.id = pr.resource_type_id
-    WHERE pr.player_id = $1
-    ORDER BY rt.id ASC
-    `,
-    [playerId],
-  );
-
-  return result.rows;
-}
-
-async function getPlayerResources(playerId) {
+export async function getPlayerResources(playerId) {
   const result = await db.query(
     `
     SELECT
@@ -38,7 +18,7 @@ async function getPlayerResources(playerId) {
   return result.rows;
 }
 
-async function addPlayerResource(playerId, resourceTypeId, amount) {
+export async function addPlayerResource(playerId, resourceTypeId, amount) {
   await db.query(
     `
     INSERT INTO player_resources (
@@ -55,8 +35,23 @@ async function addPlayerResource(playerId, resourceTypeId, amount) {
   );
 }
 
-export {
-  getPlayerResourceTypes,
-  getPlayerResources,
-  addPlayerResource,
-};
+export async function getPlayerResourceState(playerId) {
+  const result = await db.query(
+    `
+    SELECT
+      pr.resource_type_id,
+      rt.name,
+      pr.amount,
+      rt.nutrition_value,
+      rt.storage_category
+    FROM player_resources pr
+    JOIN resource_types rt
+      ON rt.id = pr.resource_type_id
+    WHERE pr.player_id = $1
+    ORDER BY rt.id ASC
+    `,
+    [playerId],
+  );
+
+  return result.rows;
+}
