@@ -1,6 +1,8 @@
 import db from "../db.js";
-import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
-import { getPlayerResources, addPlayerResource } from "./resourceService.js";
+import {
+  getPlayerResourceState,
+  addPlayerResource,
+} from "./resourceService.js";
 import { getPlayerStorage } from "./storageService.js";
 import {
   calculateProductionPerTick,
@@ -41,7 +43,7 @@ async function consumeInputs(
       resource.amount -= amount;
 
       const storageEntry = storage.find(
-        (entry) => entry.storage_category === resource.storage_category,
+        (entry) => entry.storage_category === resource.storageCategory,
       );
 
       if (storageEntry) {
@@ -98,7 +100,7 @@ export async function processResourceTick(playerId) {
       [playerId],
     );
 
-    const resources = await getPlayerResources(playerId);
+    const resources = await getPlayerResourceState(playerId);
     const storage = await getPlayerStorage(playerId);
 
     for (const building of buildings.rows) {
@@ -140,7 +142,7 @@ export async function processResourceTick(playerId) {
         outputResource.amount += outputAmount;
 
         const storageEntry = storage.find(
-          (entry) => entry.storage_category === outputResource.storage_category,
+          (entry) => entry.storage_category === outputResource.storageCategory,
         );
 
         if (storageEntry) {

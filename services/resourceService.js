@@ -53,5 +53,11 @@ export async function getPlayerResourceState(playerId) {
     [playerId],
   );
 
-  return result.rows;
+  return result.rows.map((resource) => ({
+    resource_type_id: resource.resource_type_id,
+    name: resource.name,
+    amount: Number(resource.amount),
+    nutrition_value: resource.nutrition_value,
+    storageCategory: resource.storage_category,
+  }));
 }

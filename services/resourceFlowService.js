@@ -114,7 +114,7 @@ export async function getResourceFlow(playerId) {
     name: resource.name,
     amount: Number(resource.amount),
     nutrition_value: resource.nutrition_value,
-    storageCategory: resource.storage_category,
+    storageCategory: resource.storageCategory,
     producedPerMinute: 0,
     consumedPerMinute: 0,
     netPerMinute: 0,
