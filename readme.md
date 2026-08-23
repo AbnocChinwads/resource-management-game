@@ -22,7 +22,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Recent Updates
 
-# 0.4.7 — Interface Refinement
+## Alpha v0.4.7 — Interface Refinement
 
 - Simplified the population display by combining idle and assigned workers, and combining current and max population.
 - Simplified the food display by combining supply and demand values.
@@ -30,7 +30,9 @@ Players begin by manually gathering resources before expanding their settlement 
 - Simplified the storage display by combining stored and capacity values.
 - Reduced unnecessary table columns while retaining the same gameplay information.
 
-# 0.4.6 — Population & Food Overhaul
+---
+
+## Alpha v0.4.6 — Population & Food Overhaul
 
 ### Population
 
@@ -90,6 +92,7 @@ Your housing determines how many people you can support, your population determi
 
 This forms the foundation for the settlement's future population and survival mechanics.
 
+---
 
 ## Alpha v0.4.5 - Production State
 
