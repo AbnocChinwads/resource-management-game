@@ -79,6 +79,32 @@ export function initialiseGameActions(refreshStats) {
       const formData = new FormData(form);
       const recipeId = formData.get("recipeId");
 
+      const recipeItem = form.closest("[data-recipe-id]");
+
+      const buildingType = recipeItem?.dataset.buildingType;
+      const populationGain = Number(recipeItem?.dataset.populationGain);
+
+      const population = Number(
+        document.getElementById("population-current-max")?.dataset.population ??
+          0,
+      );
+
+      if (
+        population === 0 &&
+        buildingType === "housing" &&
+        populationGain > 0
+      ) {
+        const confirmed = confirm(
+          `This will establish ${populationGain} population when completed.\n\n` +
+            `They will require ${populationGain} nutrition per minute.\n\n` +
+            `Make sure you have enough food stored before continuing.`,
+        );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
       try {
         const res = await fetch("/start-task", {
           method: "POST",

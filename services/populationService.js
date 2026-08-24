@@ -1,5 +1,19 @@
 import db from "../db.js";
-import { calculateAvailableWorkers } from "./workerService.js";
+
+export async function establishInitialPopulation(playerId, populationGain) {
+  await db.query(
+    `
+    UPDATE players
+    SET
+      population = $2,
+      workers = $2,
+      historical_max_population = GREATEST(historical_max_population, $2)
+    WHERE id = $1
+      AND population = 0
+    `,
+    [playerId, populationGain],
+  );
+}
 
 export async function getPopulation(playerId) {
   const result = await db.query(

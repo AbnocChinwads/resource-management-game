@@ -56,7 +56,10 @@
                                     %>
                                     <% if (!hideRecipe) { %>
                                         <li class="list-group-item" data-recipe-id="<%= recipe.id %>"
-                                            data-hide-until-available="<%= recipe.hide_until_available %>">
+                                            data-hide-until-available="<%= recipe.hide_until_available %>"
+                                            data-building-type="<%= recipe.building_type ?? '' %>"
+                                            data-population-gain="<%= recipe.population_gain ?? '' %>"
+                                        >
                                             <form class="start-task-form">
                                                 <input type="hidden" name="recipeId" value="<%= recipe.id %>">
                                                 <strong class="me-3">

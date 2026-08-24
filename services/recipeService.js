@@ -21,9 +21,14 @@ export async function getRecipeInputs() {
 export async function getRecipes(recipeInputs) {
   const recipesRes = await db.query(
     `
-    SELECT *
-    FROM recipes
-    ORDER BY id ASC
+    SELECT
+      r.*,
+      b.type AS building_type,
+      b.population_gain
+    FROM recipes r
+    LEFT JOIN buildings b
+      ON b.id = r.output_building_id
+    ORDER BY r.id ASC
     `,
   );
 

@@ -21,4 +21,12 @@ export function updatePlayerDisplay(data) {
   if (foodNetEl) {
     updateNetFlowElement(foodNetEl, data.foodNetFlowPerMinute ?? 0);
   }
+
+  const populationEl = document.getElementById("population-current-max");
+
+  if (populationEl) {
+    populationEl.textContent = `${data.population} / ${data.populationCapacity}`;
+
+    populationEl.dataset.population = data.population;
+  }
 }

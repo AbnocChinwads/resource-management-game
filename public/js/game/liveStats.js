@@ -8,10 +8,6 @@ async function updateStats() {
 
     updateResources(data.resources);
     updateStorage(data.storage);
-
-    document.getElementById("population-count").textContent = data.population;
-
-    document.getElementById("worker-count").textContent = data.workers;
   } catch (err) {
     console.error("Stats update error:", err);
   }

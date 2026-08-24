@@ -4,6 +4,7 @@ import {
   canAddPlayerResource,
   getStorageForResource,
 } from "./storageService.js";
+import { establishInitialPopulation } from "./populationService.js";
 
 export async function completeTask(playerId, taskId) {
   try {
@@ -91,14 +92,20 @@ export async function completeTask(playerId, taskId) {
 
       const buildingRes = await db.query(
         `
-        SELECT type
+        SELECT
+          type,
+          population_gain
         FROM buildings
         WHERE id = $1
         `,
         [output_building_id],
       );
 
-      const { type } = buildingRes.rows[0];
+      const { type, population_gain } = buildingRes.rows[0];
+
+      if (type === "housing") {
+        await establishInitialPopulation(playerId, population_gain);
+      }
 
       if (type === "production") {
         const workerRes = await db.query(
