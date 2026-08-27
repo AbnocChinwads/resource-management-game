@@ -25,10 +25,12 @@ Players begin by manually gathering resources before expanding their settlement 
 ## Alpha v0.4.7 — Interface Refinement
 
 - Simplified the population display by combining idle and assigned workers, and combining current and max population.
+- Added population growth and starvation countdowns to the population display.
 - Simplified the food display by combining supply and demand values.
 - Combined production and consumption information for production buildings.
 - Simplified the storage display by combining stored and capacity values.
 - Reduced unnecessary table columns while retaining the same gameplay information.
+- Improved accessibility for dynamic population and food status information.
 
 ---
 
@@ -38,11 +40,11 @@ Players begin by manually gathering resources before expanding their settlement 
 
 Population is now tied directly to the housing available in your settlement.
 
-* **Current** — the number of people currently living in your settlement.
-* **Maximum** — the maximum population your buildings can support.
-* **Workers** — the number of people available to work.
-* **Idle** — workers who aren't currently assigned to a building.
-* **Assigned** — workers currently assigned to production buildings.
+- **Current** — the number of people currently living in your settlement.
+- **Maximum** — the maximum population your buildings can support.
+- **Workers** — the number of people available to work.
+- **Idle** — workers who aren't currently assigned to a building.
+- **Assigned** — workers currently assigned to production buildings.
 
 Your settlement also remembers the highest population you have reached.
 
@@ -52,9 +54,9 @@ A sustained food surplus will now allow your population to grow.
 
 As long as:
 
-* You have food available.
-* Your settlement has enough food production capacity to meet its population's needs.
-* There is available housing capacity.
+- You have food available.
+- Your settlement has enough food production capacity to meet its population's needs.
+- There is available housing capacity.
 
 your population can gradually increase.
 
@@ -64,10 +66,10 @@ Building additional housing increases your maximum population and gives your set
 
 Food is now displayed separately from population, with a clearer breakdown of your settlement's food situation:
 
-* **Food** — your current stored food.
-* **Food Required** — how much food your population needs.
-* **Food Supplied** — how much food your production can supply.
-* **Food Balance** — the difference between food supplied and food required.
+- **Food** — your current stored food.
+- **Food Required** — how much food your population needs.
+- **Food Supplied** — how much food your production can supply.
+- **Food Balance** — the difference between food supplied and food required.
 
 Food storage capacity can temporarily stop production when your stores are full. This does not prevent population growth if your settlement has sufficient production capacity and stored food.
 
@@ -81,8 +83,8 @@ If your stored food reaches zero and your settlement cannot sustain its populati
 
 During starvation:
 
-* Recovering your food supply stops the starvation process.
-* Once food conditions recover, population can begin rebuilding through the normal growth system.
+- Recovering your food supply stops the starvation process.
+- Once food conditions recover, population can begin rebuilding through the normal growth system.
 
 ### Why This Matters
 

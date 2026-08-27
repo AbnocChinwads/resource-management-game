@@ -22,7 +22,9 @@ export async function getPopulation(playerId) {
       population,
       workers,
       historical_max_population,
-      food_tick_rate_seconds
+      food_tick_rate_seconds,
+      starvation_started_at,
+      food_surplus_started_at
     FROM players
     WHERE id = $1
     `,

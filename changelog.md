@@ -449,6 +449,12 @@
 
 # v0.4.7 — Interface Refinement
 
+## Added
+
+- Added population growth and starvation countdown timers.
+- Added live population status updates showing time until the next population change.
+- Added accessible labels for dynamic population and food information.
+
 ## Changed
 
 - Refactored the population table to display idle and assigned workers in a single `Idle / Assigned` column, and current and max population in a single `Current / Max` column.
@@ -458,3 +464,9 @@
 - Kept the underlying API/service data unchanged; the changes are limited to frontend presentation.
 - Removed redundant DOM elements and selectors associated with the previous table columns.
 - Retained existing production, consumption, storage, and population calculations.
+- Population status now reflects population capacity and the historical population floor when determining whether a growth or starvation countdown should be displayed.
+- Population status updates independently of the normal game-state polling so countdowns update in real time.
+
+## Fixed
+
+- Fixed food consumption calculations incorrectly treating resources with zero nutritional value as food when no actual food was available.

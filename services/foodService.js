@@ -11,9 +11,9 @@ export function calculateFoodConsumption(foods, nutritionNeeded) {
 
   let remainingNutrition = nutritionNeeded;
 
-  const sortedFoods = [...foods].sort(
-    (a, b) => Number(b.nutrition_value) - Number(a.nutrition_value),
-  );
+  const sortedFoods = [...foods]
+    .filter((food) => Number(food.nutrition_value) > 0)
+    .sort((a, b) => Number(b.nutrition_value) - Number(a.nutrition_value));
 
   for (const food of sortedFoods) {
     if (remainingNutrition <= 0) {
@@ -69,6 +69,15 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
 
     const now = new Date();
 
+    if (player.last_food_tick === null) {
+      await db.query(
+        `UPDATE players
+      SET last_food_tick = $1
+      WHERE id = $2`,
+        [now, playerId],
+      );
+    }
+
     const lastTick = player.last_food_tick
       ? new Date(player.last_food_tick)
       : now;
@@ -112,7 +121,6 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
 
     if (ticks <= 0) {
       await db.query("COMMIT");
-
       return {
         food: nutritionBefore,
         population,
