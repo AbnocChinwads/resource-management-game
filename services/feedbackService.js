@@ -1,5 +1,10 @@
 import db from "../db.js";
 
+const BUG_STATUSES = ["open", "in_progress", "resolved", "wont_fix"];
+const BUG_PRIORITIES = ["low", "medium", "high", "critical"];
+const SUGGESTION_STATUSES = ["new", "considering", "implemented", "declined"];
+
+/*Create*/
 export async function createBugReport(
   playerId,
   title,
@@ -49,7 +54,9 @@ export async function createSuggestion(
 
   return result.rows[0].id;
 }
+/*Create*/
 
+/*Read*/
 export async function getBugReports() {
   const result = await db.query(
     `
@@ -67,7 +74,6 @@ export async function getBugReports() {
   return result.rows;
 }
 
-
 export async function getSuggestions() {
   const result = await db.query(
     `
@@ -84,3 +90,41 @@ export async function getSuggestions() {
 
   return result.rows;
 }
+/*Read*/
+
+/*Update*/
+export async function updateBugReport(id, status, priority) {
+  if (!BUG_STATUSES.includes(status)) {
+    throw new Error("Invalid bug status");
+  }
+
+  if (!BUG_PRIORITIES.includes(priority)) {
+    throw new Error("Invalid bug priority");
+  }
+
+  await db.query(
+    `
+    UPDATE bug_reports
+    SET status = $1,
+        priority = $2
+    WHERE id = $3
+    `,
+    [status, priority, id],
+  );
+}
+
+export async function updateSuggestion(id, status) {
+  if (!SUGGESTION_STATUSES.includes(status)) {
+    throw new Error("Invalid suggestion status");
+  }
+
+  await db.query(
+    `
+    UPDATE gameplay_suggestions
+    SET status = $1
+    WHERE id = $2
+    `,
+    [status, id],
+  );
+}
+/*Update*/

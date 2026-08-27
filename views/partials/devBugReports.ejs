@@ -4,79 +4,91 @@
     </div>
     <div class="card-body table-responsive">
         <% if (bugs.length===0) { %>
-
             <p>No bug reports submitted.</p>
-
-            <% } else { %>
-
-                <table class="table table-sm table-striped table-hover table-bordered">
-
-                    <thead>
-
+        <% } else { %>
+            <table class="table table-sm table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Player</th>
+                        <th>Page</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Reported</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bugs.forEach(bug=> { %>
                         <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Player</th>
-                            <th>Page</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>Reported</th>
+                            <td>
+                                <%= bug.title %>
+                            </td>
+                            <td>
+                                <%= bug.description %>
+                            </td>
+                            <td>
+                                <% if (bug.player_id) { %>
+                                    <a href="/dev?player=<%= bug.player_id %>">
+                                        <%= bug.player_name %>
+                                    </a>
+                                    <% } else { %>
+                                        Unknown
+                                    <% } %>
+                            </td>
+                            <td>
+                                <%= bug.page ?? "-" %>
+                            </td>
+                            <td>
+                                <label class="visually-hidden" for="bug-status<%= bug.id %>">Status for <%= bug.title %></label>
+                                <select id="bug-status-<%= bug.id %>" name="status" form="bug-form-<%= bug.id %>" class="form-select form-select-sm">
+                                    <option value="open" <%= bug.status === "open" ? "selected" : "" %>>
+                                        Open
+                                    </option>
+                                    <option value="in_progress" <%= bug.status === "in_progress" ? "selected" : "" %>>
+                                        In Progress
+                                    </option>
+                                    <option value="resolved" <%= bug.status === "resolved" ? "selected" : "" %>>
+                                        Resolved
+                                    </option>
+                                    <option value="wont_fix" <%= bug.status === "wont_fix" ? "selected" : "" %>>
+                                        Won't Fix
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <label class="visually-hidden" for="bug-priority-<%= bug.id %>">
+                                    Priority for <%= bug.title %>
+                                </label>
+                                <select id="bug-priority-<%= bug.id %>" name="priority" form="bug-form-<%= bug.id %>" class="form-select form-select-sm">
+                                    <option value="low" <%= bug.priority === "low" ? "selected" : "" %>>
+                                        Low
+                                    </option>
+                                    <option value="medium" <%= bug.priority === "medium" ? "selected" : "" %>>
+                                        Medium
+                                    </option>
+                                    <option value="high" <%= bug.priority === "high" ? "selected" : "" %>>
+                                        High
+                                    </option>
+                                    <option value="critical" <%= bug.priority === "critical" ? "selected" : "" %>>
+                                        Critical
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <%= new Date(bug.created_at).toLocaleString("en-GB") %>
+                            </td>
+                            <td>
+                                <form id="bug-form-<%= bug.id %>" method="POST" action="/dev/bugs/<%= bug.id %>">
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        Update
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        <% bugs.forEach(bug=> { %>
-
-                            <tr>
-
-                                <td>
-                                    <%= bug.title %>
-                                </td>
-
-                                <td>
-                                    <%= bug.description %>
-                                </td>
-
-                                <td>
-                                    <% if (bug.player_id) { %>
-
-                                        <a href="/dev?player=<%= bug.player_id %>">
-                                            <%= bug.player_name %>
-                                        </a>
-
-                                        <% } else { %>
-
-                                            Unknown
-
-                                            <% } %>
-                                </td>
-
-                                <td>
-                                    <%= bug.page ?? "-" %>
-                                </td>
-
-                                <td>
-                                    <%= bug.status %>
-                                </td>
-
-                                <td>
-                                    <%= bug.priority %>
-                                </td>
-
-                                <td>
-                                    <%= new Date(bug.created_at).toLocaleString("en-GB") %>
-                                </td>
-
-                            </tr>
-
-                            <% }) %>
-
-                    </tbody>
-
-                </table>
-
-                <% } %>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
     </div>
 </div>

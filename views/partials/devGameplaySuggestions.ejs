@@ -4,69 +4,97 @@
     </div>
     <div class="card-body table-responsive">
         <% if (suggestions.length===0) { %>
-
             <p>No gameplay suggestions submitted.</p>
-
-            <% } else { %>
-
-                <table class="table table-sm table-striped table-hover table-bordered">
-
-                    <thead>
-
+        <% } else { %>
+            <table class="table table-sm table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Player</th>
+                        <th>Status</th>
+                        <th>Reported</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% suggestions.forEach(suggestion=> { %>
                         <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Player</th>
-                            <th>Status</th>
-                            <th>Reported</th>
+                            <td>
+                                <%= suggestion.title %>
+                            </td>
+                            <td>
+                                <%= suggestion.description %>
+                            </td>
+                            <td>
+                                <% if (suggestion.player_id) { %>
+                                    <a href="/dev?player=<%= suggestion.player_id %>">
+                                        <%= suggestion.player_name %>
+                                    </a>
+                                <% } else { %>
+                                    Unknown
+                                <% } %>
+                            </td>
+                            <td>
+                                <label
+                                    class="visually-hidden"
+                                    for="suggestion-status-<%= suggestion.id %>"
+                                >
+                                    Status for <%= suggestion.title %>
+                                </label>
+                                <select
+                                    id="suggestion-status-<%= suggestion.id %>"
+                                    name="status"
+                                    form="suggestion-form-<%= suggestion.id %>"
+                                    class="form-select form-select-sm"
+                                >
+                                    <option
+                                        value="new"
+                                        <%= suggestion.status === "new" ? "selected" : "" %>
+                                    >
+                                        New
+                                    </option>
+                                    <option
+                                        value="considering"
+                                        <%= suggestion.status === "considering" ? "selected" : "" %>
+                                    >
+                                        Considering
+                                    </option>
+                                    <option
+                                        value="implemented"
+                                        <%= suggestion.status === "implemented" ? "selected" : "" %>
+                                    >
+                                        Implemented
+                                    </option>
+                                    <option
+                                        value="declined"
+                                        <%= suggestion.status === "declined" ? "selected" : "" %>
+                                    >
+                                        Declined
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <%= new Date(suggestion.created_at).toLocaleString("en-GB") %>
+                            </td>
+                            <td>
+                                <form
+                                    id="suggestion-form-<%= suggestion.id %>"
+                                    method="POST"
+                                    action="/dev/suggestions/<%= suggestion.id %>"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-primary"
+                                    >
+                                        Update
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        <% suggestions.forEach(suggestion=> { %>
-
-                            <tr>
-
-                                <td>
-                                    <%= suggestion.title %>
-                                </td>
-
-                                <td>
-                                    <%= suggestion.description %>
-                                </td>
-
-                                <td>
-                                    <% if (suggestion.player_id) { %>
-
-                                        <a href="/dev?player=<%= suggestion.player_id %>">
-                                            <%= suggestion.player_name %>
-                                        </a>
-
-                                        <% } else { %>
-
-                                            Unknown
-
-                                            <% } %>
-                                </td>
-
-                                <td>
-                                    <%= suggestion.status %>
-                                </td>
-
-                                <td>
-                                    <%= new Date(suggestion.created_at).toLocaleString("en-GB") %>
-                                </td>
-
-                            </tr>
-
-                            <% }) %>
-
-                    </tbody>
-
-                </table>
-
-                <% } %>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
     </div>
 </div>
