@@ -1,5 +1,3 @@
-import { formatResourceAmount } from "./helpers.js";
-
 export function updateBuildings(buildings) {
   if (!buildings) return;
 
@@ -16,6 +14,7 @@ export function updateBuildings(buildings) {
     if (!row) {
       row = document.createElement("tr");
       row.dataset.buildingId = building.id;
+      row.dataset.buildingName = building.name;
 
       if (building.type === "housing") {
         row.innerHTML = `
@@ -64,6 +63,26 @@ export function updateBuildings(buildings) {
       updateProductionConsumptionElement(productionConsumptionEl, building);
     }
   });
+
+  sortBuildingRows("population-buildings-body");
+  sortBuildingRows("production-buildings-body");
+}
+
+function sortBuildingRows(containerId) {
+  const container = document.getElementById(containerId);
+
+  if (!container) return;
+
+  const rows = [...container.querySelectorAll("tr")];
+
+  rows.sort((a, b) => {
+    const nameA = a.dataset.buildingName ?? "";
+    const nameB = b.dataset.buildingName ?? "";
+
+    return nameA.localeCompare(nameB);
+  });
+
+  rows.forEach((row) => container.appendChild(row));
 }
 
 function updateProductionConsumptionElement(element, building) {

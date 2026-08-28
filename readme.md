@@ -16,11 +16,27 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.4.9**
+**Alpha v0.4.10**
 
 ---
 
 # Recent Updates
+
+## Alpha v0.4.10 — Ingredient Storage
+
+### Storage Categories
+
+- Added **Ingredient** as a new storage category.
+- **Flour** has been moved from **Material** storage to **Ingredient** storage.
+- Ingredient storage starts with a capacity of **100**.
+
+### Resource Management
+
+Flour is now treated separately from general construction and manufacturing materials, reflecting its role as an intermediate resource in food production.
+
+This keeps **Material** storage focused on resources used for construction and manufacturing, while allowing food-production resources to be managed independently as the settlement develops.
+
+---
 
 ## Alpha v0.4.9 — Building Construction Rebalance
 

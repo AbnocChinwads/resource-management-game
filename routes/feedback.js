@@ -52,8 +52,6 @@ router.post("/bug", requireAuth, async (req, res) => {
       }
     }
 
-    console.log("Bug report metadata:", metadata);
-
     await createBugReport(req.playerId, title, description, req.originalUrl, metadata,);
 
     return res.json({

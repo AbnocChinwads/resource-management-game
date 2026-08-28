@@ -62,22 +62,23 @@
 - Added dynamic production and consumption information to production buildings.
 - Improved accessibility of resource flow indicators with screen-reader labels.
 
-### [0.3.3]
+## [0.3.3]
 
 ### Fixed
 - Prevented overlapping simulation ticks to improve stability.
 
-### [0.3.4]
+## [0.3.4]
 
 ### Changed
 - Improved game layout responsiveness by restructuring Bootstrap columns.
 - Moved settlement resources into a full-width status section.
 - Updated dashboard sections to stack correctly on smaller screens.
 
-### [0.3.5]
+## [0.3.5]
 
 ### Changed
-## Frontend / UI
+
+#### Frontend / UI
 - Restructured the main game page layout to improve responsive behaviour across desktop, tablet, and mobile screen sizes.
 - Moved the resources and population overview into a full-width status section rather than forcing them into dashboard columns.
 - Updated Bootstrap column usage to allow dashboard sections to stack naturally on smaller screens.
@@ -85,7 +86,7 @@
 - Improved table markup consistency and accessibility support.
 - Added clearer screen reader handling for dynamic values and worker controls.
 
-## Notes
+### Notes
 - This update focuses on improving usability and layout stability rather than adding new gameplay systems.
 - The current building tables remain in place, with future plans to introduce grouped/collapsible building management views as the number of buildings and production chains increase.
 
@@ -537,3 +538,37 @@ Construction requirements are now intended to reflect both the progression role 
 - Verified the Blacksmith can be constructed without requiring Tools.
 - Verified the Sawmill can be constructed using raw Ore without requiring Tools.
 - Verified the Cottage uses Planks as a construction requirement.
+
+# 0.4.10 — Ingredient Storage Reclassification
+
+## Added
+
+- Added `ingredient` as a new storage category.
+- Added an initial capacity of 100 for `ingredient` storage.
+- Added a settlement migration to initialise `ingredient` storage for existing players.
+
+## Changed
+
+- Reclassified `Flour` from the `material` storage category to the `ingredient` storage category.
+- Updated storage category definitions to support the new `ingredient` category.
+- Updated existing player storage states through migration to ensure Flour is stored against the new category.
+
+## Storage Categories
+
+Storage categories now distinguish between general materials and intermediate food-production resources.
+
+- `grain` — Wheat
+- `ingredient` — Flour
+- `food` — Bread
+- `fuel` — Charcoal
+- `tool` — Tools
+- `material` — Stone, Ore, Wood, Logs, Planks
+
+## Testing
+
+- Tested the new `ingredient` storage category.
+- Verified Flour uses `ingredient` storage rather than `material` storage.
+- Verified the initial ingredient storage capacity is 100.
+- Tested the settlement migration for existing players.
+- Verified existing Flour quantities remain available after the category migration.
+- Verified the reduced load on `material` storage after moving Flour to `ingredient` storage.

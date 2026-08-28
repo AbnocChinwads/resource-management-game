@@ -1,6 +1,10 @@
 import db from "../db.js";
 import { reconcileWorkers } from "./workerService.js";
-import { increasePopulation, reducePopulation } from "./populationService.js";
+import {
+  increasePopulation,
+  reducePopulation,
+  getPopulationCapacity,
+} from "./populationService.js";
 import {
   POPULATION_GROWTH_TICKS,
   STARVATION_CONSEQUENCE_TICKS,
@@ -176,7 +180,12 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     } else {
       starvationStartedAt = null;
 
-      if (foodPotentialBalancePerMinute > 0) {
+      const populationCapacity = await getPopulationCapacity(playerId);
+
+      if (
+        foodPotentialBalancePerMinute > 0 &&
+        population < populationCapacity
+      ) {
         if (!foodSurplusStartedAt) {
           foodSurplusStartedAt = now;
         }
