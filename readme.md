@@ -460,7 +460,7 @@ The project is being developed incrementally rather than attempting to implement
 
 This phase focuses on establishing the core systems that future settlement-management mechanics will build upon.
 
-### Completed / In Progress
+### Completed
 
 - [x] Core resource management
 - [x] Resource production and consumption
@@ -473,11 +473,13 @@ This phase focuses on establishing the core systems that future settlement-manag
 - [x] Initial gameplay balancing
 - [x] Further refinement of core settlement systems
 
+---
+
 ## v0.5.x - Storage & Resource Management
 
 The next major development phase will turn the current storage-capacity foundation into a more complete settlement management system.
 
-### Planned
+### Completed / In Progress
 
 - [ ] Storage expansion
 - [ ] Storage buildings and upgrades
