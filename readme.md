@@ -16,11 +16,33 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.4.7**
+**Alpha v0.4.8**
 
 ---
 
 # Recent Updates
+
+## Alpha v0.4.8 — Charcoal & Kiln Rework
+
+### Production
+
+* Added **Charcoal** as a new resource.
+* Reworked the **Kiln** to produce Charcoal from Wood.
+* Added Charcoal as a required input for **Bread** production.
+* Added Charcoal as a required input for **Tools** production.
+* Updated production chains to introduce fuel requirements where appropriate.
+
+### Kiln
+
+The Kiln has been repurposed as the settlement's basic charcoal production building.
+
+* Assign a worker to the Kiln to produce Charcoal.
+* Each production cycle consumes Wood and produces Charcoal.
+* Charcoal can then be used by other production buildings.
+
+This update expands the production chain and introduces the first step towards more interconnected production requirements.
+
+---
 
 ## Alpha v0.4.7 — Interface Refinement
 
@@ -352,6 +374,7 @@ This update focused on usability and preparing the interface for future manageme
 - Food consumption
 - Population growth
 - Persistent settlement state
+- Charcoal production
 
 ## Interface Systems
 
@@ -395,6 +418,7 @@ As the settlement develops, players can:
 - Balance resource production against consumption.
 - Manage limited storage capacity.
 - Expand production chains.
+- Manage interconnected production requirements.
 
 The intended gameplay loop is centred around gradually reducing manual work while managing the increasingly complex interactions between resources, production, workers, population, food, and storage.
 

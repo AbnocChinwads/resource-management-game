@@ -470,3 +470,32 @@
 ## Fixed
 
 - Fixed food consumption calculations incorrectly treating resources with zero nutritional value as food when no actual food was available.
+
+# 0.4.8 — Charcoal & Kiln Rework
+
+## Added
+
+- Added `Charcoal` to `resource_types`.
+- Added the `Produce Charcoal` recipe with a 10-second craft time and a Wood input.
+- Added Charcoal as a required input to the Bread and Tools recipes.
+- Added a settlement migration to initialise Charcoal in existing player resource states.
+
+## Changed
+
+- Reworked the Kiln to use the Charcoal production recipe.
+- Updated the Kiln description to `Simple oven used to make charcoal`.
+- Production buildings now initialise their output resource in `player_resources` when constructed if the resource is not already present.
+
+## Fixed
+
+- Fixed newly constructed production buildings being unable to operate when their output resource was absent from the player's resource state.
+
+## Testing
+
+- Tested the Charcoal resource and recipe in the production chain.
+- Tested the Kiln producing Charcoal with an assigned worker.
+- Tested Wood consumption during Charcoal production.
+- Tested Charcoal consumption by Bread and Tools production.
+- Tested newly constructed production buildings initialising their output resources.
+- Tested existing settlements receiving Charcoal through settlement migration.
+- Tested the Kiln's working and idle production states.

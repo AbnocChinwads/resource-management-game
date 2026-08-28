@@ -94,14 +94,33 @@ export async function completeTask(playerId, taskId) {
         `
         SELECT
           type,
-          population_gain
+          population_gain,
+          production_recipe_id
         FROM buildings
         WHERE id = $1
         `,
         [output_building_id],
       );
 
-      const { type, population_gain } = buildingRes.rows[0];
+      const { type, population_gain, production_recipe_id } =
+        buildingRes.rows[0];
+
+      if (type === "production" && production_recipe_id) {
+        const recipeRes = await db.query(
+          `
+    SELECT output_resource_id
+    FROM recipes
+    WHERE id = $1
+    `,
+          [production_recipe_id],
+        );
+
+        const outputResourceId = recipeRes.rows[0]?.output_resource_id;
+
+        if (outputResourceId) {
+          await addPlayerResource(playerId, outputResourceId, 0);
+        }
+      }
 
       if (type === "housing") {
         await establishInitialPopulation(playerId, population_gain);
