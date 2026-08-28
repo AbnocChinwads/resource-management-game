@@ -39,3 +39,4 @@ WHERE r.name = 'Forge Tools'
       FROM recipe_inputs ri
       WHERE ri.recipe_id = r.id
         AND ri.resource_type_id = rt.id
+  );
