@@ -16,29 +16,55 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.4.8**
+**Alpha v0.4.9**
 
 ---
 
 # Recent Updates
 
+## Alpha v0.4.9 — Building Construction Rebalance
+
+### Building Costs
+
+Building requirements have been rebalanced to make settlement progression more consistent.
+
+- Basic resource buildings remain accessible early in the game.
+- More advanced buildings now require a wider range of resources.
+- **Sawmills** now require **Ore** for their metal cutting equipment.
+- **Blacksmiths** now require **Ore** as part of their initial construction.
+- **Cottages** now require **Planks**, reflecting their more substantial construction.
+- **Bakery** construction now uses more **Stone** and less **Logs**.
+- **Lumber Camps** now require **Stone** as well as Wood.
+
+These changes are intended to make building progression feel more natural while giving processed resources such as **Logs** and **Planks**, and raw resources such as **Ore**, more meaningful roles in settlement development.
+
+### Settlement Progression
+
+Construction requirements now better reflect the increasing complexity of your settlement.
+
+Basic resource buildings provide the foundations for your economy, while later buildings increasingly depend on resources produced by other parts of your settlement.
+
+This creates a more interconnected progression as your settlement develops.
+
+---
+
 ## Alpha v0.4.8 — Charcoal & Kiln Rework
 
 ### Production
 
-* Added **Charcoal** as a new resource.
-* Reworked the **Kiln** to produce Charcoal from Wood.
-* Added Charcoal as a required input for **Bread** production.
-* Added Charcoal as a required input for **Tools** production.
-* Updated production chains to introduce fuel requirements where appropriate.
+- Added **Charcoal** as a new resource.
+- Reworked the **Kiln** to produce Charcoal from Wood.
+- Added Charcoal as a required input for **Bread** production.
+- Added Charcoal as a required input for **Tools** production.
+- Updated production chains to introduce fuel requirements where appropriate.
 
 ### Kiln
 
 The Kiln has been repurposed as the settlement's basic charcoal production building.
 
-* Assign a worker to the Kiln to produce Charcoal.
-* Each production cycle consumes Wood and produces Charcoal.
-* Charcoal can then be used by other production buildings.
+- Assign a worker to the Kiln to produce Charcoal.
+- Each production cycle consumes Wood and produces Charcoal.
+- Charcoal can then be used by other production buildings.
 
 This update expands the production chain and introduces the first step towards more interconnected production requirements.
 
@@ -444,8 +470,8 @@ This phase focuses on establishing the core systems that future settlement-manag
 - [x] Population growth and starvation mechanics
 - [x] Basic food consumption and production
 - [x] Player-facing population and food information
+- [x] Initial gameplay balancing
 - [ ] Further refinement of core settlement systems
-- [ ] Initial gameplay balancing
 
 ## v0.5.x - Storage & Resource Management
 
@@ -456,7 +482,7 @@ The next major development phase will turn the current storage-capacity foundati
 - [ ] Storage expansion
 - [ ] Storage buildings and upgrades
 - [ ] Improved storage management interface
-- [ ] More meaningful storage categories
+- [x] More meaningful storage categories
 - [ ] Better handling of production when storage is unavailable
 - [ ] Production buildings displaying clear idle or blocked states
 - [ ] Improved player-facing automation feedback

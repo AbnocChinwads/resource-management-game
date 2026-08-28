@@ -499,3 +499,41 @@
 - Tested newly constructed production buildings initialising their output resources.
 - Tested existing settlements receiving Charcoal through settlement migration.
 - Tested the Kiln's working and idle production states.
+
+# 0.4.9 — Building Construction Rebalance
+
+## Changed
+
+- Rebalanced construction requirements for all existing buildings.
+- Reduced the construction cost of the basic resource buildings to reflect their role as Tier 1 infrastructure.
+- Reclassified the Mine as a Tier 1 resource building alongside the Farm, Quarry, and Woodcutter's Hut.
+- Rebalanced the Mine construction requirements while retaining its existing total resource cost.
+- Increased the construction requirements of the Lumber Camp to distinguish it from the basic Woodcutter's Hut.
+- Added Stone to the Lumber Camp construction requirements.
+- Added Ore to the Sawmill construction requirements to represent the metal components required for its cutting equipment.
+- Rebalanced the Bakery construction requirements to favour Stone over Logs, reflecting the structural requirements of a building containing an oven and hearth.
+- Added Ore to the Blacksmith construction requirements to represent the initial metal required for basic metalworking equipment.
+- Increased the construction requirements of the Blacksmith to make it a more substantial Tier 2 building.
+- Added Planks to the Cottage construction requirements.
+- Rebalanced the Cottage as a more substantial housing building capable of supporting 5 population.
+- Retained the Hut's existing construction requirements of 2 Wheat + 4 Wood.
+
+## Construction Progression
+
+Construction requirements are now intended to reflect both the progression role and physical nature of each building.
+
+- Tier 1 buildings provide access to fundamental resources and basic settlement infrastructure.
+- Tier 2 buildings primarily process existing resources into more specialised resources or products.
+- Construction costs are balanced as approximate ranges rather than requiring every building within a tier to have identical costs.
+- Raw resources such as Ore can be used directly in construction where a building would reasonably require basic metal components.
+- Processed resources such as Planks can be used where they represent more substantial construction materials.
+
+## Testing
+
+- Tested revised construction recipes in the development database.
+- Verified all construction recipes contain the intended resource inputs and quantities.
+- Tested construction requirements for the revised buildings.
+- Verified the revised requirements do not introduce circular dependencies between buildings and production chains.
+- Verified the Blacksmith can be constructed without requiring Tools.
+- Verified the Sawmill can be constructed using raw Ore without requiring Tools.
+- Verified the Cottage uses Planks as a construction requirement.
