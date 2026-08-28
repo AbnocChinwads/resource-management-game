@@ -382,7 +382,7 @@
 * Provide players with a clear explanation when automated production is blocked.
 * Centralise production rules so the simulation and frontend receive the same production state.
 
-# 0.4.6 — Population & Food System Overhaul
+# [0.4.6] — Population & Food System Overhaul
 
 ## Added
 
@@ -448,7 +448,7 @@
 * Tested that full food storage does not incorrectly prevent population growth.
 * Tested accelerated food/simulation ticks for population growth and starvation.
 
-# v0.4.7 — Interface Refinement
+# [0.4.7] — Interface Refinement
 
 ## Added
 
@@ -472,7 +472,7 @@
 
 - Fixed food consumption calculations incorrectly treating resources with zero nutritional value as food when no actual food was available.
 
-# 0.4.8 — Charcoal & Kiln Rework
+# [0.4.8] — Charcoal & Kiln Rework
 
 ## Added
 
@@ -501,7 +501,7 @@
 - Tested existing settlements receiving Charcoal through settlement migration.
 - Tested the Kiln's working and idle production states.
 
-# 0.4.9 — Building Construction Rebalance
+# [0.4.9] — Building Construction Rebalance
 
 ## Changed
 
@@ -539,7 +539,7 @@ Construction requirements are now intended to reflect both the progression role 
 - Verified the Sawmill can be constructed using raw Ore without requiring Tools.
 - Verified the Cottage uses Planks as a construction requirement.
 
-# 0.4.10 — Ingredient Storage Reclassification
+# [0.4.10] — Ingredient Storage Reclassification
 
 ## Added
 
@@ -572,3 +572,59 @@ Storage categories now distinguish between general materials and intermediate fo
 - Tested the settlement migration for existing players.
 - Verified existing Flour quantities remain available after the category migration.
 - Verified the reduced load on `material` storage after moving Flour to `ingredient` storage.
+
+# [0.5.0] — Storage Expansion
+
+## Added
+
+- Added storage capacity to building definitions.
+- Added storage category and storage capacity properties to buildings.
+- Added four dedicated storage buildings:
+  - Storehouse
+  - Granary
+  - Pantry
+  - Food Store
+- Added construction recipes for the new storage buildings.
+- Added storage capacity bonuses to the new storage buildings.
+- Added storage category information to building construction recipes.
+- Added storage capacity information to the player-facing recipe interface.
+
+## Changed
+
+- Building a storage building now increases the player's capacity for its associated storage category.
+- Storage capacity is now expanded through settlement infrastructure rather than only through fixed base capacities.
+- Storage buildings now contribute their capacity bonus to the appropriate `player_storage` category when constructed.
+- Construction recipes for storage buildings now communicate the storage category and capacity they provide.
+- Updated recipe data to expose storage building information to the frontend.
+- Updated the storage interface to display buildings contributing capacity to each storage category.
+
+## Storage Buildings
+
+The initial storage buildings provide specialised capacity increases for different resource categories.
+
+- `Storehouse` — increases `material` storage.
+- `Granary` — increases `grain` storage.
+- `Pantry` — increases `ingredient` storage.
+- `Food Store` — increases `food` storage.
+
+Storage buildings can be built alongside existing production and housing buildings, allowing storage capacity to scale with the needs of the settlement.
+
+## Storage Management
+
+Storage capacity is now directly connected to settlement expansion and production.
+
+As production increases, players can construct appropriate storage buildings to prevent storage limitations from blocking their production chains.
+
+The storage interface now shows which buildings are contributing capacity to each storage category, while construction recipes indicate the capacity provided by storage buildings before they are built.
+
+## Testing
+
+- Tested construction of all four storage buildings.
+- Verified each storage building increases the correct `player_storage` category.
+- Verified storage capacity increases are applied when construction completes.
+- Verified storage capacity remains correctly associated with the relevant category.
+- Tested storage buildings alongside existing production chains.
+- Verified production can resume when additional storage capacity becomes available.
+- Verified storage building information is displayed in the construction recipes.
+- Verified storage category and capacity information is displayed correctly in the storage interface.
+- Verified existing players retain their current storage state when the new storage building system is introduced.

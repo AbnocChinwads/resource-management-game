@@ -16,11 +16,61 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.4.10**
+**Alpha v0.5.0**
 
 ---
 
 # Recent Updates
+
+## Alpha v0.5.0 — Storage Expansion
+
+### Storage
+
+Storage is now divided into categories based on the role of each resource within your settlement.
+
+- **Material** — resources used for construction and processing, such as Stone, Ore, Wood, Logs and Planks.
+- **Ingredient** — resources used as ingredients in production, such as Flour.
+- **Food** — resources that can directly provide nutrition to your population.
+- **Fuel** — resources used to power production.
+- **Tool** — equipment used by your settlement.
+- **Grain** — harvested grain resources such as Wheat.
+
+Each storage category has its own capacity.
+
+When a storage category reaches its capacity, production of resources belonging to that category can be prevented until space becomes available.
+
+### Expanding Storage
+
+Your settlement can now build dedicated storage buildings to increase its storage capacity.
+
+- **Storehouse** — increases Material storage capacity.
+- **Granary** — increases Grain storage capacity.
+- **Pantry** — increases Ingredient storage capacity.
+- **Food Store** — increases Food storage capacity.
+
+Each storage building adds capacity to its associated storage category when constructed.
+
+Multiple storage buildings can be built to continue expanding your settlement's storage capacity.
+
+### Storage Buildings
+
+Storage buildings are now part of the settlement's infrastructure rather than simply increasing the default storage limits.
+
+Building additional storage allows your production chains to continue operating as your settlement grows and produces larger quantities of resources.
+
+Storage buildings also create a new construction decision: expanding production may require expanding the infrastructure needed to store what your settlement produces.
+
+### Why This Matters
+
+Storage is now connected to the wider settlement economy.
+
+Your production buildings determine what your settlement can produce, while your storage capacity determines how much of those resources your settlement can hold.
+
+As production increases and new resources become available, expanding your storage infrastructure becomes an important part of maintaining a functioning settlement.
+
+## This forms the foundation for future storage upgrades and more specialised settlement infrastructure.
+
+---
 
 ## Alpha v0.4.10 — Ingredient Storage
 
@@ -493,18 +543,22 @@ This phase focuses on establishing the core systems that future settlement-manag
 
 ## v0.5.x - Storage & Resource Management
 
-The next major development phase will turn the current storage-capacity foundation into a more complete settlement management system.
+The 0.5.x development phase expands storage from a simple capacity limit into a more active part of settlement management.
 
 ### Completed / In Progress
 
-- [ ] Storage expansion
-- [ ] Storage buildings and upgrades
-- [ ] Improved storage management interface
+- [x] Storage expansion
+- [x] Storage buildings
+- [ ] Storage upgrades
+- [x] Improved storage management interface
 - [x] More meaningful storage categories
-- [ ] Better handling of production when storage is unavailable
-- [ ] Production buildings displaying clear idle or blocked states
-- [ ] Improved player-facing automation feedback
-- [ ] Better interaction between production chains and storage capacity
+- [x] Better handling of production when storage is unavailable
+- [x] Production buildings displaying clear idle or blocked states
+- [x] Improved player-facing automation feedback
+- [x] Better interaction between production chains and storage capacity
+- [ ] More advanced storage management and prioritisation
+- [ ] Storage buildings with specialised or upgraded capacity
+- [ ] Improved visibility of storage pressure across the settlement
 
 ---
 

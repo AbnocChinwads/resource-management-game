@@ -95,23 +95,38 @@ export async function completeTask(playerId, taskId) {
         SELECT
           type,
           population_gain,
-          production_recipe_id
+          production_recipe_id,
+          storage_category,
+          storage_capacity
         FROM buildings
-        WHERE id = $1
-        `,
+        WHERE id = $1`,
         [output_building_id],
       );
-
-      const { type, population_gain, production_recipe_id } =
-        buildingRes.rows[0];
+      const {
+        type,
+        population_gain,
+        production_recipe_id,
+        storage_category,
+        storage_capacity,
+      } = buildingRes.rows[0];
+      if (storage_capacity > 0 && storage_category) {
+        await db.query(
+          `
+          UPDATE player_storage
+          SET capacity = capacity + $1
+          WHERE player_id = $2
+            AND storage_category = $3`,
+          [storage_capacity, playerId, storage_category],
+        );
+      }
 
       if (type === "production" && production_recipe_id) {
         const recipeRes = await db.query(
           `
-    SELECT output_resource_id
-    FROM recipes
-    WHERE id = $1
-    `,
+          SELECT output_resource_id
+          FROM recipes
+          WHERE id = $1
+          `,
           [production_recipe_id],
         );
 

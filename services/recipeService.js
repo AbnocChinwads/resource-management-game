@@ -24,7 +24,9 @@ export async function getRecipes(recipeInputs) {
     SELECT
       r.*,
       b.type AS building_type,
-      b.population_gain
+      b.population_gain,
+      b.storage_category,
+      b.storage_capacity
     FROM recipes r
     LEFT JOIN buildings b
       ON b.id = r.output_building_id

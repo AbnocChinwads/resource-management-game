@@ -34,6 +34,21 @@ export function updateRecipes(data) {
           : "";
     }
 
+    const storageElement = recipeElement.querySelector(".recipe-storage");
+
+    if (storageElement) {
+      const storageCapacity = Number(recipe.storage_capacity ?? 0);
+
+      if (recipe.storage_category && storageCapacity > 0) {
+        storageElement.textContent = `+${storageCapacity} ${recipe.storage_category} storage capacity`;
+
+        storageElement.classList.remove("d-none");
+      } else {
+        storageElement.textContent = "";
+        storageElement.classList.add("d-none");
+      }
+    }
+
     let canStart = true;
 
     inputs.forEach((input) => {

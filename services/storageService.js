@@ -86,7 +86,35 @@ async function getPlayerStorage(playerId) {
     SELECT
       ps.storage_category,
       ps.capacity,
-      COALESCE(SUM(pr.amount), 0) AS used
+      COALESCE(SUM(pr.amount), 0) AS used,
+      COALESCE(
+        (
+          SELECT json_agg(
+            json_build_object(
+              'name', building_data.name,
+              'building_number', building_data.building_number,
+              'storage_capacity', building_data.storage_capacity
+            )
+            ORDER BY building_data.name, building_data.building_number
+          )
+          FROM (
+            SELECT
+              b.name,
+              b.storage_capacity,
+              ROW_NUMBER() OVER (
+                PARTITION BY pb.building_id
+                ORDER BY pb.id ASC
+              ) AS building_number
+            FROM player_buildings pb
+            JOIN buildings b
+              ON pb.building_id = b.id
+            WHERE pb.player_id = ps.player_id
+              AND b.storage_category = ps.storage_category
+              AND b.storage_capacity > 0
+          ) AS building_data
+        ),
+        '[]'::json
+      ) AS buildings
     FROM player_storage ps
     LEFT JOIN resource_types rt
       ON rt.storage_category = ps.storage_category
@@ -95,6 +123,7 @@ async function getPlayerStorage(playerId) {
       AND pr.player_id = ps.player_id
     WHERE ps.player_id = $1
     GROUP BY
+      ps.player_id,
       ps.storage_category,
       ps.capacity;
     `,
