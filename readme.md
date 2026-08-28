@@ -471,7 +471,7 @@ This phase focuses on establishing the core systems that future settlement-manag
 - [x] Basic food consumption and production
 - [x] Player-facing population and food information
 - [x] Initial gameplay balancing
-- [ ] Further refinement of core settlement systems
+- [x] Further refinement of core settlement systems
 
 ## v0.5.x - Storage & Resource Management
 
@@ -487,7 +487,6 @@ The next major development phase will turn the current storage-capacity foundati
 - [ ] Production buildings displaying clear idle or blocked states
 - [ ] Improved player-facing automation feedback
 - [ ] Better interaction between production chains and storage capacity
-- [ ] Further resource-management improvements
 
 ---
 
