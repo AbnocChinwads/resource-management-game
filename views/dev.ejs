@@ -1,9 +1,19 @@
 <%- include('partials/header.ejs'); -%>
-        <h1>Dev Dashboard</h1>
+    <h1>Dev Dashboard</h1>
+
+    <nav class="nav nav-tabs mb-4">
+        <a href="/dev" class="nav-link <%= page === 'settlement' ? 'active' : '' %>">Settlement</a>
+        <a href="/dev/bugs" class="nav-link <%= page === 'bugs' ? 'active' : '' %>">Bug Reports</a>
+        <a href="/dev/suggestions" class="nav-link <%= page === 'suggestions' ? 'active' : '' %>">Gameplay Suggestions</a>
+    </nav>
+
+    <% if (page === "settlement") { %>
         <%- include('partials/devPlayerSelector.ejs'); %>
+
         <% if (stats) { %>
             <%- include('partials/devPlayerStats.ejs'); %>
         <% } %>
+    
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-header">
@@ -18,23 +28,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% stats.resources.forEach(resource=> { %>
+                            <% stats.resources.forEach(resource => { %>
                                 <tr>
-                                    <td>
-                                        <%= resource.name %>
-                                    </td>
-                                    <td>
-                                        <%= resource.amount %>
-                                    </td>
+                                    <td><%= resource.name %></td>
+                                    <td><%= resource.amount %></td>
                                 </tr>
-                            <% }) %>
+                            <% }); %>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+    <% } else if (page === "bugs") {%>
         <%- include('partials/devBugReports.ejs'); -%>
+    <% } else if (page === "suggestions") {%>
         <%- include('partials/devGameplaySuggestions.ejs'); -%>
-        <%- include('partials/footer.ejs'); -%>
+    <% } %>
+
+    <%- include('partials/footer.ejs'); -%>
     </body>
 </html>

@@ -5,15 +5,26 @@ import { getAllPlayers } from "../services/playerService.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+async function renderDevPage(req, res, page) {
   try {
-    const bugs = await getBugReports();
-    const suggestions = await getSuggestions();
     const players = await getAllPlayers();
-
     const inspectedPlayerId = req.query.player || req.playerId;
 
-    const stats = await getPlayerStats(inspectedPlayerId);
+    let stats = null;
+    let bugs = [];
+    let suggestions = [];
+
+    if (page === "settlement") {
+      stats = await getPlayerStats(inspectedPlayerId);
+    }
+
+    if (page === "bugs") {
+      bugs = await getBugReports();
+    }
+
+    if (page === "suggestions") {
+      suggestions = await getSuggestions();
+    }
 
     res.render("dev", {
       bugs,
@@ -21,11 +32,24 @@ router.get("/", async (req, res) => {
       players,
       stats,
       inspectedPlayerId,
+      page,
     });
   } catch (err) {
     console.error("Dev page error:", err);
     res.status(500).send("Dev page error");
   }
+}
+
+router.get("/", (req, res) => {
+  renderDevPage(req, res, "settlement");
+});
+
+router.get("/bugs", (req, res) => {
+  renderDevPage(req, res, "bugs");
+});
+
+router.get("/suggestions", (req, res) => {
+  renderDevPage(req, res, "suggestions");
 });
 
 router.post("/bugs/:id", async (req, res) => {
@@ -34,7 +58,7 @@ router.post("/bugs/:id", async (req, res) => {
 
     await updateBugReport(req.params.id, status, priority);
 
-    return res.redirect("/dev");
+    return res.redirect("/dev/bugs");
   } catch (err) {
     console.error("Bug update error:", err);
     return res.status(500).send("Bug update error");
@@ -47,12 +71,11 @@ router.post("/suggestions/:id", async (req, res) => {
 
     await updateSuggestion(req.params.id, status);
 
-    return res.redirect("/dev");
+    return res.redirect("/dev/suggestions");
   } catch (err) {
     console.error("Suggestion update error:", err);
     return res.status(500).send("Suggestion update error");
   }
 });
-
 
 export default router;
