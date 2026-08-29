@@ -1,6 +1,13 @@
 import express from "express";
 import { getPlayerStats } from "../services/playerStatsService.js";
-import { getBugReports, getSuggestions, updateBugReport, updateSuggestion } from "../services/feedbackService.js";
+import {
+  getBugReports,
+  getActiveBugs,
+  getCompletedBugs,
+  getSuggestions,
+  updateBugReport,
+  updateSuggestion,
+} from "../services/feedbackService.js";
 import { getAllPlayers } from "../services/playerService.js";
 
 const router = express.Router();
@@ -12,6 +19,8 @@ async function renderDevPage(req, res, page) {
 
     let stats = null;
     let bugs = [];
+    let activeBugs = [];
+    let completedBugs = [];
     let suggestions = [];
 
     if (page === "settlement") {
@@ -20,6 +29,8 @@ async function renderDevPage(req, res, page) {
 
     if (page === "bugs") {
       bugs = await getBugReports();
+      activeBugs = getActiveBugs(bugs);
+      completedBugs = getCompletedBugs(bugs);
     }
 
     if (page === "suggestions") {
@@ -28,6 +39,8 @@ async function renderDevPage(req, res, page) {
 
     res.render("dev", {
       bugs,
+      activeBugs,
+      completedBugs,
       suggestions,
       players,
       stats,

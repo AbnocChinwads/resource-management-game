@@ -4,6 +4,23 @@ const BUG_STATUSES = ["open", "in_progress", "resolved", "wont_fix"];
 const BUG_PRIORITIES = ["low", "medium", "high", "critical"];
 const SUGGESTION_STATUSES = ["new", "considering", "implemented", "declined"];
 
+const BUG_STATUS_ORDER = {
+  in_progress: 0,
+  open: 1,
+};
+
+const BUG_PRIORITY_ORDER = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
+const BUG_COMPLETED_STATUS_ORDER = {
+  resolved: 0,
+  wont_fix: 1,
+};
+
 /*Create*/
 export async function createBugReport(
   playerId,
@@ -72,6 +89,51 @@ export async function getBugReports() {
   );
 
   return result.rows;
+}
+
+export function getActiveBugs(bugs) {
+  return bugs
+    .filter((bug) => bug.status === "open" || bug.status === "in_progress")
+    .sort((a, b) => {
+      const statusDifference =
+        BUG_STATUS_ORDER[a.status] - BUG_STATUS_ORDER[b.status];
+
+      if (statusDifference !== 0) {
+        return statusDifference;
+      }
+
+      const priorityDifference =
+        BUG_PRIORITY_ORDER[a.priority] - BUG_PRIORITY_ORDER[b.priority];
+
+      if (priorityDifference !== 0) {
+        return priorityDifference;
+      }
+
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+export function getCompletedBugs(bugs) {
+  return bugs
+    .filter((bug) => bug.status === "resolved" || bug.status === "wont_fix")
+    .sort((a, b) => {
+      const statusDifference =
+        BUG_COMPLETED_STATUS_ORDER[a.status] -
+        BUG_COMPLETED_STATUS_ORDER[b.status];
+
+      if (statusDifference !== 0) {
+        return statusDifference;
+      }
+
+      const priorityDifference =
+        BUG_PRIORITY_ORDER[a.priority] - BUG_PRIORITY_ORDER[b.priority];
+
+      if (priorityDifference !== 0) {
+        return priorityDifference;
+      }
+
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
 }
 
 export async function getSuggestions() {
