@@ -13,32 +13,6 @@
         <% if (stats) { %>
             <%- include('partials/devPlayerStats.ejs'); %>
         <% } %>
-    
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Resources</h5>
-                </div>
-                <div class="card-body table-responsive">
-                    <table class="table table-sm table-striped table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Resource</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% stats.resources.forEach(resource => { %>
-                                <tr>
-                                    <td><%= resource.name %></td>
-                                    <td><%= resource.amount %></td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     <% } else if (page === "bugs") {%>
         <%- include('partials/devBugReports.ejs'); -%>
     <% } else if (page === "suggestions") {%>

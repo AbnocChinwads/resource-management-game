@@ -3,22 +3,95 @@
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Population</h5>
+                <span>Population: <%= stats.population %> / <%= stats.populationCapacity %></span>
             </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        Population: <%= stats.population %>
-                    </li>
-                    <li class="list-group-item">
-                        Workers: <%= stats.workers %>
-                    </li>
-                    <li class="list-group-item">
-                        Assigned Workers: <%= stats.assignedWorkers %>
-                    </li>
-                    <li class="list-group-item">
-                        Available Workers: <%= stats.availableWorkers %>
-                    </li>
-                </ul>
-            </div>
+            <details>
+                <summary class="my-2">View details</summary>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item"> Workers: <%= stats.workers %>
+                        </li>
+                        <li class="list-group-item"> Assigned Workers: <%= stats.assignedWorkers %>
+                        </li>
+                        <li class="list-group-item"> Available Workers: <%= stats.availableWorkers %>
+                        </li>
+                    </ul>
+                </div>
+            </details>
         </div>
     </div>
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Food</h5>
+                <span>Nutrition: <%= Number(stats.food).toFixed(2) %></span>
+            </div>
+            <details>
+                <summary class="my-2">View details</summary>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item"> Required / min: <%= Number(stats.foodRequiredPerMinute).toFixed(2) %>
+                        </li>
+                        <li class="list-group-item"> Supplied / min: <%= Number(stats.foodSuppliedPerMinute).toFixed(2) %>
+                        </li>
+                        <li class="list-group-item"> Net / min: <%= Number(stats.foodNetFlowPerMinute).toFixed(2) %>
+                        </li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Storage</h5>
+                <span>
+                    <%= stats.totalStorageUsed.toFixed(2) %> / <%= stats.totalStorageCapacity.toFixed(2) %> used
+                </span>
+            </div>
+            <details>
+                <summary class="my-2">View details</summary>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <% stats.storage.forEach(storage=> { %>
+                            <li class="list-group-item">
+                                <%= storage.storage_category %>: <%= Number(storage.used).toFixed(2) %> / <%= storage.capacity %>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Resources</h5>
+                <span><%= stats.discoveredResourceTypes %> Discovered</span>
+            </div>
+            <details>
+                <summary class="my-2">View details</summary>
+                <div class="card-body table-responsive">
+                    <table class="table table-sm table-striped table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% stats.resources.forEach(resource => { %>
+                                <tr>
+                                    <td><%= resource.name %></td>
+                                    <td><%= Number(resource.amount).toFixed(2) %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </div>
+    </div>
+</div>

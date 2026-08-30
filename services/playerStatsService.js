@@ -60,6 +60,17 @@ export async function getPlayerStats(playerId) {
   const starvationConsequenceSeconds =
     foodTickRateSeconds * STARVATION_CONSEQUENCE_TICKS;
 
+  //Dev metadata for bug reports
+  const totalStorageUsed = storage.reduce(
+    (sum, storage) => sum + Number(storage.used),
+    0,
+  );
+  const totalStorageCapacity = storage.reduce(
+    (sum, storage) => sum + Number(storage.capacity),
+    0,
+  );
+  const discoveredResourceTypes = resources.length;
+
   return {
     population,
     workers,
@@ -80,6 +91,9 @@ export async function getPlayerStats(playerId) {
     resources,
     buildings,
     storage,
+    totalStorageUsed,
+    totalStorageCapacity,
+    discoveredResourceTypes,
     recipes: recipeData.recipes,
     recipeInputs: recipeData.recipeInputs,
   };
