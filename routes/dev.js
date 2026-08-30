@@ -5,6 +5,8 @@ import {
   getActiveBugs,
   getCompletedBugs,
   getSuggestions,
+  getActiveSuggestions,
+  getCompletedSuggestions,
   updateBugReport,
   updateSuggestion,
 } from "../services/feedbackService.js";
@@ -22,6 +24,8 @@ async function renderDevPage(req, res, page) {
     let activeBugs = [];
     let completedBugs = [];
     let suggestions = [];
+    let activeSuggestions = [];
+    let completedSuggestions = [];
 
     if (page === "settlement") {
       stats = await getPlayerStats(inspectedPlayerId);
@@ -35,6 +39,8 @@ async function renderDevPage(req, res, page) {
 
     if (page === "suggestions") {
       suggestions = await getSuggestions();
+      activeSuggestions = getActiveSuggestions(suggestions);
+      completedSuggestions = getCompletedSuggestions(suggestions);
     }
 
     res.render("dev", {
@@ -42,6 +48,8 @@ async function renderDevPage(req, res, page) {
       activeBugs,
       completedBugs,
       suggestions,
+      activeSuggestions,
+      completedSuggestions,
       players,
       stats,
       inspectedPlayerId,

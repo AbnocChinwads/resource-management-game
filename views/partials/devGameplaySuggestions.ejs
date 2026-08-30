@@ -1,16 +1,15 @@
 <div class="card mb-4">
     <div class="card-header">
-        Gameplay Suggestions
+        <h5 class="mb-0">Active Suggestions</h5>
     </div>
     <div class="card-body table-responsive">
-        <% if (suggestions.length===0) { %>
-            <p>No gameplay suggestions submitted.</p>
+        <% if (activeSuggestions.length===0) { %>
+            <p>No active suggestions.</p>
         <% } else { %>
             <table class="table table-sm table-striped table-hover table-bordered">
                 <thead>
                     <tr>
                         <th>Title</th>
-                        <th>Description</th>
                         <th>Player</th>
                         <th>Status</th>
                         <th>Reported</th>
@@ -18,13 +17,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% suggestions.forEach(suggestion=> { %>
+                    <% activeSuggestions.forEach(suggestion=> { %>
                         <tr>
                             <td>
                                 <%= suggestion.title %>
-                            </td>
-                            <td>
-                                <%= suggestion.description %>
                             </td>
                             <td>
                                 <% if (suggestion.player_id) { %>
@@ -77,19 +73,145 @@
                             <td>
                                 <%= new Date(suggestion.created_at).toLocaleString("en-GB") %>
                             </td>
-                            <td>
-                                <form
-                                    id="suggestion-form-<%= suggestion.id %>"
-                                    method="POST"
-                                    action="/dev/suggestions/<%= suggestion.id %>"
-                                >
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm btn-primary"
-                                    >
-                                        Update
+                            <td class="position-relative">
+                                <div class="d-flex position-absolute top-50 start-50 translate-middle gap-3">
+                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#suggestion-details-<%= suggestion.id %>" aria-expanded="false" aria-controls="suggestion-details-<%= suggestion.id %>">
+                                        View
                                     </button>
-                                </form>
+                                    <form
+                                        id="suggestion-form-<%= suggestion.id %>"
+                                        method="POST"
+                                        action="/dev/suggestions/<%= suggestion.id %>"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-primary"
+                                        >
+                                            Update
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <div id="suggestion-details-<%= suggestion.id %>" class="collapse">
+                                    <strong>Description</strong>
+                                    <p class="mb-0 mt-2">
+                                        <%= suggestion.description %>
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Completed Suggestions</h5>
+    </div>
+    <div class="card-body table-responsive">
+        <% if (completedSuggestions.length===0) { %>
+            <p>No completed suggestions.</p>
+        <% } else { %>
+            <table class="table table-sm table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Player</th>
+                        <th>Status</th>
+                        <th>Reported</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% completedSuggestions.forEach(suggestion=> { %>
+                        <tr>
+                            <td>
+                                <%= suggestion.title %>
+                            </td>
+                            <td>
+                                <% if (suggestion.player_id) { %>
+                                    <a href="/dev?player=<%= suggestion.player_id %>">
+                                        <%= suggestion.player_name %>
+                                    </a>
+                                <% } else { %>
+                                    Unknown
+                                <% } %>
+                            </td>
+                            <td>
+                                <label
+                                    class="visually-hidden"
+                                    for="suggestion-status-<%= suggestion.id %>"
+                                >
+                                    Status for <%= suggestion.title %>
+                                </label>
+                                <select
+                                    id="suggestion-status-<%= suggestion.id %>"
+                                    name="status"
+                                    form="suggestion-form-<%= suggestion.id %>"
+                                    class="form-select form-select-sm"
+                                >
+                                    <option
+                                        value="new"
+                                        <%= suggestion.status === "new" ? "selected" : "" %>
+                                    >
+                                        New
+                                    </option>
+                                    <option
+                                        value="considering"
+                                        <%= suggestion.status === "considering" ? "selected" : "" %>
+                                    >
+                                        Considering
+                                    </option>
+                                    <option
+                                        value="implemented"
+                                        <%= suggestion.status === "implemented" ? "selected" : "" %>
+                                    >
+                                        Implemented
+                                    </option>
+                                    <option
+                                        value="declined"
+                                        <%= suggestion.status === "declined" ? "selected" : "" %>
+                                    >
+                                        Declined
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <%= new Date(suggestion.created_at).toLocaleString("en-GB") %>
+                            </td>
+                            <td class="position-relative">
+                                <div class="d-flex position-absolute top-50 start-50 translate-middle gap-3">
+                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#suggestion-details-<%= suggestion.id %>" aria-expanded="false" aria-controls="suggestion-details-<%= suggestion.id %>">
+                                        View
+                                    </button>
+                                    <form
+                                        id="suggestion-form-<%= suggestion.id %>"
+                                        method="POST"
+                                        action="/dev/suggestions/<%= suggestion.id %>"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-primary"
+                                        >
+                                            Update
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <div id="suggestion-details-<%= suggestion.id %>" class="collapse">
+                                    <strong>Description</strong>
+                                    <p class="mb-0 mt-2">
+                                        <%= suggestion.description %>
+                                    </p>
+                                </div>
                             </td>
                         </tr>
                     <% }) %>

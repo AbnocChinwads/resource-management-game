@@ -21,6 +21,16 @@ const BUG_COMPLETED_STATUS_ORDER = {
   wont_fix: 1,
 };
 
+const SUGGESTION_STATUS_ORDER = {
+  considering: 0,
+  new: 1,
+};
+
+const SUGGESTION_COMPLETED_STATUS_ORDER = {
+  implemented: 0,
+  declined: 1,
+};
+
 /*Create*/
 export async function createBugReport(
   playerId,
@@ -151,6 +161,43 @@ export async function getSuggestions() {
   );
 
   return result.rows;
+}
+
+export function getActiveSuggestions(suggestions) {
+  return suggestions
+    .filter(
+      (suggestion) =>
+        suggestion.status === "new" || suggestion.status === "considering",
+    )
+    .sort((a, b) => {
+      const statusDifference =
+        SUGGESTION_STATUS_ORDER[a.status] - SUGGESTION_STATUS_ORDER[b.status];
+
+      if (statusDifference !== 0) {
+        return statusDifference;
+      }
+
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+export function getCompletedSuggestions(suggestions) {
+  return suggestions
+    .filter(
+      (suggestion) =>
+        suggestion.status === "implemented" || suggestion.status === "declined",
+    )
+    .sort((a, b) => {
+      const statusDifference =
+        SUGGESTION_COMPLETED_STATUS_ORDER[a.status] -
+        SUGGESTION_COMPLETED_STATUS_ORDER[b.status];
+
+      if (statusDifference !== 0) {
+        return statusDifference;
+      }
+
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
 }
 /*Read*/
 
