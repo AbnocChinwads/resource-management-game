@@ -3,8 +3,8 @@
         <h5 class="mb-0">Open Bug Reports</h5>
     </div>
     <div class="card-body table-responsive">
-        <% if (bugs.length===0) { %>
-            <p>No bug reports submitted.</p>
+        <% if (activeBugs.length===0) { %>
+            <p>No active bug reports.</p>
         <% } else { %>
             <table class="table table-sm table-striped table-hover table-bordered">
                 <thead>
@@ -90,19 +90,25 @@
                             <td>
                                 <%= new Date(bug.created_at).toLocaleString("en-GB") %>
                             </td>
-                            <td>
-                                <form
-                                    id="bug-form-<%= bug.id %>"
-                                    method="POST"
-                                    action="/dev/bugs/<%= bug.id %>"
-                                >
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm btn-primary"
-                                    >
-                                        Update
+                            <td class="position-relative">
+                                <div class="d-flex position-absolute top-50 start-50 translate-middle gap-3">
+                                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#bug-details-<%= bug.id %>" aria-expanded="false" aria-controls="bug-details-<%= bug.id %>">
+                                        View
                                     </button>
-                                </form>
+                                    <form
+                                        id="bug-form-<%= bug.id %>"
+                                        method="POST"
+                                        action="/dev/bugs/<%= bug.id %>"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-primary"
+                                        >
+                                            Update
+                                        </button>
+                                    </form>
+                                </div>
+                                <%- include("devBugDetails.ejs", {bug}) %>
                             </td>
                         </tr>
                     <% }); %>
@@ -203,19 +209,25 @@
                             <td>
                                 <%= new Date(bug.created_at).toLocaleString("en-GB") %>
                             </td>
-                            <td>
-                                <form
-                                    id="completed-bug-form-<%= bug.id %>"
-                                    method="POST"
-                                    action="/dev/bugs/<%= bug.id %>"
-                                >
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm btn-primary"
-                                    >
-                                        Update
+                            <td class="position-relative">
+                                <div class="d-flex position-absolute top-50 start-50 translate-middle gap-3">
+                                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#bug-details-<%= bug.id %>" aria-expanded="false" aria-controls="bug-details-<%= bug.id %>">
+                                        View
                                     </button>
-                                </form>
+                                    <form
+                                        id="completed-bug-form-<%= bug.id %>"
+                                        method="POST"
+                                        action="/dev/bugs/<%= bug.id %>"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-primary"
+                                        >
+                                            Update
+                                        </button>
+                                    </form>
+                                </div>
+                                <%- include("devBugDetails.ejs", {bug}) %>
                             </td>
                         </tr>
                     <% }); %>

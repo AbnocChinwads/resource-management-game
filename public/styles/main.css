@@ -5,8 +5,3 @@
 td {
     vertical-align: top;
 }
-
-td:nth-child(2) {
-    max-width: 400px;
-    white-space: pre-wrap;
-}
