@@ -628,3 +628,79 @@ The storage interface now shows which buildings are contributing capacity to eac
 - Verified storage building information is displayed in the construction recipes.
 - Verified storage category and capacity information is displayed correctly in the storage interface.
 - Verified existing players retain their current storage state when the new storage building system is introduced.
+
+# [0.5.1] — Player Interface & Developer Dashboard
+
+## Added
+
+- Added a persistent player status interface to the main game view.
+- Added population and worker information to the player status interface.
+- Added current resource amounts and resource flow indicators to the player status interface.
+- Added storage usage and capacity information for each storage category to the player status interface.
+- Added tabbed navigation for detailed player-facing game information.
+- Added dedicated tabs for Resources, Storage, Recipes, and Tasks.
+- Added persistent building interfaces beneath the game navigation.
+- Added increasing, decreasing, and stable indicators for player resource flows.
+- Added accessible text descriptions for resource flow indicators.
+
+## Changed
+
+- Reorganised the main game interface to separate persistent settlement information from detailed management interfaces.
+- Player population and worker information is now visible without navigating away from the current game view.
+- Resource amounts and their current net flow are now visible without opening the detailed Resources interface.
+- Storage usage by category is now visible without opening the detailed Storage interface.
+- Detailed Resources, Storage, Recipes, and Tasks information is now accessed through tabs rather than being displayed simultaneously.
+- Population and production buildings remain visible while navigating between the detailed game information tabs.
+- Reorganised the game view layout to make better use of available screen space while retaining access to frequently used settlement information.
+- Updated the player-facing interface to use the existing `getPlayerStats()` data rather than introducing additional database queries for the new status information.
+- Refactored player status rendering into a dedicated `playerStatus.js` module.
+
+## Player Status
+
+The new player status interface provides a persistent overview of the settlement's current state.
+
+The interface displays:
+
+- Population and population capacity.
+- Idle and assigned workers.
+- Current amount of every discovered resource.
+- Whether each resource is currently increasing, decreasing, or stable.
+- Storage used and available capacity for each storage category.
+
+This information remains visible while players navigate between the detailed management interfaces.
+
+## Game Navigation
+
+Detailed settlement management information has been reorganised into dedicated tabs:
+
+- `Resources` — detailed resource information and production/consumption rates.
+- `Storage` — detailed storage information and contributing storage buildings.
+- `Recipes` — available construction and production recipes.
+- `Tasks` — active and available manual tasks.
+
+Population and production buildings remain permanently visible beneath the navigation so that workers can be reassigned without leaving the current game context.
+
+## Developer Dashboard
+
+- Improved the developer settlement view to provide a more useful overview of player state.
+- Added persistent population and worker information to the developer view.
+- Added resource amounts and resource flow information to the developer view.
+- Added storage usage and capacity information to the developer view.
+- Retained detailed storage and building information within the developer interface for debugging and inspection.
+
+## Testing
+
+- Tested the new player status interface in-game.
+- Verified population and population capacity display correctly.
+- Verified idle and assigned worker counts display correctly.
+- Verified all discovered resources and their current amounts are displayed correctly.
+- Verified positive resource flows display as increasing.
+- Verified negative resource flows display as decreasing.
+- Verified zero resource flows display as stable.
+- Verified storage usage and capacity display correctly for each storage category.
+- Tested navigation between all game information tabs.
+- Verified buildings remain visible while switching between tabs.
+- Verified the interface behaves correctly when individual tab contents have different heights.
+- Verified the page footer remains correctly positioned for both short and long views.
+- Verified the new player status information uses the existing player statistics data.
+- Tested the improved developer settlement view successfully.

@@ -1,14 +1,15 @@
 import { fetchGameData } from "/js/api/gameData.js";
-import { initialiseGameActions } from "/js/game/actions.js";
-import { checkDiscovery } from "/js/game/discovery.js";
-import { checkAnnouncements } from "/js/game/announcements.js";
-import { updatePlayerDisplay } from "/js/game/playerDisplay.js";
-import { updateRecipes } from "/js/game/recipes.js";
-import { updateResources, renderResources } from "/js/game/resources.js";
-import { updateStorage } from "/js/game/storage.js";
-import { updateBuildings } from "/js/game/buildings.js";
-import { updateTasks } from "/js/game/tasks.js";
-import { startProgressUpdates } from "/js/game/progressBars.js";
+import { initialiseGameActions } from "./actions.js";
+import { checkDiscovery } from "./discovery.js";
+import { checkAnnouncements } from "./announcements.js";
+import { updatePlayerDisplay } from "./playerDisplay.js";
+import { updateRecipes } from "./recipes.js";
+import { updateResources, renderResources } from "./resources.js";
+import { updateStorage } from "./storage.js";
+import { updateBuildings } from "./buildings.js";
+import { updateTasks } from "./tasks.js";
+import { startProgressUpdates } from "./progressBars.js";
+import { updatePlayerStatus } from "./playerStatus.js";
 
 async function updateStats() {
   try {
@@ -26,6 +27,7 @@ async function updateStats() {
     }
 
     updatePlayerDisplay(updatedData);
+    updatePlayerStatus(updatedData);
     updateResources(updatedData.resources);
     updateStorage(updatedData.storage);
     updateBuildings(updatedData.buildings);

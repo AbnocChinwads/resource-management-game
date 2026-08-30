@@ -16,11 +16,64 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.5.0**
+**Alpha v0.5.1**
 
 ---
 
 # Recent Updates
+
+## Alpha v0.5.1 — Settlement Overview
+
+### Settlement Status
+
+Your settlement's most important information is now available at a glance.
+
+The new settlement status panel continuously displays:
+
+Population — your current population and maximum population capacity.
+Workers — the number of idle and assigned workers.
+Resources — the current amount of each discovered resource.
+Resource Flow — whether each resource is currently increasing, decreasing, or remaining stable.
+Storage — how much storage is currently being used in each resource category.
+
+This information remains visible while you manage the rest of your settlement.
+
+### Game Navigation
+
+The detailed settlement information has been reorganised into separate tabs.
+
+Resources — detailed information about your resources and their production and consumption.
+Storage — detailed information about your storage capacity and the buildings providing it.
+Recipes — available production and construction options.
+Tasks — available manual tasks.
+
+This keeps the main settlement view focused while still allowing you to access detailed information when you need it.
+
+### Buildings
+
+Population and production buildings are now kept visible while navigating between the detailed settlement views.
+
+This allows you to continue managing your workforce while checking resources, storage, recipes, or tasks without having to leave the building interface.
+
+### A Better Settlement Overview
+
+The settlement view is now organised around two levels of information.
+
+The settlement status panel provides the information you need to monitor continuously, while the detailed interfaces provide the information needed to make individual management decisions.
+
+This means you can see the current state of your settlement while making decisions about what to produce, build, store, or assign workers to.
+
+### Why This Matters
+
+As your settlement grows, there is more information to keep track of.
+
+The new layout keeps the information that is most important to your settlement's ongoing operation visible at all times, while moving less frequently needed detail into dedicated views.
+
+You can now monitor your population, workforce, resources, and storage while using the detailed settlement interfaces to decide what your settlement needs next.
+
+## This forms the foundation for expanding the settlement interface as new management systems are introduced.
+
+---
 
 ## Alpha v0.5.0 — Storage Expansion
 
