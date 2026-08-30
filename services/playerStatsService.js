@@ -70,6 +70,7 @@ export async function getPlayerStats(playerId) {
     0,
   );
   const discoveredResourceTypes = resources.length;
+  const totalBuildings = buildings.length;
 
   return {
     population,
@@ -94,6 +95,7 @@ export async function getPlayerStats(playerId) {
     totalStorageUsed,
     totalStorageCapacity,
     discoveredResourceTypes,
+    totalBuildings,
     recipes: recipeData.recipes,
     recipeInputs: recipeData.recipeInputs,
   };
