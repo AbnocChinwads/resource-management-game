@@ -60,7 +60,7 @@ export async function getPlayerStats(playerId) {
   const starvationConsequenceSeconds =
     foodTickRateSeconds * STARVATION_CONSEQUENCE_TICKS;
 
-  //Dev metadata for bug reports
+  // Derived gamestate values
   const totalStorageUsed = storage.reduce(
     (sum, storage) => sum + Number(storage.used),
     0,

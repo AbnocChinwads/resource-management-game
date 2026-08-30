@@ -30,11 +30,9 @@
                 <summary class="my-2">View details</summary>
                 <div class="card-body">
                     <ul class="list-group">
-                        <li class="list-group-item"> Required / min: <%= Number(stats.foodRequiredPerMinute).toFixed(2)
-                                %>
+                        <li class="list-group-item"> Required / min: <%= Number(stats.foodRequiredPerMinute).toFixed(2) %>
                         </li>
-                        <li class="list-group-item"> Supplied / min: <%= Number(stats.foodSuppliedPerMinute).toFixed(2)
-                                %>
+                        <li class="list-group-item"> Supplied / min: <%= Number(stats.foodSuppliedPerMinute).toFixed(2) %>
                         </li>
                         <li class="list-group-item"> Net / min: <%= Number(stats.foodNetFlowPerMinute).toFixed(2) %>
                         </li>
@@ -47,9 +45,6 @@
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Storage</h5>
-                <span>
-                    <%= stats.totalStorageUsed.toFixed(2) %> / <%= stats.totalStorageCapacity.toFixed(2) %> used
-                </span>
             </div>
             <details>
                 <summary class="my-2">View details</summary>
@@ -57,8 +52,7 @@
                     <ul class="list-group">
                         <% stats.storage.forEach(storage => { %>
                             <li class="list-group-item">
-                                <%= storage.storage_category %>: <%= Number(storage.used).toFixed(2) %> / <%=
-                                            storage.capacity %>
+                                <%= storage.storage_category %>: <%= Number(storage.used).toFixed(2) %> / <%= storage.capacity %>
                             </li>
                             <% }); %>
                     </ul>
@@ -136,11 +130,10 @@
                                         <%= building.type %>
                                     </td>
                                     <td>
-                                        <%= building.workers_assigned %> /
-                                            <%= building.max_workers %>
+                                        <%= building.workers_assigned %> / <%= building.max_workers %>
                                     </td>
                                     <td>
-                                        <%= building.productionRate %> / min
+                                        <%= Number(building.productionRate).toFixed(2) %> / min
                                     </td>
                                     <td>
                                         <%= building.output_resource_name ?? "-" %>
