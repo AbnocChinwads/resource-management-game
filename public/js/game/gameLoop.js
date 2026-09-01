@@ -9,7 +9,6 @@ import { updateStorage } from "./storage.js";
 import { updateBuildings } from "./buildings.js";
 import { updateTasks } from "./tasks.js";
 import { startProgressUpdates } from "./progressBars.js";
-import { updatePlayerStatus } from "./playerStatus.js";
 
 async function updateStats() {
   try {
@@ -18,16 +17,8 @@ async function updateStats() {
     const discoveryChanged = checkDiscovery(data);
 
     const updatedData = discoveryChanged ? await fetchGameData() : data;
-
-    if (
-      discoveryChanged ||
-      document.querySelector("#resource-table-body").children.length === 0
-    ) {
-      renderResources(updatedData.resources);
-    }
-
+    
     updatePlayerDisplay(updatedData);
-    updatePlayerStatus(updatedData);
     updateResources(updatedData.resources);
     updateStorage(updatedData.storage);
     updateBuildings(updatedData.buildings);

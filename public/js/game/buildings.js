@@ -2,10 +2,24 @@ export function updateBuildings(buildings) {
   if (!buildings) return;
 
   buildings.forEach((building) => {
-    const container =
-      building.type === "housing"
-        ? document.getElementById("population-buildings-body")
-        : document.getElementById("production-buildings-body");
+    let container;
+
+    switch (building.type) {
+      case "housing":
+        container = document.getElementById("population-buildings-body");
+        break;
+
+      case "production":
+        container = document.getElementById("production-buildings-body");
+        break;
+
+      case "storage":
+        container = document.getElementById("storage-buildings-body");
+        break;
+
+      default:
+        return;
+    }
 
     if (!container) return;
 
@@ -52,6 +66,14 @@ export function updateBuildings(buildings) {
         `;
       }
 
+      if (building.type === "storage") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td>${building.health}/${building.max_health}</td>
+          <td>${building.storage_capacity} ${building.storage_category}</td>
+        `;
+      }
+      
       container.appendChild(row);
     }
 
@@ -66,6 +88,7 @@ export function updateBuildings(buildings) {
 
   sortBuildingRows("population-buildings-body");
   sortBuildingRows("production-buildings-body");
+  sortBuildingRows("storage-buildings-body");
 }
 
 function sortBuildingRows(containerId) {

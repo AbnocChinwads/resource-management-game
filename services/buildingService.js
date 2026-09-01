@@ -20,6 +20,8 @@ export async function getPlayerBuildings(
     b.max_workers, 
     b.max_health, 
     b.population_gain,
+    b.storage_category,
+    b.storage_capacity,
     r.id AS recipe_id,
     r.output_resource_id,
     r.output_amount,
