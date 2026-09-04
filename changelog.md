@@ -704,3 +704,49 @@ Population and production buildings remain permanently visible beneath the navig
 - Verified the page footer remains correctly positioned for both short and long views.
 - Verified the new player status information uses the existing player statistics data.
 - Tested the improved developer settlement view successfully.
+
+
+# [0.5.2] — Building Groups & Settlement Interface
+
+## Added
+
+- Added grouped building displays for population, production, and storage buildings.
+- Added collapsible building groups to reduce the amount of information displayed in the settlement interface.
+- Added building counts to each building group.
+- Added aggregate production and consumption summaries to production building groups.
+- Added individual building visibility when a building group is expanded.
+- Added production building group summaries showing combined production and resource consumption rates.
+
+## Changed
+
+- Reorganised population, production, and storage buildings into named building groups.
+- Building groups are now collapsed by default when the game interface is loaded.
+- Individual buildings are now displayed beneath their corresponding building group when expanded.
+- Production building groups now provide a summary of their combined production and resource consumption.
+- Building groups are now sorted alphabetically, with individual buildings sorted by building number within each group.
+- Updated the building interface to make better use of available space when multiple buildings of the same type are present.
+- Retained the existing individual building controls and production status information when groups are expanded.
+- Updated building group rendering to prevent duplicate buildings from affecting group counts or production summaries.
+
+## Building Management
+
+The building interface now groups buildings of the same type together.
+
+Each group displays the number of buildings it contains and can be expanded to view and manage individual buildings.
+
+Production building groups also display their combined production and resource consumption while collapsed, providing an overview of production without requiring every building to be expanded.
+
+## Testing
+
+- Tested population buildings with grouped and collapsed displays.
+- Tested production buildings with grouped and collapsed displays.
+- Tested storage buildings with grouped and collapsed displays.
+- Verified building counts match the number of individual buildings displayed when groups are expanded.
+- Verified production group summaries correctly combine production rates.
+- Verified production group summaries correctly combine resource consumption rates.
+- Verified idle production buildings do not contribute to production or consumption summaries.
+- Verified individual building worker controls continue to function when groups are expanded.
+- Verified building groups remain collapsed after a page refresh.
+- Verified building groups sort correctly by building name.
+- Verified individual buildings sort correctly by building number within their groups.
+- Verified repeated game updates do not create duplicate building rows or incorrectly increase building group counts.

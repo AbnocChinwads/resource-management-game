@@ -1,94 +1,81 @@
-export function updateBuildings(buildings) {
-  if (!buildings) return;
+function getOrCreateBuildingGroup(container, building) {
+  const groupName = building.name;
 
-  buildings.forEach((building) => {
-    let container;
+  let groupRow = container.querySelector(
+    `[data-building-group="${groupName}"][data-building-group-row]`,
+  );
 
-    switch (building.type) {
-      case "housing":
-        container = document.getElementById("population-buildings-body");
-        break;
+  if (!groupRow) {
+    groupRow = document.createElement("tr");
 
-      case "production":
-        container = document.getElementById("production-buildings-body");
-        break;
+    groupRow.dataset.buildingGroup = groupName;
+    groupRow.dataset.buildingGroupRow = "";
+    groupRow.dataset.expanded = "false";
 
-      case "storage":
-        container = document.getElementById("storage-buildings-body");
-        break;
+    const columns = building.type === "production" ? 5 : 3;
 
-      default:
-        return;
-    }
+    groupRow.innerHTML = `
+      <td>
+        <button
+          type="button"
+          class="btn btn-link text-decoration-none p-0"
+        >
+          <span aria-hidden="true">▸</span>
+          ${groupName}
+        </button>
 
-    if (!container) return;
+        <span
+          class="text-muted ms-2"
+          data-building-group-count
+        ></span>
+      </td>
 
-    let row = container.querySelector(`[data-building-id="${building.id}"]`);
+      <td></td>
 
-    if (!row) {
-      row = document.createElement("tr");
-      row.dataset.buildingId = building.id;
-      row.dataset.buildingName = building.name;
+      <td data-building-group-summary></td>
 
-      if (building.type === "housing") {
-        row.innerHTML = `
-          <td>${building.name} #${building.building_number}</td>
-          <td>${building.health}/${building.max_health}</td>
-          <td>${building.population_gain}</td>
-        `;
-      }
+      ${columns === 5 ? `
+        <td></td>
+        <td></td>
+      ` : ""}
+    `;
 
-      if (building.type === "production") {
-        row.innerHTML = `
-          <td>${building.name} #${building.building_number}</td>
-          <td>${building.health}/${building.max_health}</td>
-          <td class="d-none d-xxl-table-cell" id="building-${building.id}-production-consumption"></td>
-          <td>
-            <span id="building-${building.id}-workers">
-              ${building.workers_assigned}
-            </span>/${building.max_workers}
-          </td>
-          <td>
-            <div class="btn-group">
-              <button class="btn btn-sm btn-danger px-2"
-                aria-label="Remove worker"
-                onclick="changeWorkers(${building.id}, -1)">
-                -
-              </button>
+    const button = groupRow.querySelector("button");
 
-              <button class="btn btn-sm btn-success px-2"
-                aria-label="Add worker"
-                onclick="changeWorkers(${building.id}, 1)">
-                +
-              </button>
-            </div>
-          </td>
-        `;
-      }
+    button.addEventListener("click", () => {
+      const expanded = groupRow.dataset.expanded === "true";
 
-      if (building.type === "storage") {
-        row.innerHTML = `
-          <td>${building.name} #${building.building_number}</td>
-          <td>${building.health}/${building.max_health}</td>
-          <td>${building.storage_capacity} ${building.storage_category}</td>
-        `;
-      }
-      
-      container.appendChild(row);
-    }
+      groupRow.dataset.expanded = String(!expanded);
 
-    if (building.type === "production") {
-      const productionConsumptionEl = row.querySelector(
-        `#building-${building.id}-production-consumption`,
+      const buildingRows = container.querySelectorAll(
+        `[data-building-group="${groupName}"]:not([data-building-group-row])`,
       );
 
-      updateProductionConsumptionElement(productionConsumptionEl, building);
-    }
-  });
+      buildingRows.forEach((buildingRow) => {
+        buildingRow.hidden = expanded;
+      });
 
-  sortBuildingRows("population-buildings-body");
-  sortBuildingRows("production-buildings-body");
-  sortBuildingRows("storage-buildings-body");
+      button.querySelector("span").textContent = expanded ? "▸" : "▾";
+    });
+
+    container.appendChild(groupRow);
+  }
+
+  return groupRow;
+}
+
+function addBuildingRowToGroup(container, groupRow, row) {
+  const groupRows = container.querySelectorAll(
+    `[data-building-group="${row.dataset.buildingGroup}"]:not([data-building-group-row])`,
+  );
+
+  row.hidden = groupRow.dataset.expanded !== "true";
+
+  if (groupRows.length > 0) {
+    groupRows[groupRows.length - 1].after(row);
+  } else {
+    groupRow.after(row);
+  }
 }
 
 function sortBuildingRows(containerId) {
@@ -96,16 +83,123 @@ function sortBuildingRows(containerId) {
 
   if (!container) return;
 
-  const rows = [...container.querySelectorAll("tr")];
+  const groupRows = [
+    ...container.querySelectorAll("tr[data-building-group-row]"),
+  ];
 
-  rows.sort((a, b) => {
-    const nameA = a.dataset.buildingName ?? "";
-    const nameB = b.dataset.buildingName ?? "";
+  groupRows.sort((a, b) => {
+    const groupA = a.dataset.buildingGroup ?? "";
+    const groupB = b.dataset.buildingGroup ?? "";
 
-    return nameA.localeCompare(nameB);
+    return groupA.localeCompare(groupB);
   });
 
-  rows.forEach((row) => container.appendChild(row));
+  groupRows.forEach((groupRow) => {
+    const groupName = groupRow.dataset.buildingGroup;
+
+    const buildingRows = [
+      ...container.querySelectorAll(
+        `tr[data-building-group="${groupName}"]:not([data-building-group-row])`,
+      ),
+    ];
+
+    buildingRows.sort((a, b) => {
+      const numberA = Number(a.dataset.buildingNumber ?? 0);
+      const numberB = Number(b.dataset.buildingNumber ?? 0);
+
+      return numberA - numberB;
+    });
+
+    container.appendChild(groupRow);
+
+    buildingRows.forEach((buildingRow) => {
+      container.appendChild(buildingRow);
+    });
+  });
+}
+
+function updateBuildingGroupSummary(groupRow, buildings) {
+  const countElement = groupRow.querySelector(
+    "[data-building-group-count]",
+  );
+
+  if (countElement) {
+    countElement.textContent =
+      `(${buildings.length} ${buildings.length === 1 ? "building" : "buildings"})`;
+  }
+
+  if (buildings[0]?.type !== "production") {
+    return;
+  }
+
+  const production = {};
+  const consumption = {};
+
+  buildings.forEach((building) => {
+    if (building.productionStatus?.status === "idle") {
+      return;
+    }
+
+    const productionRate = Number(building.productionRate ?? 0);
+    const outputName = building.output_resource_name;
+
+    if (productionRate !== 0 && outputName) {
+      production[outputName] =
+        (production[outputName] ?? 0) + productionRate;
+    }
+
+    if (
+      building.consumptionRates?.length > 0 &&
+      building.workers_assigned > 0
+    ) {
+      building.consumptionRates.forEach((input) => {
+        const amount = Number(input.amount ?? 0);
+
+        consumption[input.name] =
+          (consumption[input.name] ?? 0) + amount;
+      });
+    }
+  });
+
+  let summaryHtml = "";
+
+  Object.entries(production).forEach(([resourceName, amount]) => {
+    if (amount > 0) {
+      summaryHtml += `
+        <span class="text-success ms-3">
+          <span aria-hidden="true">▲</span>
+          ${resourceName}
+          ${amount.toFixed(1)}/min
+        </span>
+      `;
+    } else if (amount < 0) {
+      summaryHtml += `
+        <span class="text-danger ms-3">
+          <span aria-hidden="true">▼</span>
+          ${resourceName}
+          ${Math.abs(amount).toFixed(1)}/min
+        </span>
+      `;
+    }
+  });
+
+  Object.entries(consumption).forEach(([resourceName, amount]) => {
+    summaryHtml += `
+      <span class="text-danger ms-3">
+        <span aria-hidden="true">▼</span>
+        ${resourceName}
+        ${amount.toFixed(1)}/min
+      </span>
+    `;
+  });
+
+  const summaryElement = groupRow.querySelector(
+    "[data-building-group-summary]",
+  );
+
+  if (summaryElement) {
+    summaryElement.innerHTML = summaryHtml;
+  }
 }
 
 function updateProductionConsumptionElement(element, building) {
@@ -180,4 +274,157 @@ function getProductionStatusMessage(building) {
   };
 
   return reasonMessages[building.productionStatus?.reason] ?? "Not producing";
+}
+
+export function updateBuildings(buildings) {
+  if (!buildings) return;
+
+  const buildingGroups = {};
+
+  // Collect production buildings for group summaries.
+  // Use a Map so each building ID can only appear once.
+  buildings.forEach((building) => {
+    if (!buildingGroups[building.name]) {
+      buildingGroups[building.name] = new Map();
+    }
+
+    buildingGroups[building.name].set(building.id, building);
+  });
+
+  buildings.forEach((building) => {
+    let container;
+
+    switch (building.type) {
+      case "housing":
+        container = document.getElementById("population-buildings-body");
+        break;
+
+      case "production":
+        container = document.getElementById("production-buildings-body");
+        break;
+
+      case "storage":
+        container = document.getElementById("storage-buildings-body");
+        break;
+
+      default:
+        return;
+    }
+
+    if (!container) return;
+
+    const groupRow = getOrCreateBuildingGroup(container, building);
+
+    let row = container.querySelector(
+      `[data-building-id="${building.id}"]`,
+    );
+
+    if (!row) {
+      row = document.createElement("tr");
+
+      row.dataset.buildingId = building.id;
+      row.dataset.buildingName = building.name;
+      row.dataset.buildingGroup = building.name;
+      row.dataset.buildingNumber = building.building_number;
+
+      if (building.type === "housing") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td>${building.health}/${building.max_health}</td>
+          <td>${building.population_gain}</td>
+        `;
+      }
+
+      if (building.type === "production") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td>${building.health}/${building.max_health}</td>
+          <td class="d-none d-xxl-table-cell" id="building-${building.id}-production-consumption"></td>
+          <td>
+            <span id="building-${building.id}-workers">
+              ${building.workers_assigned}
+            </span>/${building.max_workers}
+          </td>
+          <td>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-danger px-2"
+                aria-label="Remove worker"
+                onclick="changeWorkers(${building.id}, -1)">
+                -
+              </button>
+
+              <button class="btn btn-sm btn-success px-2"
+                aria-label="Add worker"
+                onclick="changeWorkers(${building.id}, 1)">
+                +
+              </button>
+            </div>
+          </td>
+        `;
+      }
+
+      if (building.type === "storage") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td>${building.health}/${building.max_health}</td>
+          <td>${building.storage_capacity} ${building.storage_category}</td>
+        `;
+      }
+
+      addBuildingRowToGroup(container, groupRow, row);
+    }
+
+    if (building.type === "production") {
+      const productionConsumptionEl = row.querySelector(
+        `#building-${building.id}-production-consumption`,
+      );
+
+      updateProductionConsumptionElement(
+        productionConsumptionEl,
+        building,
+      );
+    }
+  });
+
+  // Update production group summaries.
+  Object.entries(buildingGroups).forEach(([groupName, buildingMap]) => {
+    const groupBuildings = [...buildingMap.values()];
+    
+    const building = groupBuildings[0];
+    
+    if (!building) return;
+    
+    let container;
+    
+    switch (building.type) {
+      case "housing":
+        container = document.getElementById("population-buildings-body");
+        break;
+    
+      case "production":
+        container = document.getElementById("production-buildings-body");
+        break;
+    
+      case "storage":
+        container = document.getElementById("storage-buildings-body");
+        break;
+    
+      default:
+        return;
+    }
+  
+    if (!container) return;
+  
+    const groupRow = container.querySelector(
+      `[data-building-group="${groupName}"][data-building-group-row]`,
+    );
+  
+    if (groupRow) {
+      updateBuildingGroupSummary(groupRow, groupBuildings);
+    }
+  });
+
+  sortBuildingRows("population-buildings-body");
+  sortBuildingRows("production-buildings-body");
+  sortBuildingRows("storage-buildings-body");
 }

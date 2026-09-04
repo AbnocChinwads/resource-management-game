@@ -1,47 +1,24 @@
 <%- include('partials/header.ejs'); -%>
 <%- include('partials/player-status.ejs'); -%>
-
         <div class="row">
-            <div class="col-12">
-                <ul class="nav nav-tabs mb-4" id="game-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipes-panel" type="button" role="tab">
-                            Recipes
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks-panel" type="button" role="tab">
-                            Tasks
-                        </button>
-                    </li>
-                </ul>
+            <div class="col-lg-5 mb-4">
+                <div id="population-buildings-container">
+                    <%- include('partials/population-buildings.ejs'); -%>
+                </div>
+                <div id="production-buildings-container">
+                    <%- include('partials/production-buildings.ejs'); -%>
+                </div>
+                <div id="storage-buildings-container">
+                    <%- include('partials/storage-buildings.ejs'); -%> 
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-xl-6 mb-4" id="population-buildings-container">
-                <%- include('partials/population-buildings.ejs'); -%>
-            </div>
-            <div class="col-12 col-xl-6 mb-4" id="production-buildings-container">
-                <%- include('partials/production-buildings.ejs'); -%>
-            </div>
-            <div class="col-12 col-xl-6 mb-4" id="storage-buildings-container">
-                <%- include('partials/storage-buildings.ejs'); -%> 
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="tab-content" id="game-tab-content">
-                    <div class="tab-pane fade" id="recipes-panel" role="tabpanel" aria-labelledby="recipes-tab">
-                        <div id="recipes-container">
-                            <%- include('partials/recipes.ejs'); -%>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="tasks-panel" role="tabpanel" aria-labelledby="tasks-tab">
-                        <div id="manual-tasks-container">
-                            <%- include('partials/manual-tasks.ejs'); -%>
-                        </div>
-                    </div>
-                </div> 
+            <div class="col-lg-7">
+                <div id="recipes-container">
+                    <%- include('partials/recipes.ejs'); -%>
+                </div>
+                <div id="manual-tasks-container">
+                    <%- include('partials/manual-tasks.ejs'); -%>
+                </div>
             </div>
         </div>
         <%- include('partials/announcementModal.ejs'); -%>

@@ -16,11 +16,53 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.5.1**
+**Alpha v0.5.2**
 
 ---
 
 # Recent Updates
+
+## Alpha v0.5.2 — Building Management
+
+### Grouped Buildings
+
+Buildings are now grouped together by building type.
+
+Instead of displaying every building as a separate entry, buildings of the same type are organised into a single expandable group.
+
+This makes the building interface easier to manage as your settlement grows and you construct multiple copies of the same building.
+
+### Collapsible Building Groups
+
+Building groups are collapsed by default and can be expanded when you need to manage individual buildings.
+
+Each group displays the number of buildings it contains, allowing you to see the size of your settlement without opening every group.
+
+Individual buildings remain available when expanded, including their health, production information, worker assignments, and management controls.
+
+### Production Overview
+
+Production building groups now provide an overview of their combined production and resource consumption.
+
+This allows you to see the overall output and resource requirements of a group without having to expand it and inspect each building individually.
+
+Individual production buildings continue to display their own production status and resource requirements when the group is expanded.
+
+### A More Manageable Settlement
+
+The building interface is now designed to remain useful as the number of buildings in your settlement increases.
+
+Groups provide a quick overview of your buildings, while the expanded view provides access to the detailed information and controls needed to manage individual buildings.
+
+### Why This Matters
+
+As your settlement grows, managing every building individually becomes increasingly difficult.
+
+Grouping buildings reduces the amount of information displayed at once while keeping the details available when they are needed.
+
+You can now get a quick overview of how many buildings you have and how your production groups are performing, while expanding a group only when you need to make individual management decisions.
+
+---
 
 ## Alpha v0.5.1 — Settlement Overview
 
