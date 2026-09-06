@@ -719,22 +719,20 @@ The project is being developed incrementally rather than attempting to implement
 
 <summary>v0.4.x - Core Systems & Foundations</summary>
 
-## v0.4.x - Core Systems & Foundations
-
 This phase focuses on establishing the core systems that future settlement-management mechanics will build upon.
 
 ### Completed
 
-- [x] Core resource management
-- [x] Resource production and consumption
-- [x] Basic storage capacity
-- [x] Worker assignment and availability
-- [x] Population capacity and housing
-- [x] Population growth and starvation mechanics
-- [x] Basic food consumption and production
-- [x] Player-facing population and food information
-- [x] Initial gameplay balancing
-- [x] Further refinement of core settlement systems
+* [x] Core resource management
+* [x] Resource production and consumption
+* [x] Basic storage capacity
+* [x] Worker assignment and availability
+* [x] Population capacity and housing
+* [x] Population growth and starvation mechanics
+* [x] Basic food consumption and production
+* [x] Player-facing population and food information
+* [x] Initial gameplay balancing
+* [x] Further refinement of core settlement systems
 
 ---
 
@@ -744,24 +742,22 @@ This phase focuses on establishing the core systems that future settlement-manag
 
 <summary>v0.5.x - Storage & Resource Management</summary>
 
-## v0.5.x - Storage & Resource Management
-
 The 0.5.x development phase expands storage from a simple capacity limit into a more active part of settlement management.
 
 ### Completed / In Progress
 
-- [x] Storage expansion
-- [x] Storage buildings
-- [ ] Storage upgrades
-- [x] Improved storage management interface
-- [x] More meaningful storage categories
-- [x] Better handling of production when storage is unavailable
-- [x] Production buildings displaying clear idle or blocked states
-- [x] Improved player-facing automation feedback
-- [x] Better interaction between production chains and storage capacity
-- [ ] More advanced storage management and prioritisation
-- [ ] Storage buildings with specialised or upgraded capacity
-- [ ] Improved visibility of storage pressure across the settlement
+* [x] Storage expansion
+* [x] Storage buildings
+* [x] Improved storage management interface
+* [x] More meaningful storage categories
+* [x] Better handling of production when storage is unavailable
+* [x] Production buildings displaying clear idle or blocked states
+* [x] Improved player-facing automation feedback
+* [x] Better interaction between production chains and storage capacity
+* [ ] Expand storage capacity through additional storage progression
+* [ ] More advanced storage management and prioritisation
+* [ ] Add warnings when resource storage approaches capacity
+* [ ] Allow players to discard stored resources
 
 ---
 
@@ -769,21 +765,21 @@ The 0.5.x development phase expands storage from a simple capacity limit into a 
 
 <details>
 
-<summary>v0.6.x - Tools & Player Automation</summary>
+<summary>v0.6.x - Tools, Automation & Population</summary>
 
-## v0.6.x - Tools & Player Automation
-
-This phase will expand the player's ability to interact with and automate the settlement.
+This phase will expand the player's ability to interact with and automate the settlement, while introducing a more detailed population lifecycle.
 
 ### Planned
 
-- [ ] Rework tools and gathering mechanics
-- [ ] Expand tool progression
-- [ ] Improve manual gathering interactions
-- [ ] Introduce additional automation options
-- [ ] Improve worker management
-- [ ] Improve production building states
-- [ ] Add clearer explanations for why automated systems are idle or blocked
+* [ ] Rework tools and gathering mechanics
+* [ ] Expand tool progression
+* [ ] Improve manual gathering interactions
+* [ ] Introduce additional automation options
+* [ ] Introduce child, adult and elderly population categories
+* [ ] Add population ageing between life stages
+* [ ] Add player-facing population age breakdown
+* [ ] Make adult population determine available workers
+* [ ] Make population growth depend on adult population
 
 ---
 
@@ -793,65 +789,38 @@ This phase will expand the player's ability to interact with and automate the se
 
 <summary>v0.7.x - Production & Settlement Expansion</summary>
 
-## v0.7.x - Production & Settlement Expansion
+This phase will expand production systems and introduce additional resource and consumable choices that give the player more meaningful decisions.
 
 ### Planned
 
-- [ ] Expand production chains
-- [ ] Add additional buildings
-- [ ] Introduce more resource interactions
-- [ ] Expand population mechanics
-- [ ] Expand food systems
-- [ ] Add additional settlement progression systems
-- [ ] Improve balancing between manual work and automation
+* [ ] Expand production chains
+* [ ] Introduce more resource interactions
+* [ ] Introduce additional consumable resources and production choices
 
 ---
 
 </details>
 
-<details>
+<summary>v0.8.x - Reliability, Architecture & Polish</summary>
 
-<summary>v0.8.x - Progression & Gameplay Depth</summary>
-
-## v0.8.x - Progression & Gameplay Depth
-
-This phase will focus on making the existing systems work together as a more complete resource-management game.
+This phase will focus on improving the reliability, architecture and maintainability of the existing game systems rather than introducing large new mechanics.
 
 ### Planned
 
-- [ ] More meaningful progression between settlement stages
-- [ ] Additional resource tiers
-- [ ] More complex production chains
-- [ ] More specialised buildings
-- [ ] Expanded worker and population management
-- [ ] More meaningful resource-management decisions
-- [ ] Gameplay balancing
-- [ ] Improved long-term progression
-
----
-
-</details>
-
-<details>
-
-<summary>v0.9.x - Reliability & Polish</summary>
-
-## v0.9.x - Reliability & Polish
-
-This phase will focus on making the existing game systems reliable and pleasant to use rather than introducing large new mechanics.
-
-### Planned
-
-- [ ] Improve simulation reliability
-- [ ] Improve handling of interrupted or failed actions
-- [ ] Improve consistency between server state and displayed state
-- [ ] Improve error handling and player-facing feedback
-- [ ] Improve recovery from connection or request failures
-- [ ] Improve database migration reliability
-- [ ] Improve testing coverage for important gameplay systems
-- [ ] Improve interface polish
-- [ ] Accessibility improvements
-- [ ] Performance improvements
+* [ ] Improve simulation reliability and concurrency
+* [ ] Reduce unnecessary database queries and improve data access efficiency
+* [ ] Introduce a proper database connection pool
+* [ ] Move game logic out of middleware where appropriate
+* [ ] Move JavaScript behaviour out of EJS templates where possible
+* [ ] Improve handling of interrupted or failed actions
+* [ ] Improve consistency between server state and displayed state
+* [ ] Improve error handling and player-facing feedback
+* [ ] Improve recovery from connection or request failures
+* [ ] Improve database migration reliability
+* [ ] Improve testing coverage for important gameplay systems
+* [ ] Improve interface polish
+* [ ] Accessibility improvements
+* [ ] Performance improvements
 
 ---
 
@@ -861,22 +830,20 @@ This phase will focus on making the existing game systems reliable and pleasant 
 
 <summary>v1.0.x - Core Game Release</summary>
 
-## v1.0.x - Core Game Release
-
 The first major release will represent a stable, playable version of the core resource-management experience.
 
 ### Goals
 
-- [ ] Core gameplay loop is stable.
-- [ ] Resource management is meaningful.
-- [ ] Storage systems are fully implemented.
-- [ ] Production chains are reliable.
-- [ ] Worker automation is reliable.
-- [ ] Population and food systems are balanced.
-- [ ] Progression provides meaningful long-term goals.
-- [ ] Major gameplay systems have appropriate testing and error handling.
-- [ ] Interface is consistent and usable across supported screen sizes.
-- [ ] No major known gameplay-breaking issues.
+* [ ] Core gameplay loop is stable.
+* [ ] Resource management is meaningful.
+* [ ] Storage systems are fully implemented.
+* [ ] Production chains are reliable.
+* [ ] Worker automation is reliable.
+* [ ] Population and food systems are balanced.
+* [ ] Progression provides meaningful long-term goals.
+* [ ] Major gameplay systems have appropriate testing and error handling.
+* [ ] Interface is consistent and usable across supported screen sizes.
+* [ ] No major known gameplay-breaking issues.
 
 ---
 
