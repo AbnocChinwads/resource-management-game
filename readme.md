@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.5.3**
+**Alpha v0.5.4**
 
 ---
 
@@ -110,6 +110,56 @@ The game is designed around **persistent settlement progression** rather than a 
 </details>
 
 # Recent Updates
+
+<details>
+
+<summary>Alpha v0.5.4 — Storage Capacity Feedback</summary>
+
+### Storage Capacity Warnings
+
+The player interface now provides warnings when resource storage approaches its capacity limit.
+
+Storage reaching 80% capacity is displayed as a **Nearly full** warning, giving the player an indication that additional storage may soon be required.
+
+Once storage reaches its capacity limit, the warning changes to **Full**.
+
+These warnings are displayed directly alongside the affected storage category so the player can immediately see which resources are approaching their limits.
+
+### Improved Storage Blocked-State Feedback
+
+Actions that cannot be completed because there is insufficient storage space now provide feedback directly within the player interface.
+
+Previously, attempting an action that could not store its resulting resources used a browser alert to display the error.
+
+The feedback is now displayed within the Storage section of the interface, keeping the player informed without interrupting the game with a browser dialog.
+
+### Automatic Feedback Clearing
+
+Storage-related action feedback is automatically cleared when the player's storage state is successfully refreshed.
+
+This prevents outdated error messages from remaining visible after the player has taken an action that resolves the storage problem.
+
+### Bootstrap Icons
+
+Bootstrap Icons have been added to the player interface to provide consistent visual indicators for storage warnings.
+
+Warning indicators now use Bootstrap's icon font rather than emoji characters, allowing the warning icon to follow the same colour styling as the associated message.
+
+### A More Informative Storage Interface
+
+The Storage section now communicates both the player's current storage levels and potential capacity problems.
+
+Players can see when storage is approaching its limit before an action is blocked, while failed actions provide clear feedback when storage capacity has already become a problem.
+
+### Why This Matters
+
+Previously, the player could only discover a storage problem when an action attempted to produce more resources than the available storage could hold.
+
+The storage interface now provides earlier warning when capacity is becoming limited and clearer feedback when an action is blocked.
+
+This gives the player more information to manage their storage before it becomes a direct obstacle to production and other actions.
+
+</details>
 
 <details>
 
@@ -756,7 +806,7 @@ The 0.5.x development phase expands storage from a simple capacity limit into a 
 * [x] Better interaction between production chains and storage capacity
 * [ ] Expand storage capacity through additional storage progression
 * [ ] More advanced storage management and prioritisation
-* [ ] Add warnings when resource storage approaches capacity
+* [x] Improve storage capacity warnings and blocked-state feedback
 * [ ] Allow players to discard stored resources
 
 ---
@@ -767,13 +817,16 @@ The 0.5.x development phase expands storage from a simple capacity limit into a 
 
 <summary>v0.6.x - Tools, Automation & Population</summary>
 
-This phase will expand the player's ability to interact with and automate the settlement, while introducing a more detailed population lifecycle.
+## v0.6.x - Tools, Automation & Population
+
+This phase will introduce meaningful uses for tools, expand settlement automation, and introduce a more detailed population lifecycle.
 
 ### Planned
 
-* [ ] Rework tools and gathering mechanics
-* [ ] Expand tool progression
-* [ ] Improve manual gathering interactions
+* [ ] Add building degradation
+* [ ] Add building repair mechanics requiring tools
+* [ ] Add tool-based worker efficiency
+* [ ] Introduce tools as a resource with competing uses between production and repairs
 * [ ] Introduce additional automation options
 * [ ] Introduce child, adult and elderly population categories
 * [ ] Add population ageing between life stages

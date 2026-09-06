@@ -145,14 +145,35 @@ function updateResources(data) {
     .join("");
 }
 
+function getStorageWarning(storage) {
+  const percentage = Number(storage.used) / Number(storage.capacity);
+
+  if (percentage >= 1) {
+    return `<span class="text-danger ms-2"><i class="bi bi-exclamation-triangle-fill"></i> Full</span>`;
+  } else if (percentage >= 0.8) {
+    return `<span class="text-warning ms-2"><i class="bi bi-exclamation-triangle-fill"></i> Nearly full</span>`;
+  }
+
+  return "";
+}
+
 function updateStorage(data) {
   const storageEl = document.getElementById("player-storage");
 
   if (!storageEl) return;
 
+  const feedbackEl = document.getElementById("storage-feedback");
+
+  if (feedbackEl) {
+    feedbackEl.textContent = "";
+    feedbackEl.classList.add("d-none");
+  }
+
   storageEl.innerHTML = data.storage
     .map((storage) => {
-      return ` <span class="me-3"> ${storage.storage_category}: ${Number(storage.used)} / ${Number(storage.capacity)} </span> `;
+      const warning = getStorageWarning(storage);
+
+      return `<span class="me-3"> ${storage.storage_category}: ${Number(storage.used)} / ${Number(storage.capacity)} ${warning} </span>`;
     })
     .join("");
 }

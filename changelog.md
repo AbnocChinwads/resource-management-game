@@ -814,3 +814,62 @@ Active recipe tasks are now represented directly by their recipe, providing a si
 - Verified task completion continues to apply recipe outputs correctly.
 - Verified the obsolete `renderResources()` function has no remaining references.
 - Verified repeated game updates do not create duplicate recipe task displays.
+
+# [0.5.4] — Storage Capacity Feedback
+
+## Added
+
+- Added proactive storage capacity warnings to the player interface.
+- Added **Nearly full** warnings when storage reaches 80% capacity.
+- Added **Full** warnings when storage reaches 100% capacity.
+- Added in-page feedback for actions blocked by insufficient storage capacity.
+- Added Bootstrap Icons for storage warning indicators.
+
+## Changed
+
+- Storage warnings are now displayed directly alongside the affected storage category.
+- Storage warnings use different severity levels for approaching and reached capacity.
+- Replaced browser alerts for storage-related action failures with in-page feedback.
+- Storage action feedback is now cleared automatically when storage is successfully refreshed.
+- Updated storage warning indicators to use Bootstrap Icons rather than emoji characters.
+- Storage warning icons inherit the colour of their associated warning state.
+
+## Storage Feedback
+
+Storage now provides both proactive and reactive feedback.
+
+When a storage category reaches 80% capacity, it displays a **Nearly full** warning. When it reaches or exceeds its capacity limit, the warning changes to **Full**.
+
+Actions that fail because their resulting resources cannot be stored now display their error message within the Storage section rather than using a browser alert.
+
+Successful game-data refreshes automatically clear any previous storage action feedback.
+
+## Storage Warnings
+
+Storage warnings are calculated from the current used and available capacity of each storage category.
+
+The warning states are:
+
+- Below 80% — no warning.
+- 80% to below 100% — **Nearly full**.
+- 100% or above — **Full**.
+
+The warning indicators use Bootstrap Icons so that their colour follows the warning severity consistently.
+
+## Testing
+
+- Tested storage approaching capacity displays the **Nearly full** warning.
+- Verified **Nearly full** warnings appear at the intended 80% threshold.
+- Tested storage reaching capacity displays the **Full** warning.
+- Verified **Full** warnings use the danger styling.
+- Verified warning indicators display correctly using Bootstrap Icons.
+- Verified warning icons inherit the correct warning colour.
+- Verified storage warnings are displayed alongside the affected storage category.
+- Tested an action failing because of insufficient storage capacity.
+- Verified storage failures display in-page feedback rather than a browser alert.
+- Verified storage feedback remains visible after a failed action.
+- Verified successful actions refresh storage data and clear previous feedback.
+- Verified storage warnings disappear when storage falls below the warning threshold.
+- Verified storage warnings update correctly as resource amounts change.
+- Verified existing storage displays continue to show current used and maximum capacity.
+- Verified adding storage feedback does not interfere with existing resource or recipe interactions.

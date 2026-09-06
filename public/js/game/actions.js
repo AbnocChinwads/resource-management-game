@@ -1,3 +1,12 @@
+function showStorageFeedback(message) {
+  const feedbackEl = document.getElementById("storage-feedback");
+
+  if (!feedbackEl) return;
+
+  feedbackEl.textContent = message;
+  feedbackEl.classList.remove("d-none");
+}
+
 export function initialiseGameActions(refreshStats) {
   window.changeWorkers = async function (buildingId, delta) {
     try {
@@ -63,7 +72,7 @@ export function initialiseGameActions(refreshStats) {
         if (data.success) {
           await refreshStats();
         } else {
-          alert(data.error);
+          showStorageFeedback(data.error);
         }
       } catch (err) {
         console.error("Complete task error:", err);
