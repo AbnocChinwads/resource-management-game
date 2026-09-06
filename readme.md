@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.5.4**
+**Alpha v0.5.5**
 
 ---
 
@@ -110,6 +110,48 @@ The game is designed around **persistent settlement progression** rather than a 
 </details>
 
 # Recent Updates
+
+<details>
+
+<summary>Alpha v0.5.5 — Tool Shed Building</summary>
+
+### Tool Shed
+
+A new **Tool Shed** building has been added to provide additional storage capacity for tools.
+
+The Tool Shed provides **20 additional tool storage capacity**, increasing the amount of tools the settlement can retain beyond its initial storage limit.
+
+### Tool Shed Construction
+
+The Tool Shed can be constructed through the existing building recipe system.
+
+The **Build Tool Shed** recipe requires:
+
+* **10 Planks**
+* **10 Stone**
+
+Construction takes **30 seconds** to complete.
+
+### Expanded Tool Storage
+
+Building a Tool Shed increases the settlement's available tool storage capacity by 20.
+
+The Tool Shed uses the existing storage system, so tool capacity is automatically reflected in the player's Storage display and existing storage warnings.
+
+### Tool Storage Progression
+
+The Tool Shed provides the first dedicated expansion to tool storage.
+
+The initial tool storage capacity remains limited, while the Tool Shed gives the player a way to expand that capacity when increased tool production makes the original limit insufficient.
+
+### Why This Matters
+
+Tool storage is now something the player can actively expand rather than being limited to the initial capacity indefinitely.
+
+The Tool Shed provides a clear progression from producing tools to having enough storage space to maintain a larger stockpile, while keeping storage buildings separate from production buildings.
+
+</details>
+
 
 <details>
 

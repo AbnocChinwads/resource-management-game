@@ -873,3 +873,54 @@ The warning indicators use Bootstrap Icons so that their colour follows the warn
 - Verified storage warnings update correctly as resource amounts change.
 - Verified existing storage displays continue to show current used and maximum capacity.
 - Verified adding storage feedback does not interfere with existing resource or recipe interactions.
+
+# [0.5.5] — Tool Shed Building
+
+## Added
+
+- Added the Tool Shed building.
+- Added the Build Tool Shed recipe.
+- Added 20 additional tool storage capacity through the Tool Shed.
+- Added the Tool Shed construction cost of 10 Planks and 10 Stone.
+- Added a 30-second construction time for the Tool Shed.
+
+## Changed
+
+- Added tool storage expansion through the existing storage building system.
+- Updated the available building recipes to include the Tool Shed.
+- Updated storage capacity calculations so Tool Shed capacity contributes to the player's shared tool storage.
+- Integrated the Tool Shed with the existing storage display and capacity warning system.
+- Changed the Mine Ore recipe type from `crafting` to `gathering` to reflect its current resource-gathering behaviour.
+
+## Tool Shed
+
+The Tool Shed provides an additional 20 units of shared tool storage capacity.
+
+The building does not provide production capacity and does not create a separate storage pool. Tools continue to use the existing shared tool storage system.
+
+The initial tool storage capacity remains unchanged, while building a Tool Shed expands the settlement's total available tool storage.
+
+## Construction
+
+The Tool Shed is constructed through the existing recipe system.
+
+The Build Tool Shed recipe requires:
+
+- 10 Planks
+- 10 Stone
+
+Construction takes 30 seconds to complete.
+
+## Testing
+
+- Verified the Tool Shed is available as a buildable building.
+- Verified the Build Tool Shed recipe displays correctly.
+- Verified the recipe requires 10 Planks and 10 Stone.
+- Verified the recipe takes 30 seconds to complete.
+- Verified completing the recipe creates a Tool Shed.
+- Verified the Tool Shed provides 20 additional tool storage capacity.
+- Verified Tool Shed storage capacity is included in the player's shared tool storage.
+- Verified building a Tool Shed increases the displayed tool storage capacity.
+- Verified the Tool Shed does not create a separate tool storage pool.
+- Verified existing storage warnings continue to work with the increased tool capacity.
+- Verified the Mine Ore recipe is categorised as `gathering`.
