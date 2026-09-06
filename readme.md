@@ -807,7 +807,6 @@ The 0.5.x development phase expands storage from a simple capacity limit into a 
 * [ ] Expand storage capacity through additional storage progression
 * [ ] More advanced storage management and prioritisation
 * [x] Improve storage capacity warnings and blocked-state feedback
-* [ ] Allow players to discard stored resources
 
 ---
 
