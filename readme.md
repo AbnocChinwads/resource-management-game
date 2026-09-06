@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.5.5**
+**Alpha v0.6.0**
 
 ---
 
@@ -110,6 +110,64 @@ The game is designed around **persistent settlement progression** rather than a 
 </details>
 
 # Recent Updates
+
+<details>
+
+<summary>Alpha v0.6.0 — Building Degradation & Repairs</summary>
+
+### Building Degradation
+
+Buildings now gradually lose health over time.
+
+All buildings experience normal wear, while production buildings experience additional wear while actively producing resources.
+
+As a building's health decreases, its ability to support workers is also reduced.
+
+### Building Health
+
+Building health is displayed for each building as its current health compared to its maximum health.
+
+For example:
+
+**75/100**
+
+As health decreases, larger buildings may support fewer workers.
+
+A building with 0 health cannot operate and provides no worker capacity.
+
+### Building Repairs
+
+Damaged buildings can now be repaired using **Tools**.
+
+Each repair uses **1 Tool** and restores **10 health**, up to the building's maximum health.
+
+For example:
+
+**75/100 → 85/100**
+
+If a building is only 5 health below its maximum, a repair restores it to full health rather than exceeding its maximum.
+
+### Tool Usage
+
+Tools now have an active use within the settlement.
+
+Players must maintain a supply of Tools to repair damaged buildings and keep their settlement operating effectively.
+
+### Building Maintenance
+
+Building condition is now an ongoing part of settlement management.
+
+Allowing buildings to become damaged can reduce their available worker capacity and eventually stop production entirely.
+
+Maintaining buildings therefore becomes an additional consideration when managing resources and expanding the settlement.
+
+### Why This Matters
+
+Buildings are no longer completely static once constructed.
+
+Settlement expansion now comes with an ongoing maintenance requirement, giving Tools a practical purpose while making building condition another part of managing production and available workers.
+
+</details>
 
 <details>
 

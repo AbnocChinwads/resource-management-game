@@ -7,6 +7,24 @@ function showStorageFeedback(message) {
   feedbackEl.classList.remove("d-none");
 }
 
+async function repairBuilding(buildingId) {
+  const response = await fetch("/repair-building", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ buildingId }),
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    await refreshStats();
+  }
+}
+
+window.repairBuilding = repairBuilding;
+
 export function initialiseGameActions(refreshStats) {
   window.changeWorkers = async function (buildingId, delta) {
     try {

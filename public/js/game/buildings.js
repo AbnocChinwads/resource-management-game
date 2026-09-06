@@ -34,10 +34,14 @@ function getOrCreateBuildingGroup(container, building) {
 
       <td data-building-group-summary></td>
 
-      ${columns === 5 ? `
+      ${
+        columns === 5
+          ? `
         <td></td>
         <td></td>
-      ` : ""}
+      `
+          : ""
+      }
     `;
 
     const button = groupRow.querySelector("button");
@@ -119,13 +123,10 @@ function sortBuildingRows(containerId) {
 }
 
 function updateBuildingGroupSummary(groupRow, buildings) {
-  const countElement = groupRow.querySelector(
-    "[data-building-group-count]",
-  );
+  const countElement = groupRow.querySelector("[data-building-group-count]");
 
   if (countElement) {
-    countElement.textContent =
-      `(${buildings.length} ${buildings.length === 1 ? "building" : "buildings"})`;
+    countElement.textContent = `(${buildings.length} ${buildings.length === 1 ? "building" : "buildings"})`;
   }
 
   if (buildings[0]?.type !== "production") {
@@ -144,8 +145,7 @@ function updateBuildingGroupSummary(groupRow, buildings) {
     const outputName = building.output_resource_name;
 
     if (productionRate !== 0 && outputName) {
-      production[outputName] =
-        (production[outputName] ?? 0) + productionRate;
+      production[outputName] = (production[outputName] ?? 0) + productionRate;
     }
 
     if (
@@ -155,8 +155,7 @@ function updateBuildingGroupSummary(groupRow, buildings) {
       building.consumptionRates.forEach((input) => {
         const amount = Number(input.amount ?? 0);
 
-        consumption[input.name] =
-          (consumption[input.name] ?? 0) + amount;
+        consumption[input.name] = (consumption[input.name] ?? 0) + amount;
       });
     }
   });
@@ -315,9 +314,7 @@ export function updateBuildings(buildings) {
 
     const groupRow = getOrCreateBuildingGroup(container, building);
 
-    let row = container.querySelector(
-      `[data-building-id="${building.id}"]`,
-    );
+    let row = container.querySelector(`[data-building-id="${building.id}"]`);
 
     if (!row) {
       row = document.createElement("tr");
@@ -330,7 +327,7 @@ export function updateBuildings(buildings) {
       if (building.type === "housing") {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
-          <td>${building.health}/${building.max_health}</td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span><button class="btn btn-sm btn-outline-secondary ms-2 building-repair-button" onclick="repairBuilding(${building.id})">Repair</button></td>
           <td>${building.population_gain}</td>
         `;
       }
@@ -338,12 +335,14 @@ export function updateBuildings(buildings) {
       if (building.type === "production") {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
-          <td>${building.health}/${building.max_health}</td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span><button class="btn btn-sm btn-outline-secondary ms-2 building-repair-button" onclick="repairBuilding(${building.id})">Repair</button></td>
           <td class="d-none d-xxl-table-cell" id="building-${building.id}-production-consumption"></td>
           <td>
             <span id="building-${building.id}-workers">
               ${building.workers_assigned}
-            </span>/${building.max_workers}
+            </span>/<span id="building-${building.id}-worker-capacity">
+              ${building.effectiveWorkerCapacity}
+            </span>
           </td>
           <td>
             <div class="btn-group">
@@ -366,7 +365,7 @@ export function updateBuildings(buildings) {
       if (building.type === "storage") {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
-          <td>${building.health}/${building.max_health}</td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span><button class="btn btn-sm btn-outline-secondary ms-2 building-repair-button" onclick="repairBuilding(${building.id})">Repair</button></td>
           <td>${building.storage_capacity} ${building.storage_category}</td>
         `;
       }
@@ -374,51 +373,82 @@ export function updateBuildings(buildings) {
       addBuildingRowToGroup(container, groupRow, row);
     }
 
+    const healthElement = row.querySelector("[data-building-health]");
+
+    if (healthElement) {
+      healthElement.querySelector(".building-health-value").textContent =
+        `${building.health}/${building.max_health}`;
+
+      const repairButton = healthElement.querySelector(
+        ".building-repair-button",
+      );
+
+      if (repairButton) {
+        repairButton.classList.toggle(
+          "d-none",
+          building.health >= building.max_health,
+        );
+      }
+    }
+
+    const workersElement = row.querySelector(
+      `#building-${building.id}-workers`,
+    );
+
+    if (workersElement) {
+      workersElement.textContent = building.workers_assigned;
+    }
+
+    const workerCapacityElement = row.querySelector(
+      `#building-${building.id}-worker-capacity`,
+    );
+
+    if (workerCapacityElement) {
+      workerCapacityElement.textContent = building.effectiveWorkerCapacity;
+    }
+
     if (building.type === "production") {
       const productionConsumptionEl = row.querySelector(
         `#building-${building.id}-production-consumption`,
       );
 
-      updateProductionConsumptionElement(
-        productionConsumptionEl,
-        building,
-      );
+      updateProductionConsumptionElement(productionConsumptionEl, building);
     }
   });
 
   // Update production group summaries.
   Object.entries(buildingGroups).forEach(([groupName, buildingMap]) => {
     const groupBuildings = [...buildingMap.values()];
-    
+
     const building = groupBuildings[0];
-    
+
     if (!building) return;
-    
+
     let container;
-    
+
     switch (building.type) {
       case "housing":
         container = document.getElementById("population-buildings-body");
         break;
-    
+
       case "production":
         container = document.getElementById("production-buildings-body");
         break;
-    
+
       case "storage":
         container = document.getElementById("storage-buildings-body");
         break;
-    
+
       default:
         return;
     }
-  
+
     if (!container) return;
-  
+
     const groupRow = container.querySelector(
       `[data-building-group="${groupName}"][data-building-group-row]`,
     );
-  
+
     if (groupRow) {
       updateBuildingGroupSummary(groupRow, groupBuildings);
     }

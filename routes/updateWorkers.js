@@ -1,5 +1,7 @@
 import express from "express";
 import db from "../db.js";
+import { getEffectiveWorkerCapacity } from "../services/buildingService.js";
+
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -11,8 +13,10 @@ router.post("/", async (req, res) => {
 
     const buildingRes = await db.query(
       `SELECT 
-      pb.workers_assigned, 
-      b.max_workers
+      pb.workers_assigned,
+      pb.health,
+      b.max_workers,
+      b.max_health
       FROM player_buildings pb
       JOIN buildings b ON pb.building_id = b.id
       WHERE pb.id = $1 AND pb.player_id = $2
@@ -25,7 +29,14 @@ router.post("/", async (req, res) => {
       return res.json({ success: false, error: "InvalidBuilding" });
     }
 
-    const { workers_assigned, max_workers } = buildingRes.rows[0];
+    const { workers_assigned, health, max_workers, max_health } =
+      buildingRes.rows[0];
+
+    const effectiveWorkerCapacity = getEffectiveWorkerCapacity({
+      max_workers,
+      health,
+      max_health,
+    });
 
     const playerRes = await db.query(
       `SELECT population FROM players WHERE id = $1 FOR UPDATE`,
@@ -47,7 +58,7 @@ router.post("/", async (req, res) => {
     const maxAllowedByPopulation = workers_assigned + availableWorkers;
 
     newWorkers = Math.max(0, newWorkers);
-    newWorkers = Math.min(newWorkers, max_workers);
+    newWorkers = Math.min(newWorkers, effectiveWorkerCapacity);
     newWorkers = Math.min(newWorkers, maxAllowedByPopulation);
 
     await db.query(

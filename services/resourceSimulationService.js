@@ -50,6 +50,8 @@ async function consumeInputs(
 }
 
 export async function processResourceTick(playerId) {
+  const workingBuildings = [];
+
   await db.query("BEGIN");
 
   try {
@@ -113,6 +115,8 @@ export async function processResourceTick(playerId) {
       if (productionStatus.status !== "working") {
         continue;
       }
+
+      workingBuildings.push(building.player_building_id);
 
       const progress =
         Number(building.production_progress_seconds) + SIMULATION_TICK_SECONDS;
@@ -206,6 +210,8 @@ export async function processResourceTick(playerId) {
     }
 
     await db.query("COMMIT");
+
+    return workingBuildings;
   } catch (err) {
     await db.query("ROLLBACK");
     throw err;

@@ -924,3 +924,76 @@ Construction takes 30 seconds to complete.
 - Verified the Tool Shed does not create a separate tool storage pool.
 - Verified existing storage warnings continue to work with the increased tool capacity.
 - Verified the Mine Ore recipe is categorised as `gathering`.
+
+# [0.6.0] — Building Degradation & Repairs
+
+## Added
+
+- Added building degradation over time.
+- Added additional degradation for production buildings while actively working.
+- Added health-based effective worker capacity.
+- Added automatic reduction of assigned workers when building health reduces available capacity.
+- Added building repair mechanics.
+- Added Tool consumption for building repairs.
+- Added 10 health restored per Tool during repairs.
+- Added repair health capped at the building's maximum health.
+- Added persistent degradation timing for buildings.
+
+## Changed
+
+- Updated building production so buildings at 0 health cannot operate.
+- Updated building worker capacity calculations to account for current building health.
+- Updated building displays to show current health and effective worker capacity.
+- Updated building displays so health and worker capacity refresh automatically as buildings degrade.
+- Updated Tool usage so Tools can be used to maintain building health.
+- Changed passive building degradation to occur at a slower rate while keeping health stored as whole numbers.
+- Added separate production wear timing so active production causes additional wear without doubling the normal degradation rate.
+
+## Building Degradation
+
+Buildings gradually lose health over time.
+
+All buildings experience passive degradation. Production buildings receive additional wear while actively producing resources.
+
+Passive degradation occurs once every 4 simulation ticks, while active production adds an additional point of degradation every 5 working ticks.
+
+Building health remains stored as a whole number.
+
+## Worker Capacity
+
+Building health affects the number of workers a building can effectively support.
+
+As health decreases, effective worker capacity decreases.
+
+Assigned workers are automatically reduced if building health falls below the level required to support the current number of workers.
+
+Buildings at 0 health have no effective worker capacity.
+
+## Repairs
+
+Damaged buildings can be repaired using Tools.
+
+Each repair consumes 1 Tool and restores 10 health, up to the building's maximum health.
+
+Repairs restore building health only. Effective worker capacity increases naturally as the building's health is restored.
+
+## Testing
+
+- Verified buildings lose health through passive degradation.
+- Verified passive degradation occurs at the intended interval.
+- Verified actively working production buildings receive additional degradation.
+- Verified idle production buildings do not receive active production wear.
+- Verified production wear uses a separate timing counter.
+- Verified building health never falls below 0.
+- Verified buildings at 0 health have no effective worker capacity.
+- Verified damaged buildings reduce their effective worker capacity.
+- Verified assigned workers are automatically reduced when building health reduces available capacity.
+- Verified production stops when a building reaches 0 health.
+- Verified the Repair button is available for damaged buildings.
+- Verified repairing a building restores 10 health.
+- Verified repairing a building consumes 1 Tool.
+- Verified repair health is capped at the building's maximum health.
+- Verified attempting to repair without sufficient Tools does not consume a Tool.
+- Verified building health updates automatically in the building interface.
+- Verified effective worker capacity updates automatically as building health changes.
+- Verified the database continues to store building health as whole numbers.
