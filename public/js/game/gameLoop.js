@@ -4,10 +4,9 @@ import { checkDiscovery } from "./discovery.js";
 import { checkAnnouncements } from "./announcements.js";
 import { updatePlayerDisplay } from "./playerDisplay.js";
 import { updateRecipes } from "./recipes.js";
-import { updateResources, renderResources } from "./resources.js";
+import { updateResources } from "./resources.js";
 import { updateStorage } from "./storage.js";
 import { updateBuildings } from "./buildings.js";
-import { updateTasks } from "./tasks.js";
 import { startProgressUpdates } from "./progressBars.js";
 
 async function updateStats() {
@@ -23,7 +22,6 @@ async function updateStats() {
     updateStorage(updatedData.storage);
     updateBuildings(updatedData.buildings);
     updateRecipes(updatedData);
-    updateTasks(updatedData.tasks);
   } catch (err) {
     console.error("Stats update error:", err);
   }

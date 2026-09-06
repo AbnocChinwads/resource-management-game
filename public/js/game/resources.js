@@ -17,30 +17,6 @@ export function updateNetFlowElement(element, amount) {
   }
 }
 
-export function renderResources(resources) {
-  const container = document.querySelector("#resource-table-body");
-
-  if (!container) {
-    return;
-  }
-
-  container.innerHTML = "";
-
-  resources.forEach((resource) => {
-    const row = document.createElement("tr");
-
-    row.dataset.resourceId = resource.resource_type_id;
-
-    row.innerHTML = `
-      <td>${resource.name}</td>
-      <td id="resource-${resource.resource_type_id}-amount"></td>
-      <td id="resource-${resource.resource_type_id}-net" aria-live="polite"></td>
-    `;
-
-    container.appendChild(row);
-  });
-}
-
 export function updateResources(resources) {
   resources.forEach((r) => {
     const amountEl = document.getElementById(

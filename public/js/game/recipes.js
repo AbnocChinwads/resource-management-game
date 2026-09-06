@@ -73,10 +73,61 @@ export function updateRecipes(data) {
       }
     }
 
+    const task = data.tasks.find((task) => task.recipe_id === recipeId);
+
     const button = recipeElement.querySelector(".recipe-button");
+    const statusElement = recipeElement.querySelector(".recipe-task-status");
 
     if (button) {
       button.disabled = !canStart;
+    }
+
+    if (task) {
+      if (button) {
+        button.classList.add("d-none");
+      }
+
+      if (statusElement) {
+        statusElement.classList.remove("d-none");
+
+        if (task.is_finished) {
+          statusElement.innerHTML = `
+        <form class="complete-form">
+          <input type="hidden" name="taskId" value="${task.id}">
+          <button type="submit" class="btn btn-success">
+            Complete
+          </button>
+        </form>
+      `;
+        } else {
+          let progressBar = statusElement.querySelector(".recipe-progress-bar");
+
+          if (!progressBar) {
+            statusElement.innerHTML = `
+          <div class="progress">
+            <div
+              class="progress-bar recipe-progress-bar"
+              role="progressbar"
+              style="width: 0%"
+            ></div>
+          </div>
+        `;
+
+            progressBar = statusElement.querySelector(".recipe-progress-bar");
+          }
+
+          progressBar.dataset.startedAt = new Date(task.started_at).getTime();
+          progressBar.dataset.craftTime = task.duration_seconds;
+        }
+      }
+    } else {
+      if (button) {
+        button.classList.remove("d-none");
+      }
+
+      if (statusElement) {
+        statusElement.classList.add("d-none");
+      }
     }
 
     recipeElement.classList.toggle("text-muted", !canStart);

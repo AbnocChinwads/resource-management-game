@@ -22,6 +22,64 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Recent Updates
 
+## Alpha v0.5.3 — Integrated Recipe Actions
+
+### Recipe Progress
+
+Recipe actions now display their progress directly within the recipe interface.
+
+When an action is started, its action button is replaced by a progress bar showing how far the action has progressed.
+
+Once the action has finished, the progress bar is replaced by a Complete button.
+
+### Integrated Task Management
+
+Active recipe tasks are now managed directly from the recipe they belong to.
+
+This removes the need to switch between the recipe list and a separate task list to check the status of an action.
+
+Starting, monitoring, and completing a recipe action can now all be handled from the same place.
+
+### One Active Task Per Recipe
+
+A recipe can no longer be started again while it already has an active task.
+
+Previously, repeatedly starting a recipe could add multiple instances of the same recipe to the Current Tasks table.
+
+Now, once a recipe has been started, its action is replaced by its progress and completion controls until that task has been completed.
+
+This makes the current state of each recipe immediately visible and prevents recipes from being repeatedly queued through the interface.
+
+### Removed Current Tasks Display
+
+The separate Current Tasks table has been removed from the player interface.
+
+The underlying task system and `player_tasks` database records remain in place, so tasks continue to be tracked by the game even though they are no longer displayed in a separate list.
+
+### Improved Recipe Availability
+
+Recipe action buttons now update their availability as the player's resources and buildings change.
+
+Recipes that require resources will automatically become available when the required resources are obtained, rather than remaining disabled from their initial state.
+
+### A More Focused Recipe Interface
+
+Recipes now provide both the action itself and its current status in one place.
+
+This reduces duplicated information in the interface and makes the relationship between a recipe and its active task clearer.
+
+### Why This Matters
+
+Previously, starting a recipe created a task that was displayed separately in the Current Tasks table.
+
+This meant the player could start the same recipe multiple times and then manage those tasks separately.
+
+Recipe actions now contain their own task status, keeping the information and controls together while ensuring that each recipe can only have one active task at a time.
+
+The result is a more focused interface where the recipe itself tells you whether it is available, in progress, or ready to complete.
+
+---
+
 ## Alpha v0.5.2 — Building Management
 
 ### Grouped Buildings
@@ -113,7 +171,7 @@ The new layout keeps the information that is most important to your settlement's
 
 You can now monitor your population, workforce, resources, and storage while using the detailed settlement interfaces to decide what your settlement needs next.
 
-## This forms the foundation for expanding the settlement interface as new management systems are introduced.
+### This forms the foundation for expanding the settlement interface as new management systems are introduced.
 
 ---
 
@@ -163,7 +221,7 @@ Your production buildings determine what your settlement can produce, while your
 
 As production increases and new resources become available, expanding your storage infrastructure becomes an important part of maintaining a functioning settlement.
 
-## This forms the foundation for future storage upgrades and more specialised settlement infrastructure.
+### This forms the foundation for future storage upgrades and more specialised settlement infrastructure.
 
 ---
 

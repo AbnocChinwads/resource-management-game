@@ -750,3 +750,67 @@ Production building groups also display their combined production and resource c
 - Verified building groups sort correctly by building name.
 - Verified individual buildings sort correctly by building number within their groups.
 - Verified repeated game updates do not create duplicate building rows or incorrectly increase building group counts.
+
+# [0.5.3] — Integrated Recipe Actions & Task Interface
+
+## Added
+
+- Added inline task progress displays to recipe actions.
+- Added progress bars showing the current progress of active recipe tasks.
+- Added inline Complete buttons for finished recipe tasks.
+- Added active-task state handling to recipe rendering.
+- Added one-active-task-per-recipe behaviour in the recipe interface.
+
+## Changed
+
+- Recipe actions now display their active task state directly within the corresponding recipe.
+- Starting a recipe now replaces its action button with a progress bar.
+- Finished recipe tasks now replace the progress bar with a Complete button.
+- Recipe action buttons are hidden while their corresponding task is active.
+- Recipe action buttons are restored after the active task is completed.
+- Recipe availability is now recalculated during game updates and applied to the recipe action button.
+- Removed the separate Current Tasks table from the player interface.
+- Removed the frontend task table rendering and associated task display code.
+- Removed the obsolete `renderResources()` function from the resource display module.
+- Retained the underlying `player_tasks` database system and task services.
+- Retained task creation and completion through the existing task system.
+- Updated the recipe interface so task state and recipe actions are managed in the same location.
+
+## Recipe Actions
+
+Recipe actions now contain their own task state.
+
+When a recipe is started, its action button is replaced by a progress bar. Once the task is finished, the progress display is replaced by a Complete button.
+
+A recipe cannot be started again while it already has an active task. This prevents the same recipe from being repeatedly added to the task system through the interface.
+
+The separate Current Tasks table has been removed, as active tasks are now represented directly by the recipes they belong to.
+
+The underlying task system remains unchanged and continues to record tasks in `player_tasks` and process their completion.
+
+## Task Management
+
+Task management has been consolidated into the recipe interface.
+
+Previously, recipes were started from the recipe list while their active tasks were displayed separately in the Current Tasks table. This allowed multiple instances of the same recipe to be started and displayed as separate tasks.
+
+Active recipe tasks are now represented directly by their recipe, providing a single location for starting, monitoring, and completing an action.
+
+## Testing
+
+- Tested starting recipes and verified the action button is replaced by a progress bar.
+- Tested recipe progress updates correctly over time.
+- Tested finished recipe tasks display a Complete button.
+- Tested completing a recipe task restores the recipe action button.
+- Verified an active recipe cannot be started again while its task is in progress.
+- Verified the same recipe cannot be repeatedly added through the recipe interface.
+- Verified active recipe tasks remain associated with their correct recipes after game updates.
+- Verified recipe progress survives repeated game-data updates.
+- Verified recipe action buttons correctly enable when required resources become available.
+- Verified recipe action buttons correctly disable when required resources are insufficient.
+- Verified the Current Tasks table is no longer displayed.
+- Verified removing the task table does not affect task creation or completion.
+- Verified tasks continue to be recorded in `player_tasks`.
+- Verified task completion continues to apply recipe outputs correctly.
+- Verified the obsolete `renderResources()` function has no remaining references.
+- Verified repeated game updates do not create duplicate recipe task displays.
