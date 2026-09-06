@@ -16,13 +16,15 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.5.2**
+**Alpha v0.5.3**
 
 ---
 
 # Recent Updates
 
-## Alpha v0.5.3 — Integrated Recipe Actions
+<details>
+
+<summary>Alpha v0.5.3 — Integrated Recipe Actions</summary>
 
 ### Recipe Progress
 
@@ -78,9 +80,11 @@ Recipe actions now contain their own task status, keeping the information and co
 
 The result is a more focused interface where the recipe itself tells you whether it is available, in progress, or ready to complete.
 
----
+</details>
 
-## Alpha v0.5.2 — Building Management
+<details>
+
+<summary>Alpha v0.5.2 — Building Management</summary>
 
 ### Grouped Buildings
 
@@ -120,9 +124,10 @@ Grouping buildings reduces the amount of information displayed at once while kee
 
 You can now get a quick overview of how many buildings you have and how your production groups are performing, while expanding a group only when you need to make individual management decisions.
 
----
+</details>
 
-## Alpha v0.5.1 — Settlement Overview
+<details>
+<summary>Alpha v0.5.1 — Settlement Overview</summary>
 
 ### Settlement Status
 
@@ -173,9 +178,10 @@ You can now monitor your population, workforce, resources, and storage while usi
 
 ### This forms the foundation for expanding the settlement interface as new management systems are introduced.
 
----
+</details>
 
-## Alpha v0.5.0 — Storage Expansion
+<details>
+<summary>Alpha v0.5.0 — Storage Expansion</summary>
 
 ### Storage
 
@@ -223,9 +229,10 @@ As production increases and new resources become available, expanding your stora
 
 ### This forms the foundation for future storage upgrades and more specialised settlement infrastructure.
 
----
+</details>
 
-## Alpha v0.4.10 — Ingredient Storage
+<details>
+<summary>Alpha v0.4.10 — Ingredient Storage</summary>
 
 ### Storage Categories
 
@@ -239,9 +246,10 @@ Flour is now treated separately from general construction and manufacturing mate
 
 This keeps **Material** storage focused on resources used for construction and manufacturing, while allowing food-production resources to be managed independently as the settlement develops.
 
----
+</details>
 
-## Alpha v0.4.9 — Building Construction Rebalance
+<details>
+<summary>Alpha v0.4.9 — Building Construction Rebalance</summary>
 
 ### Building Costs
 
@@ -265,9 +273,10 @@ Basic resource buildings provide the foundations for your economy, while later b
 
 This creates a more interconnected progression as your settlement develops.
 
----
+</details>
 
-## Alpha v0.4.8 — Charcoal & Kiln Rework
+<details>
+<summary>Alpha v0.4.8 — Charcoal & Kiln Rework</summary>
 
 ### Production
 
@@ -287,9 +296,10 @@ The Kiln has been repurposed as the settlement's basic charcoal production build
 
 This update expands the production chain and introduces the first step towards more interconnected production requirements.
 
----
+</details>
 
-## Alpha v0.4.7 — Interface Refinement
+<details>
+<summary>Alpha v0.4.7 — Interface Refinement</summary>
 
 - Simplified the population display by combining idle and assigned workers, and combining current and max population.
 - Added population growth and starvation countdowns to the population display.
@@ -299,9 +309,10 @@ This update expands the production chain and introduces the first step towards m
 - Reduced unnecessary table columns while retaining the same gameplay information.
 - Improved accessibility for dynamic population and food status information.
 
----
+</details>
 
-## Alpha v0.4.6 — Population & Food Overhaul
+<details>
+<summary>Alpha v0.4.6 — Population & Food Overhaul</summary>
 
 ### Population
 
@@ -361,9 +372,10 @@ Your housing determines how many people you can support, your population determi
 
 This forms the foundation for the settlement's future population and survival mechanics.
 
----
+</details>
 
-## Alpha v0.4.5 - Production State
+<details>
+<summary>Alpha v0.4.5 - Production State</summary>
 
 This update builds on the storage capacity enforcement introduced in v0.4.4 by making production buildings explicitly aware of whether they can currently operate.
 
@@ -393,9 +405,10 @@ This update builds on the storage capacity enforcement introduced in v0.4.4 by m
 
 This update establishes the production-state foundation required for clearer automation feedback and future game alerts.
 
----
+</details>
 
-## Alpha v0.4.4 - Storage Capacity Enforcement
+<details>
+<summary>Alpha v0.4.4 - Storage Capacity Enforcement</summary>
 
 This update turns the storage foundation introduced in v0.4.0 into an active gameplay mechanic.
 
@@ -422,9 +435,10 @@ This update turns the storage foundation introduced in v0.4.0 into an active gam
 
 This update establishes the basic rules required for storage to become a meaningful part of settlement management.
 
----
+</details>
 
-## Alpha v0.4.3 - Live State Rebase & Frontend Architecture Completion
+<details>
+<summary>Alpha v0.4.3 - Live State Rebase & Frontend Architecture Completion</summary>
 
 This update completed a major frontend architecture rework, moving the game away from repeatedly refreshing server-rendered sections and towards a client-driven live game state.
 
@@ -476,9 +490,10 @@ The previous frontend architecture relied heavily on refreshing server-rendered 
 
 The new architecture provides a more stable foundation for the next stage of development, particularly storage mechanics, expanded production systems, building improvements, and future settlement progression.
 
----
+</details>
 
-## Alpha v0.4.2 - Frontend JavaScript Refactor
+<details>
+<summary>Alpha v0.4.2 - Frontend JavaScript Refactor</summary>
 
 ### Added
 
@@ -512,9 +527,10 @@ The new architecture provides a more stable foundation for the next stage of dev
 
 This established the frontend architecture required to support increasingly complex live game systems without relying on repeated page or partial refreshes.
 
----
+</details>
 
-## Alpha v0.4.1 - Settlement Migration System
+<details>
+<summary>Alpha v0.4.1 - Settlement Migration System</summary>
 
 ### Added
 
@@ -543,9 +559,10 @@ This established the frontend architecture required to support increasingly comp
 
 Early development relied on destructive settlement resets when introducing significant gameplay changes. The migration system provides a safer way to evolve the game's database while preserving existing player progress.
 
----
+</details>
 
-## Alpha v0.4.0 - Resource Storage Foundation
+<details>
+<summary>Alpha v0.4.0 - Resource Storage Foundation</summary>
 
 This update introduced the initial storage infrastructure required for future resource-management mechanics.
 
@@ -572,9 +589,10 @@ This update introduced the initial storage infrastructure required for future re
 
 This established the foundation for a proper storage system while avoiding prematurely implementing storage buildings and more complex capacity mechanics.
 
----
+</details>
 
-## Alpha v0.3.6 - Responsive Settlement Interface
+<details>
+<summary>Alpha v0.3.6 - Responsive Settlement Interface</summary>
 
 The settlement interface was improved to provide a better experience across desktop, tablet, and mobile devices.
 
@@ -590,7 +608,7 @@ The settlement interface was improved to provide a better experience across desk
 
 This update focused on usability and preparing the interface for future management features as settlements and production systems become more complex.
 
----
+</details>
 
 # Current Features
 

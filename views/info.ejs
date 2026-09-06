@@ -1,0 +1,639 @@
+<%- include("partials/header") %>
+    <h1>Game Information</h1>
+    <section>
+        <h2>Recent Updates</h2>
+        <div class="row">
+            <div class="col">
+                ## Alpha v0.5.3 — Integrated Recipe Actions
+
+                ### Recipe Progress
+
+                Recipe actions now display their progress directly within the recipe interface.
+
+                When an action is started, its action button is replaced by a progress bar showing how far the action
+                has progressed.
+
+                Once the action has finished, the progress bar is replaced by a Complete button.
+
+                ### Integrated Task Management
+
+                Active recipe tasks are now managed directly from the recipe they belong to.
+
+                This removes the need to switch between the recipe list and a separate task list to check the status of
+                an action.
+
+                Starting, monitoring, and completing a recipe action can now all be handled from the same place.
+
+                ### One Active Task Per Recipe
+
+                A recipe can no longer be started again while it already has an active task.
+
+                Previously, repeatedly starting a recipe could add multiple instances of the same recipe to the Current
+                Tasks table.
+
+                Now, once a recipe has been started, its action is replaced by its progress and completion controls
+                until that task has been completed.
+
+                This makes the current state of each recipe immediately visible and prevents recipes from being
+                repeatedly queued through the interface.
+
+                ### Removed Current Tasks Display
+
+                The separate Current Tasks table has been removed from the player interface.
+
+                The underlying task system and `player_tasks` database records remain in place, so tasks continue to be
+                tracked by the game even though they are no longer displayed in a separate list.
+
+                ### Improved Recipe Availability
+
+                Recipe action buttons now update their availability as the player's resources and buildings change.
+
+                Recipes that require resources will automatically become available when the required resources are
+                obtained, rather than remaining disabled from their initial state.
+
+                ### A More Focused Recipe Interface
+
+                Recipes now provide both the action itself and its current status in one place.
+
+                This reduces duplicated information in the interface and makes the relationship between a recipe and its
+                active task clearer.
+
+                ### Why This Matters
+
+                Previously, starting a recipe created a task that was displayed separately in the Current Tasks table.
+
+                This meant the player could start the same recipe multiple times and then manage those tasks separately.
+
+                Recipe actions now contain their own task status, keeping the information and controls together while
+                ensuring that each recipe can only have one active task at a time.
+
+                The result is a more focused interface where the recipe itself tells you whether it is available, in
+                progress, or ready to complete.
+
+                ---
+
+                ## Alpha v0.5.2 — Building Management
+
+                ### Grouped Buildings
+
+                Buildings are now grouped together by building type.
+
+                Instead of displaying every building as a separate entry, buildings of the same type are organised into
+                a single expandable group.
+
+                This makes the building interface easier to manage as your settlement grows and you construct multiple
+                copies of the same building.
+
+                ### Collapsible Building Groups
+
+                Building groups are collapsed by default and can be expanded when you need to manage individual
+                buildings.
+
+                Each group displays the number of buildings it contains, allowing you to see the size of your settlement
+                without opening every group.
+
+                Individual buildings remain available when expanded, including their health, production information,
+                worker assignments, and management controls.
+
+                ### Production Overview
+
+                Production building groups now provide an overview of their combined production and resource
+                consumption.
+
+                This allows you to see the overall output and resource requirements of a group without having to expand
+                it and inspect each building individually.
+
+                Individual production buildings continue to display their own production status and resource
+                requirements when the group is expanded.
+
+                ### A More Manageable Settlement
+
+                The building interface is now designed to remain useful as the number of buildings in your settlement
+                increases.
+
+                Groups provide a quick overview of your buildings, while the expanded view provides access to the
+                detailed information and controls needed to manage individual buildings.
+
+                ### Why This Matters
+
+                As your settlement grows, managing every building individually becomes increasingly difficult.
+
+                Grouping buildings reduces the amount of information displayed at once while keeping the details
+                available when they are needed.
+
+                You can now get a quick overview of how many buildings you have and how your production groups are
+                performing, while expanding a group only when you need to make individual management decisions.
+
+                ---
+
+                ## Alpha v0.5.1 — Settlement Overview
+
+                ### Settlement Status
+
+                Your settlement's most important information is now available at a glance.
+
+                The new settlement status panel continuously displays:
+
+                Population — your current population and maximum population capacity.
+                Workers — the number of idle and assigned workers.
+                Resources — the current amount of each discovered resource.
+                Resource Flow — whether each resource is currently increasing, decreasing, or remaining stable.
+                Storage — how much storage is currently being used in each resource category.
+
+                This information remains visible while you manage the rest of your settlement.
+
+                ### Game Navigation
+
+                The detailed settlement information has been reorganised into separate tabs.
+
+                Resources — detailed information about your resources and their production and consumption.
+                Storage — detailed information about your storage capacity and the buildings providing it.
+                Recipes — available production and construction options.
+                Tasks — available manual tasks.
+
+                This keeps the main settlement view focused while still allowing you to access detailed information when
+                you need it.
+
+                ### Buildings
+
+                Population and production buildings are now kept visible while navigating between the detailed
+                settlement views.
+
+                This allows you to continue managing your workforce while checking resources, storage, recipes, or tasks
+                without having to leave the building interface.
+
+                ### A Better Settlement Overview
+
+                The settlement view is now organised around two levels of information.
+
+                The settlement status panel provides the information you need to monitor continuously, while the
+                detailed interfaces provide the information needed to make individual management decisions.
+
+                This means you can see the current state of your settlement while making decisions about what to
+                produce, build, store, or assign workers to.
+
+                ### Why This Matters
+
+                As your settlement grows, there is more information to keep track of.
+
+                The new layout keeps the information that is most important to your settlement's ongoing operation
+                visible at all times, while moving less frequently needed detail into dedicated views.
+
+                You can now monitor your population, workforce, resources, and storage while using the detailed
+                settlement interfaces to decide what your settlement needs next.
+
+                ### This forms the foundation for expanding the settlement interface as new management systems are
+                introduced.
+
+                ---
+
+                ## Alpha v0.5.0 — Storage Expansion
+
+                ### Storage
+
+                Storage is now divided into categories based on the role of each resource within your settlement.
+
+                - **Material** — resources used for construction and processing, such as Stone, Ore, Wood, Logs and
+                Planks.
+                - **Ingredient** — resources used as ingredients in production, such as Flour.
+                - **Food** — resources that can directly provide nutrition to your population.
+                - **Fuel** — resources used to power production.
+                - **Tool** — equipment used by your settlement.
+                - **Grain** — harvested grain resources such as Wheat.
+
+                Each storage category has its own capacity.
+
+                When a storage category reaches its capacity, production of resources belonging to that category can be
+                prevented until space becomes available.
+
+                ### Expanding Storage
+
+                Your settlement can now build dedicated storage buildings to increase its storage capacity.
+
+                - **Storehouse** — increases Material storage capacity.
+                - **Granary** — increases Grain storage capacity.
+                - **Pantry** — increases Ingredient storage capacity.
+                - **Food Store** — increases Food storage capacity.
+
+                Each storage building adds capacity to its associated storage category when constructed.
+
+                Multiple storage buildings can be built to continue expanding your settlement's storage capacity.
+
+                ### Storage Buildings
+
+                Storage buildings are now part of the settlement's infrastructure rather than simply increasing the
+                default storage limits.
+
+                Building additional storage allows your production chains to continue operating as your settlement grows
+                and produces larger quantities of resources.
+
+                Storage buildings also create a new construction decision: expanding production may require expanding
+                the infrastructure needed to store what your settlement produces.
+
+                ### Why This Matters
+
+                Storage is now connected to the wider settlement economy.
+
+                Your production buildings determine what your settlement can produce, while your storage capacity
+                determines how much of those resources your settlement can hold.
+
+                As production increases and new resources become available, expanding your storage infrastructure
+                becomes an important part of maintaining a functioning settlement.
+
+                ### This forms the foundation for future storage upgrades and more specialised settlement
+                infrastructure.
+
+                ---
+
+                ## Alpha v0.4.10 — Ingredient Storage
+
+                ### Storage Categories
+
+                - Added **Ingredient** as a new storage category.
+                - **Flour** has been moved from **Material** storage to **Ingredient** storage.
+                - Ingredient storage starts with a capacity of **100**.
+
+                ### Resource Management
+
+                Flour is now treated separately from general construction and manufacturing materials, reflecting its
+                role as an intermediate resource in food production.
+
+                This keeps **Material** storage focused on resources used for construction and manufacturing, while
+                allowing food-production resources to be managed independently as the settlement develops.
+
+                ---
+
+                ## Alpha v0.4.9 — Building Construction Rebalance
+
+                ### Building Costs
+
+                Building requirements have been rebalanced to make settlement progression more consistent.
+
+                - Basic resource buildings remain accessible early in the game.
+                - More advanced buildings now require a wider range of resources.
+                - **Sawmills** now require **Ore** for their metal cutting equipment.
+                - **Blacksmiths** now require **Ore** as part of their initial construction.
+                - **Cottages** now require **Planks**, reflecting their more substantial construction.
+                - **Bakery** construction now uses more **Stone** and less **Logs**.
+                - **Lumber Camps** now require **Stone** as well as Wood.
+
+                These changes are intended to make building progression feel more natural while giving processed
+                resources such as **Logs** and **Planks**, and raw resources such as **Ore**, more meaningful roles in
+                settlement development.
+
+                ### Settlement Progression
+
+                Construction requirements now better reflect the increasing complexity of your settlement.
+
+                Basic resource buildings provide the foundations for your economy, while later buildings increasingly
+                depend on resources produced by other parts of your settlement.
+
+                This creates a more interconnected progression as your settlement develops.
+
+                ---
+
+                ## Alpha v0.4.8 — Charcoal & Kiln Rework
+
+                ### Production
+
+                - Added **Charcoal** as a new resource.
+                - Reworked the **Kiln** to produce Charcoal from Wood.
+                - Added Charcoal as a required input for **Bread** production.
+                - Added Charcoal as a required input for **Tools** production.
+                - Updated production chains to introduce fuel requirements where appropriate.
+
+                ### Kiln
+
+                The Kiln has been repurposed as the settlement's basic charcoal production building.
+
+                - Assign a worker to the Kiln to produce Charcoal.
+                - Each production cycle consumes Wood and produces Charcoal.
+                - Charcoal can then be used by other production buildings.
+
+                This update expands the production chain and introduces the first step towards more interconnected
+                production requirements.
+
+                ---
+
+                ## Alpha v0.4.7 — Interface Refinement
+
+                - Simplified the population display by combining idle and assigned workers, and combining current and
+                max population.
+                - Added population growth and starvation countdowns to the population display.
+                - Simplified the food display by combining supply and demand values.
+                - Combined production and consumption information for production buildings.
+                - Simplified the storage display by combining stored and capacity values.
+                - Reduced unnecessary table columns while retaining the same gameplay information.
+                - Improved accessibility for dynamic population and food status information.
+
+                ---
+
+                ## Alpha v0.4.6 — Population & Food Overhaul
+
+                ### Population
+
+                Population is now tied directly to the housing available in your settlement.
+
+                - **Current** — the number of people currently living in your settlement.
+                - **Maximum** — the maximum population your buildings can support.
+                - **Workers** — the number of people available to work.
+                - **Idle** — workers who aren't currently assigned to a building.
+                - **Assigned** — workers currently assigned to production buildings.
+
+                Your settlement also remembers the highest population you have reached.
+
+                ### Growing Your Population
+
+                A sustained food surplus will now allow your population to grow.
+
+                As long as:
+
+                - You have food available.
+                - Your settlement has enough food production capacity to meet its population's needs.
+                - There is available housing capacity.
+
+                your population can gradually increase.
+
+                Building additional housing increases your maximum population and gives your settlement room to grow.
+
+                ### Food
+
+                Food is now displayed separately from population, with a clearer breakdown of your settlement's food
+                situation:
+
+                - **Food** — your current stored food.
+                - **Food Required** — how much food your population needs.
+                - **Food Supplied** — how much food your production can supply.
+                - **Food Balance** — the difference between food supplied and food required.
+
+                Food storage capacity can temporarily stop production when your stores are full. This does not prevent
+                population growth if your settlement has sufficient production capacity and stored food.
+
+                ### Starvation
+
+                Starvation now depends on **actually running out of food**, rather than simply having a food balance of
+                zero.
+
+                A food balance of `0` means your settlement is producing exactly enough food to meet its current
+                requirements. It does **not** mean your population is starving.
+
+                If your stored food reaches zero and your settlement cannot sustain its population, starvation begins.
+
+                During starvation:
+
+                - Recovering your food supply stops the starvation process.
+                - Once food conditions recover, population can begin rebuilding through the normal growth system.
+
+                ### Why This Matters
+
+                Population, workers and food are now connected systems rather than separate numbers.
+
+                Your housing determines how many people you can support, your population determines how much food you
+                need, your workers determine how much production you can maintain, and your food supply determines
+                whether your settlement can continue to grow or begins to starve.
+
+                This forms the foundation for the settlement's future population and survival mechanics.
+
+                ---
+
+                ## Alpha v0.4.5 - Production State
+
+                This update builds on the storage capacity enforcement introduced in v0.4.4 by making production
+                buildings explicitly aware of whether they can currently operate.
+
+                ### Gameplay System Improvements
+
+                - Added explicit production states for production buildings.
+                - Production buildings can now become idle when:
+                - no workers are assigned
+                - required inputs are unavailable
+                - output storage cannot accept the next production tick
+                - the building is damaged
+
+                - Production buildings automatically return to a working state when the condition preventing production
+                is resolved.
+                - Storage availability is now evaluated against the amount required by the next production tick,
+                allowing fractional resource production to work correctly.
+
+                ### Interface Improvements
+
+                - Production buildings now display an **Idle** state when they cannot produce.
+                - Idle buildings display the reason they are unable to operate.
+                - Production and consumption information is replaced by the idle state while production is blocked.
+                - Production and consumption displays automatically return when a building becomes productive again.
+
+                ### Notes
+
+                - Production buildings currently recalculate their state as part of the normal live game-state updates.
+                - The current idle-state system does not generate player alerts.
+
+                This update establishes the production-state foundation required for clearer automation feedback and
+                future game alerts.
+
+                ---
+
+                ## Alpha v0.4.4 - Storage Capacity Enforcement
+
+                This update turns the storage foundation introduced in v0.4.0 into an active gameplay mechanic.
+
+                ### Gameplay System Improvements
+
+                - Resource additions now respect the capacity of their storage category.
+                - Manual tasks can no longer complete if their resource output would exceed available storage.
+                - Automated production now respects storage capacity.
+                - Resource production is prevented when the resulting output cannot be stored.
+                - Storage capacity is now treated as a gameplay constraint rather than display-only information.
+                - Storage categories remain available after discovery even when their current resource amounts reach
+                zero.
+                - Added clearer handling of resources that cannot be added because their storage category is full.
+
+                ### Interface Improvements
+
+                - Added player-facing feedback when a manual task cannot be completed because storage is full.
+                - Improved feedback for storage-related resource failures.
+
+                ### Notes
+
+                - Automated production currently stops when storage is unavailable.
+                - Future work will make production buildings explicitly display an **idle** or **blocked** state when
+                storage prevents production.
+                - Storage expansion and upgrades will be developed as part of the next major gameplay phase.
+
+                This update establishes the basic rules required for storage to become a meaningful part of settlement
+                management.
+
+                ---
+
+                ## Alpha v0.4.3 - Live State Rebase & Frontend Architecture Completion
+
+                This update completed a major frontend architecture rework, moving the game away from repeatedly
+                refreshing server-rendered sections and towards a client-driven live game state.
+
+                ### Gameplay & Interface
+
+                - Added fully live updates for:
+
+                - resources
+                - recipes
+                - tasks
+                - buildings
+                - storage
+                - discovery states
+
+                - Newly discovered resources, recipes, tasks, and buildings can now appear in the interface without
+                requiring a page refresh.
+                - Storage categories now persist after discovery even when the player's current amount of a resource
+                reaches zero.
+                - Improved live updates for population and production buildings.
+
+                ### Frontend Architecture
+
+                - Completed the migration away from server-rendered partial refreshes during normal gameplay.
+                - Centralised live game-state updates around API data.
+                - Separated frontend responsibilities into dedicated systems for:
+
+                - resources
+                - recipes
+                - tasks
+                - buildings
+                - storage
+                - discovery
+                - player information
+                - player actions
+
+                - Existing interface elements are now updated in place rather than repeatedly replaced.
+
+                ### Fixed
+
+                - Resources no longer require a manual page refresh after being discovered or changed.
+                - Newly discovered recipes appear immediately.
+                - Newly completed tasks update the resource display immediately.
+                - Newly constructed buildings appear without requiring a page refresh.
+                - Population and production building displays remain synchronised with live game state.
+                - Recipe accordion state is preserved during live updates.
+                - Reduced UI inconsistencies caused by the previous partial-refresh architecture.
+
+                ### Reason
+
+                The previous frontend architecture relied heavily on refreshing server-rendered sections whenever game
+                state changed. This worked for early development but became increasingly difficult to maintain as more
+                systems became interconnected.
+
+                The new architecture provides a more stable foundation for the next stage of development, particularly
+                storage mechanics, expanded production systems, building improvements, and future settlement
+                progression.
+
+                ---
+
+                ## Alpha v0.4.2 - Frontend JavaScript Refactor
+
+                ### Added
+
+                - Extracted game update logic from EJS script partials into ES modules.
+                - Added dedicated frontend systems for:
+
+                - player information
+                - resources
+                - storage
+                - buildings
+                - tasks
+                - player actions
+                - discovery states
+
+                - Added centralised game data fetching.
+
+                ### Changed
+
+                - Reworked live game updates around a central coordinator.
+                - Moved worker assignment and task completion handling into dedicated frontend actions.
+                - Moved resource, storage, building, and player update logic into separate modules.
+                - Removed duplicated frontend update logic.
+                - Improved separation between server-rendered views and client-side behaviour.
+
+                ### Removed
+
+                - Removed the legacy game action script partial.
+                - Removed unnecessary inline JavaScript dependencies.
+
+                ### Reason
+
+                This established the frontend architecture required to support increasingly complex live game systems
+                without relying on repeated page or partial refreshes.
+
+                ---
+
+                ## Alpha v0.4.1 - Settlement Migration System
+
+                ### Added
+
+                - Added per-player settlement migration support.
+                - Added settlement migration tracking.
+                - Added a migration runner for applying missing settlement updates.
+                - Added an initial settlement migration baseline.
+
+                ### Changed
+
+                - Replaced automatic settlement resets triggered by application version changes.
+                - Settlement changes are now handled through incremental migrations.
+                - Separated database migrations from player settlement migrations.
+                - Player progress is preserved across future game updates.
+
+                ### Removed
+
+                - Removed application-version-based settlement reset handling.
+                - Removed settlement version tracking from players.
+
+                ### Fixed
+
+                - Prevented future application updates from unintentionally resetting player settlements.
+
+                ### Reason
+
+                Early development relied on destructive settlement resets when introducing significant gameplay changes.
+                The migration system provides a safer way to evolve the game's database while preserving existing player
+                progress.
+
+                ---
+
+                ## Alpha v0.4.0 - Resource Storage Foundation
+
+                This update introduced the initial storage infrastructure required for future resource-management
+                mechanics.
+
+                ### Added
+
+                - Added resource storage categories.
+                - Added storage capacity tracking for player settlements.
+                - Added storage displays showing capacity and current usage.
+                - Added player announcements for major game updates.
+                - Added initial settlement versioning infrastructure.
+
+                ### Changed
+
+                - Refactored resource flow handling to separate:
+
+                - resource amounts
+                - production
+                - consumption
+                - storage
+
+                - Improved separation between simulation data and frontend presentation.
+
+                ### Reason
+
+                This established the foundation for a proper storage system while avoiding prematurely implementing
+                storage buildings and more complex capacity mechanics.
+
+                ---
+
+                ## Alpha v0.3.6 - Responsive Settlement Interface
+            </div>
+        </div>
+    </section>
+    <section>
+        <h2>Development Roadmap</h2>
+    </section>
+    <section>
+        <h2>Future Gameplay Ideas</h2>
+    </section>
+    <%- include('partials/footer.ejs'); -%>
