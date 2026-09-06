@@ -16,31 +16,34 @@ function getPopulationTimer(data) {
   const now = Date.now();
 
   if (data.starvationStartedAt && data.population > data.populationFloor) {
+    const seconds =
+      data.starvationConsequenceSeconds -
+      (now - new Date(data.starvationStartedAt).getTime()) / 1000;
+
+    if (seconds <= 0) {
+      return null;
+    }
+
     return {
       type: "loss",
-      seconds: Math.max(
-        0,
-        data.starvationConsequenceSeconds -
-          (now - new Date(data.starvationStartedAt).getTime()) / 1000,
-      ),
+      seconds,
     };
   }
 
-  if (
-    data.foodSurplusStartedAt &&
-    data.population < data.populationCapacity
-  ) {
+  if (data.foodSurplusStartedAt && data.population < data.populationCapacity) {
+    const seconds =
+      data.populationGrowthSeconds -
+      (now - new Date(data.foodSurplusStartedAt).getTime()) / 1000;
+
+    if (seconds <= 0) {
+      return null;
+    }
+
     return {
       type: "gain",
-      seconds: Math.max(
-        0,
-        data.populationGrowthSeconds -
-          (now - new Date(data.foodSurplusStartedAt).getTime()) / 1000,
-      ),
+      seconds,
     };
   }
-
-  return null;
 }
 
 function updatePopulationTimer(data) {
@@ -76,10 +79,7 @@ function updateFoodStatus(data) {
     const food = Number(data.food ?? 0).toFixed(1);
 
     foodEl.textContent = `Food: ${food}`;
-    foodEl.setAttribute(
-      "aria-label",
-      `Stored food nutrition: ${food}`,
-    );
+    foodEl.setAttribute("aria-label", `Stored food nutrition: ${food}`);
   }
 
   if (foodNetEl) {
