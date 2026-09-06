@@ -20,6 +20,95 @@ Players begin by manually gathering resources before expanding their settlement 
 
 ---
 
+# Current Features
+
+Players begin with a small settlement and a limited selection of resources and actions.
+
+As the settlement develops, players can:
+
+- Discover new resources.
+- Unlock new recipes.
+- Gather resources manually.
+- Construct buildings.
+- Increase population.
+- Gain additional workers.
+- Assign workers to production buildings.
+- Automate resource production.
+- Balance resource production against consumption.
+- Manage limited storage capacity.
+- Expand production chains.
+- Manage interconnected production requirements.
+
+The intended gameplay loop is centred around gradually reducing manual work while managing the increasingly complex interactions between resources, production, workers, population, food, and storage.
+
+The game is designed around **persistent settlement progression** rather than a traditional map-based strategy system.
+
+<details>
+
+<summary>Account Systems</summary>
+
+- Registration and login
+- Email verification
+- Account detail changes
+- Persistent player data
+
+</details>
+
+<details>
+
+<summary>Gameplay Systems</summary>
+
+- Manual resource gathering
+- Resource discovery
+- Recipe discovery
+- Building construction
+- Population buildings
+- Worker assignment
+- Worker automation
+- Automated production
+- Server-side simulation ticks
+- Live resource production and consumption
+- Resource flow tracking
+- Resource storage categories
+- Storage capacity enforcement
+- Food consumption
+- Population growth
+- Persistent settlement state
+- Charcoal production
+
+</details>
+
+<details>
+
+<summary>Interface Systems</summary>
+
+- Live resource updates
+- Live population updates
+- Live building updates
+- Live task updates
+- Live recipe updates
+- Live storage updates
+- Dynamic discovery of new gameplay content
+- Responsive settlement interface
+- Grouped and collapsible recipe interface
+- Accessible dynamic status indicators
+- Worker management controls
+
+</details>
+
+<details>
+
+<summary>Development Systems</summary>
+
+- Bug reporting
+- Gameplay suggestions
+- Developer dashboard
+- Player settlement inspection tools
+- Database migrations
+- Per-player settlement migrations
+
+</details>
+
 # Recent Updates
 
 <details>
@@ -127,6 +216,7 @@ You can now get a quick overview of how many buildings you have and how your pro
 </details>
 
 <details>
+
 <summary>Alpha v0.5.1 — Settlement Overview</summary>
 
 ### Settlement Status
@@ -136,9 +226,13 @@ Your settlement's most important information is now available at a glance.
 The new settlement status panel continuously displays:
 
 Population — your current population and maximum population capacity.
+
 Workers — the number of idle and assigned workers.
+
 Resources — the current amount of each discovered resource.
+
 Resource Flow — whether each resource is currently increasing, decreasing, or remaining stable.
+
 Storage — how much storage is currently being used in each resource category.
 
 This information remains visible while you manage the rest of your settlement.
@@ -148,8 +242,11 @@ This information remains visible while you manage the rest of your settlement.
 The detailed settlement information has been reorganised into separate tabs.
 
 Resources — detailed information about your resources and their production and consumption.
+
 Storage — detailed information about your storage capacity and the buildings providing it.
+
 Recipes — available production and construction options.
+
 Tasks — available manual tasks.
 
 This keeps the main settlement view focused while still allowing you to access detailed information when you need it.
@@ -181,6 +278,7 @@ You can now monitor your population, workforce, resources, and storage while usi
 </details>
 
 <details>
+
 <summary>Alpha v0.5.0 — Storage Expansion</summary>
 
 ### Storage
@@ -232,6 +330,7 @@ As production increases and new resources become available, expanding your stora
 </details>
 
 <details>
+
 <summary>Alpha v0.4.10 — Ingredient Storage</summary>
 
 ### Storage Categories
@@ -249,6 +348,7 @@ This keeps **Material** storage focused on resources used for construction and m
 </details>
 
 <details>
+
 <summary>Alpha v0.4.9 — Building Construction Rebalance</summary>
 
 ### Building Costs
@@ -276,6 +376,7 @@ This creates a more interconnected progression as your settlement develops.
 </details>
 
 <details>
+
 <summary>Alpha v0.4.8 — Charcoal & Kiln Rework</summary>
 
 ### Production
@@ -299,6 +400,7 @@ This update expands the production chain and introduces the first step towards m
 </details>
 
 <details>
+
 <summary>Alpha v0.4.7 — Interface Refinement</summary>
 
 - Simplified the population display by combining idle and assigned workers, and combining current and max population.
@@ -312,6 +414,7 @@ This update expands the production chain and introduces the first step towards m
 </details>
 
 <details>
+
 <summary>Alpha v0.4.6 — Population & Food Overhaul</summary>
 
 ### Population
@@ -375,6 +478,7 @@ This forms the foundation for the settlement's future population and survival me
 </details>
 
 <details>
+
 <summary>Alpha v0.4.5 - Production State</summary>
 
 This update builds on the storage capacity enforcement introduced in v0.4.4 by making production buildings explicitly aware of whether they can currently operate.
@@ -383,11 +487,10 @@ This update builds on the storage capacity enforcement introduced in v0.4.4 by m
 
 - Added explicit production states for production buildings.
 - Production buildings can now become idle when:
-  - no workers are assigned
-  - required inputs are unavailable
-  - output storage cannot accept the next production tick
-  - the building is damaged
-
+- no workers are assigned
+- required inputs are unavailable
+- output storage cannot accept the next production tick
+- the building is damaged
 - Production buildings automatically return to a working state when the condition preventing production is resolved.
 - Storage availability is now evaluated against the amount required by the next production tick, allowing fractional resource production to work correctly.
 
@@ -408,6 +511,7 @@ This update establishes the production-state foundation required for clearer aut
 </details>
 
 <details>
+
 <summary>Alpha v0.4.4 - Storage Capacity Enforcement</summary>
 
 This update turns the storage foundation introduced in v0.4.0 into an active gameplay mechanic.
@@ -438,6 +542,7 @@ This update establishes the basic rules required for storage to become a meaning
 </details>
 
 <details>
+
 <summary>Alpha v0.4.3 - Live State Rebase & Frontend Architecture Completion</summary>
 
 This update completed a major frontend architecture rework, moving the game away from repeatedly refreshing server-rendered sections and towards a client-driven live game state.
@@ -445,14 +550,12 @@ This update completed a major frontend architecture rework, moving the game away
 ### Gameplay & Interface
 
 - Added fully live updates for:
-
   - resources
   - recipes
   - tasks
   - buildings
   - storage
   - discovery states
-
 - Newly discovered resources, recipes, tasks, and buildings can now appear in the interface without requiring a page refresh.
 - Storage categories now persist after discovery even when the player's current amount of a resource reaches zero.
 - Improved live updates for population and production buildings.
@@ -462,16 +565,14 @@ This update completed a major frontend architecture rework, moving the game away
 - Completed the migration away from server-rendered partial refreshes during normal gameplay.
 - Centralised live game-state updates around API data.
 - Separated frontend responsibilities into dedicated systems for:
-
-  - resources
-  - recipes
-  - tasks
-  - buildings
-  - storage
-  - discovery
-  - player information
-  - player actions
-
+- resources
+- recipes
+- tasks
+- buildings
+- storage
+- discovery
+- player information
+- player actions
 - Existing interface elements are now updated in place rather than repeatedly replaced.
 
 ### Fixed
@@ -493,21 +594,20 @@ The new architecture provides a more stable foundation for the next stage of dev
 </details>
 
 <details>
+
 <summary>Alpha v0.4.2 - Frontend JavaScript Refactor</summary>
 
 ### Added
 
 - Extracted game update logic from EJS script partials into ES modules.
 - Added dedicated frontend systems for:
-
-  - player information
-  - resources
-  - storage
-  - buildings
-  - tasks
-  - player actions
-  - discovery states
-
+- player information
+- resources
+- storage
+- buildings
+- tasks
+- player actions
+- discovery states
 - Added centralised game data fetching.
 
 ### Changed
@@ -530,6 +630,7 @@ This established the frontend architecture required to support increasingly comp
 </details>
 
 <details>
+
 <summary>Alpha v0.4.1 - Settlement Migration System</summary>
 
 ### Added
@@ -562,6 +663,7 @@ Early development relied on destructive settlement resets when introducing signi
 </details>
 
 <details>
+
 <summary>Alpha v0.4.0 - Resource Storage Foundation</summary>
 
 This update introduced the initial storage infrastructure required for future resource-management mechanics.
@@ -577,12 +679,10 @@ This update introduced the initial storage infrastructure required for future re
 ### Changed
 
 - Refactored resource flow handling to separate:
-
-  - resource amounts
-  - production
-  - consumption
-  - storage
-
+- resource amounts
+- production
+- consumption
+- storage
 - Improved separation between simulation data and frontend presentation.
 
 ### Reason
@@ -592,6 +692,7 @@ This established the foundation for a proper storage system while avoiding prema
 </details>
 
 <details>
+
 <summary>Alpha v0.3.6 - Responsive Settlement Interface</summary>
 
 The settlement interface was improved to provide a better experience across desktop, tablet, and mobile devices.
@@ -610,88 +711,13 @@ This update focused on usability and preparing the interface for future manageme
 
 </details>
 
-# Current Features
-
-## Account Systems
-
-- Registration and login
-- Email verification
-- Account detail changes
-- Persistent player data
-
-## Gameplay Systems
-
-- Manual resource gathering
-- Resource discovery
-- Recipe discovery
-- Building construction
-- Population buildings
-- Worker assignment
-- Worker automation
-- Automated production
-- Server-side simulation ticks
-- Live resource production and consumption
-- Resource flow tracking
-- Resource storage categories
-- Storage capacity enforcement
-- Food consumption
-- Population growth
-- Persistent settlement state
-- Charcoal production
-
-## Interface Systems
-
-- Live resource updates
-- Live population updates
-- Live building updates
-- Live task updates
-- Live recipe updates
-- Live storage updates
-- Dynamic discovery of new gameplay content
-- Responsive settlement interface
-- Grouped and collapsible recipe interface
-- Accessible dynamic status indicators
-- Worker management controls
-
-## Development Systems
-
-- Bug reporting
-- Gameplay suggestions
-- Developer dashboard
-- Player settlement inspection tools
-- Database migrations
-- Per-player settlement migrations
-
----
-
-# Gameplay Overview
-
-Players begin with a small settlement and a limited selection of resources and actions.
-
-As the settlement develops, players can:
-
-- Discover new resources.
-- Unlock new recipes.
-- Gather resources manually.
-- Construct buildings.
-- Increase population.
-- Gain additional workers.
-- Assign workers to production buildings.
-- Automate resource production.
-- Balance resource production against consumption.
-- Manage limited storage capacity.
-- Expand production chains.
-- Manage interconnected production requirements.
-
-The intended gameplay loop is centred around gradually reducing manual work while managing the increasingly complex interactions between resources, production, workers, population, food, and storage.
-
-The game is designed around **persistent settlement progression** rather than a traditional map-based strategy system.
-
----
-
 # Development Roadmap
 
 The project is being developed incrementally rather than attempting to implement the complete game at once.
+
+<details>
+
+<summary>v0.4.x - Core Systems & Foundations</summary>
 
 ## v0.4.x - Core Systems & Foundations
 
@@ -711,6 +737,12 @@ This phase focuses on establishing the core systems that future settlement-manag
 - [x] Further refinement of core settlement systems
 
 ---
+
+</details>
+
+<details>
+
+<summary>v0.5.x - Storage & Resource Management</summary>
 
 ## v0.5.x - Storage & Resource Management
 
@@ -733,6 +765,12 @@ The 0.5.x development phase expands storage from a simple capacity limit into a 
 
 ---
 
+</details>
+
+<details>
+
+<summary>v0.6.x - Tools & Player Automation</summary>
+
 ## v0.6.x - Tools & Player Automation
 
 This phase will expand the player's ability to interact with and automate the settlement.
@@ -749,6 +787,12 @@ This phase will expand the player's ability to interact with and automate the se
 
 ---
 
+</details>
+
+<details>
+
+<summary>v0.7.x - Production & Settlement Expansion</summary>
+
 ## v0.7.x - Production & Settlement Expansion
 
 ### Planned
@@ -762,6 +806,12 @@ This phase will expand the player's ability to interact with and automate the se
 - [ ] Improve balancing between manual work and automation
 
 ---
+
+</details>
+
+<details>
+
+<summary>v0.8.x - Progression & Gameplay Depth</summary>
 
 ## v0.8.x - Progression & Gameplay Depth
 
@@ -779,6 +829,12 @@ This phase will focus on making the existing systems work together as a more com
 - [ ] Improved long-term progression
 
 ---
+
+</details>
+
+<details>
+
+<summary>v0.9.x - Reliability & Polish</summary>
 
 ## v0.9.x - Reliability & Polish
 
@@ -799,6 +855,12 @@ This phase will focus on making the existing game systems reliable and pleasant 
 
 ---
 
+</details>
+
+<details>
+
+<summary>v1.0.x - Core Game Release</summary>
+
 ## v1.0.x - Core Game Release
 
 The first major release will represent a stable, playable version of the core resource-management experience.
@@ -817,6 +879,8 @@ The first major release will represent a stable, playable version of the core re
 - [ ] No major known gameplay-breaking issues.
 
 ---
+
+</details>
 
 # Future Gameplay Ideas
 

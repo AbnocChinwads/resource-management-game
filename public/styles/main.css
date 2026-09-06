@@ -15,3 +15,44 @@ td {
 #player-status .card-body > div {
     white-space: nowrap;
 }
+
+.info-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.info-content > h1 {
+    margin-bottom: 1.5rem;
+}
+
+.info-content details {
+    margin-bottom: 1rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.info-content summary {
+    padding: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.info-content details > *:not(summary) {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.info-content details > h2 {
+    margin-top: 1rem;
+}
+
+.info-content details > ul,
+.info-content details > ol {
+    margin-bottom: 1rem;
+}
+
+.info-content li {
+    margin-bottom: 0.35rem;
+}
