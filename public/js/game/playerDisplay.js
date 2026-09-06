@@ -140,7 +140,7 @@ function updateResources(data) {
     .map((resource) => {
       const flow = getResourceFlowIndicator(resource.netPerMinute);
 
-      return ` <div> ${resource.name}: ${Number(resource.amount).toFixed(2)} ${flow} </div> `;
+      return ` <div> ${resource.name}: ${Number(resource.amount)} ${flow} </div> `;
     })
     .join("");
 }
@@ -152,7 +152,7 @@ function updateStorage(data) {
 
   storageEl.innerHTML = data.storage
     .map((storage) => {
-      return ` <span class="me-3"> ${storage.storage_category}: ${Number(storage.used).toFixed(2)} / ${Number(storage.capacity).toFixed(2)} </span> `;
+      return ` <span class="me-3"> ${storage.storage_category}: ${Number(storage.used)} / ${Number(storage.capacity)} </span> `;
     })
     .join("");
 }

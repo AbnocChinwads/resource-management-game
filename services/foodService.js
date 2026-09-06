@@ -28,7 +28,7 @@ export function calculateFoodConsumption(foods, nutritionNeeded) {
       Number(food.amount) * Number(food.nutrition_value);
 
     if (availableNutrition <= remainingNutrition) {
-      consumption.set(food.resource_type_id, Number(food.amount));
+      consumption.set(food.resource_type_id, food.amount);
 
       remainingNutrition -= availableNutrition;
     } else {
@@ -76,8 +76,8 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     if (player.last_food_tick === null) {
       await db.query(
         `UPDATE players
-      SET last_food_tick = $1
-      WHERE id = $2`,
+        SET last_food_tick = $1
+        WHERE id = $2`,
         [now, playerId],
       );
     }

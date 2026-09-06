@@ -1,5 +1,4 @@
 import db from "../db.js";
-import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 
 export async function getProductionBuildings(playerId) {
   const buildingsResult = await db.query(
@@ -58,20 +57,9 @@ export function calculateProductionRate(building) {
   );
 }
 
-export function calculateProductionPerTick(building) {
-  return calculateProductionRate(building) * (SIMULATION_TICK_SECONDS / 60);
-}
-
 export function calculateConsumptionRate(input, workers, craftTimeSeconds) {
   return (
     Number(input.amount) * Number(workers) * (60 / Number(craftTimeSeconds))
-  );
-}
-
-export function calculateConsumptionPerTick(input, workers, craftTimeSeconds) {
-  return (
-    calculateConsumptionRate(input, workers, craftTimeSeconds) *
-    (SIMULATION_TICK_SECONDS / 60)
   );
 }
 
@@ -98,11 +86,7 @@ export function getProductionStatus(building, inputs, resources, storage) {
   );
 
   for (const input of inputs) {
-    const required = calculateConsumptionPerTick(
-      input,
-      building.workers_assigned,
-      building.craft_time_seconds,
-    );
+    const required = Number(input.amount) * Number(building.workers_assigned);
 
     const available = resourceAmounts.get(input.resource_type_id) ?? 0;
 
@@ -114,7 +98,8 @@ export function getProductionStatus(building, inputs, resources, storage) {
     }
   }
 
-  const outputAmount = calculateProductionPerTick(building);
+  const outputAmount =
+    Number(building.output_amount) * Number(building.workers_assigned);
 
   const outputResource = resources.find(
     (resource) => resource.resource_type_id === building.output_resource_id,
@@ -140,7 +125,10 @@ export function getProductionStatus(building, inputs, resources, storage) {
     };
   }
 
-  if (outputAmount > Number(storageEntry.capacity) - Number(storageEntry.used)) {
+  if (
+    outputAmount >
+    Number(storageEntry.capacity) - Number(storageEntry.used)
+  ) {
     return {
       status: "idle",
       reason: "insufficient_storage",

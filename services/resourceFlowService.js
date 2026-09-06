@@ -89,7 +89,6 @@ function getResourceConsumption(workingBuildings) {
     } else {
       consumptionMap.set(resource.resource_type_id, {
         resource_type_id: resource.resource_type_id,
-        name: resource.name,
         consumed_per_minute: Number(resource.consumed_per_minute),
       });
     }

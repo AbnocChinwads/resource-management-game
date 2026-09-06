@@ -5,25 +5,21 @@ import {
 } from "./resourceService.js";
 import { getPlayerStorage } from "./storageService.js";
 import {
-  calculateProductionPerTick,
-  calculateConsumptionPerTick,
   getProductionStatus,
 } from "./productionService.js";
+import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 
 async function consumeInputs(
   playerId,
   inputs,
   workers,
-  craftTimeSeconds,
+  completedCrafts,
   resources,
   storage,
 ) {
   for (const input of inputs) {
-    const amount = calculateConsumptionPerTick(
-      input,
-      workers,
-      craftTimeSeconds,
-    );
+    const amount =
+      Number(input.amount) * Number(workers) * Number(completedCrafts);
 
     await db.query(
       `
@@ -83,6 +79,7 @@ export async function processResourceTick(playerId) {
         pb.id AS player_building_id,
         pb.workers_assigned,
         pb.health,
+        pb.production_progress_seconds,
         r.id AS recipe_id,
         r.name,
         r.craft_time_seconds,
@@ -117,16 +114,74 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
-      const outputAmount = calculateProductionPerTick(building);
+      const progress =
+        Number(building.production_progress_seconds) + SIMULATION_TICK_SECONDS;
+      const craftTime = Number(building.craft_time_seconds);
+      const potentialCrafts = Math.floor(progress / craftTime);
+
+      if (potentialCrafts <= 0) {
+        await db.query(
+          `
+          UPDATE player_buildings
+          SET production_progress_seconds = $1
+          WHERE id = $2
+          `,
+          [progress, building.player_building_id],
+        );
+
+        continue;
+      }
+
+      let completedCrafts = potentialCrafts;
+
+      for (const input of inputs) {
+        const requiredPerCraft =
+          Number(input.amount) * Number(building.workers_assigned);
+
+        const available =
+          resources.find(
+            (resource) => resource.resource_type_id === input.resource_type_id,
+          )?.amount ?? 0;
+
+        const possibleCrafts = Math.floor(Number(available) / requiredPerCraft);
+
+        completedCrafts = Math.min(completedCrafts, possibleCrafts);
+      }
+
+      const outputPerCraft =
+        Number(building.output_amount) * Number(building.workers_assigned);
+
+      const outputResource = resources.find(
+        (resource) => resource.resource_type_id === building.output_resource_id,
+      );
+
+      const storageEntry = storage.find(
+        (entry) => entry.storage_category === outputResource.storageCategory,
+      );
+
+      const availableStorage =
+        Number(storageEntry.capacity) - Number(storageEntry.used);
+
+      const possibleStorageCrafts = Math.floor(
+        availableStorage / outputPerCraft,
+      );
+
+      completedCrafts = Math.min(completedCrafts, possibleStorageCrafts);
+
+      if (completedCrafts <= 0) {
+        continue;
+      }
 
       await consumeInputs(
         playerId,
         inputs,
         building.workers_assigned,
-        building.craft_time_seconds,
+        completedCrafts,
         resources,
         storage,
       );
+
+      const outputAmount = outputPerCraft * completedCrafts;
 
       await addPlayerResource(
         playerId,
@@ -134,21 +189,20 @@ export async function processResourceTick(playerId) {
         outputAmount,
       );
 
-      const outputResource = resources.find(
-        (resource) => resource.resource_type_id === building.output_resource_id,
+      outputResource.amount = Number(outputResource.amount) + outputAmount;
+
+      storageEntry.used = Number(storageEntry.used) + outputAmount;
+
+      const remainingProgress = progress - completedCrafts * craftTime;
+
+      await db.query(
+        `
+        UPDATE player_buildings
+        SET production_progress_seconds = $1
+        WHERE id = $2
+        `,
+        [remainingProgress, building.player_building_id],
       );
-
-      if (outputResource) {
-        outputResource.amount += outputAmount;
-
-        const storageEntry = storage.find(
-          (entry) => entry.storage_category === outputResource.storageCategory,
-        );
-
-        if (storageEntry) {
-          storageEntry.used = Number(storageEntry.used) + outputAmount;
-        }
-      }
     }
 
     await db.query("COMMIT");
