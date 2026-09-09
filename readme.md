@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.6.0**
+**Alpha v0.6.1**
 
 ---
 
@@ -110,6 +110,58 @@ The game is designed around **persistent settlement progression** rather than a 
 </details>
 
 # Recent Updates
+
+<details>
+
+<summary>Alpha v0.6.1 — Automated Building Maintenance</summary>
+
+### Maintenance Buildings
+
+A new **Maintenance** building type has been introduced.
+
+Maintenance buildings allow the settlement to automatically maintain damaged buildings without requiring the player to manually repair each one.
+
+A functioning Maintenance building is required before automatic maintenance can be enabled.
+
+### Automatic Maintenance
+
+Buildings can now be individually assigned to automatic maintenance.
+
+When maintenance is enabled for a building, the settlement will automatically repair it when required, using the same repair resources as manual repairs.
+
+Maintenance can be enabled or disabled using the **Maintenance** switch displayed alongside each building's health.
+
+This allows players to choose which buildings should be maintained automatically rather than applying maintenance to the entire settlement.
+
+### Maintenance Availability
+
+Automatic maintenance depends on having a functioning Maintenance building.
+
+If all Maintenance buildings reach **0 health**, automatic maintenance becomes unavailable and the Maintenance controls are hidden.
+
+Once a Maintenance building is repaired and becomes operational again, the controls automatically become available.
+
+This means the settlement's maintenance infrastructure must itself be kept operational.
+
+### Building Management Interface
+
+Maintenance buildings now have their own building section alongside Population, Worker and Storage buildings.
+
+Building lists continue to group multiple buildings of the same type together, while individual buildings can be expanded and managed separately.
+
+Maintenance controls have also been integrated directly into the existing building health display.
+
+### Why This Matters
+
+Building degradation introduced an ongoing cost to settlement expansion.
+
+Automatic maintenance now gives players a way to manage that growing workload without constantly repairing buildings by hand.
+
+However, automation still depends on functioning maintenance infrastructure and a sufficient supply of repair resources, making settlement upkeep another system that must be planned and supported.
+
+---
+
+</details>
 
 <details>
 
@@ -922,11 +974,11 @@ This phase will introduce meaningful uses for tools, expand settlement automatio
 
 ### Planned
 
-* [ ] Add building degradation
-* [ ] Add building repair mechanics requiring tools
+* [x] Add building degradation
+* [x] Add building repair mechanics requiring tools
 * [ ] Add tool-based worker efficiency
 * [ ] Introduce tools as a resource with competing uses between production and repairs
-* [ ] Introduce additional automation options
+* [x] Introduce additional automation options
 * [ ] Introduce child, adult and elderly population categories
 * [ ] Add population ageing between life stages
 * [ ] Add player-facing population age breakdown

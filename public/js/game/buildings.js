@@ -12,36 +12,36 @@ function getOrCreateBuildingGroup(container, building) {
     groupRow.dataset.buildingGroupRow = "";
     groupRow.dataset.expanded = "false";
 
-    const columns = building.type === "production" ? 5 : 3;
+    let extraColumns = "";
+
+    if (building.type === "production") {
+      extraColumns = `
+        <td></td>
+        <td data-building-group-summary></td>
+        <td></td>
+        <td></td>
+      `;
+    } else if (building.type === "maintenance") {
+      extraColumns = `
+        <td></td>
+      `;
+    } else {
+      extraColumns = `
+        <td></td>
+        <td data-building-group-summary></td>
+      `;
+    }
 
     groupRow.innerHTML = `
       <td>
-        <button
-          type="button"
-          class="btn btn-link text-decoration-none p-0"
-        >
-          <span aria-hidden="true">▸</span>
-          ${groupName}
+        <button type="button" class="btn btn-link text-decoration-none p-0">
+          <span aria-hidden="true">▸</span>${groupName}
         </button>
 
-        <span
-          class="text-muted ms-2"
-          data-building-group-count
-        ></span>
+        <span class="text-muted ms-2" data-building-group-count></span>
       </td>
 
-      <td></td>
-
-      <td data-building-group-summary></td>
-
-      ${
-        columns === 5
-          ? `
-        <td></td>
-        <td></td>
-      `
-          : ""
-      }
+      ${extraColumns}
     `;
 
     const button = groupRow.querySelector("button");
@@ -278,6 +278,11 @@ function getProductionStatusMessage(building) {
 export function updateBuildings(buildings) {
   if (!buildings) return;
 
+  const maintenanceAvailable = buildings.some(
+    (building) =>
+      building.type === "maintenance" && Number(building.health) > 0,
+  );
+
   const buildingGroups = {};
 
   // Collect production buildings for group summaries.
@@ -306,6 +311,10 @@ export function updateBuildings(buildings) {
         container = document.getElementById("storage-buildings-body");
         break;
 
+      case "maintenance":
+        container = document.getElementById("maintenance-buildings-body");
+        break;
+
       default:
         return;
     }
@@ -327,7 +336,12 @@ export function updateBuildings(buildings) {
       if (building.type === "housing") {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
-          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span><button class="btn btn-sm btn-outline-secondary ms-2 building-repair-button" onclick="repairBuilding(${building.id})">Repair</button></td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
+            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+              <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
+              <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
+            </span>
+          </td>
           <td>${building.population_gain}</td>
         `;
       }
@@ -335,7 +349,12 @@ export function updateBuildings(buildings) {
       if (building.type === "production") {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
-          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span><button class="btn btn-sm btn-outline-secondary ms-2 building-repair-button" onclick="repairBuilding(${building.id})">Repair</button></td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
+            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+              <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
+              <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
+            </span>
+          </td>
           <td class="d-none d-xxl-table-cell" id="building-${building.id}-production-consumption"></td>
           <td>
             <span id="building-${building.id}-workers">
@@ -365,12 +384,69 @@ export function updateBuildings(buildings) {
       if (building.type === "storage") {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
-          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span><button class="btn btn-sm btn-outline-secondary ms-2 building-repair-button" onclick="repairBuilding(${building.id})">Repair</button></td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
+            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+              <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
+              <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
+            </span>
+          </td>
           <td>${building.storage_capacity} ${building.storage_category}</td>
         `;
       }
 
+      if (building.type === "maintenance") {
+        row.innerHTML = `
+          <td>${building.name} #${building.building_number}</td>
+          <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
+            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+              <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
+              <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
+            </span>
+          </td>
+        `;
+      }
+
+      const maintenanceCheckbox = row.querySelector(
+        `#maintenance-${building.id}`,
+      );
+
+      if (maintenanceCheckbox) {
+        maintenanceCheckbox.addEventListener("change", async (event) => {
+          const enabled = event.target.checked;
+
+          const res = await fetch("/update-maintenance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              buildingId: building.id,
+              autoRepair: enabled,
+            }),
+          });
+
+          const data = await res.json();
+
+          console.log(data);
+        });
+      }
+
       addBuildingRowToGroup(container, groupRow, row);
+    }
+
+    const maintenanceControl = row.querySelector("[data-maintenance-control]");
+
+    if (maintenanceControl) {
+      maintenanceControl.classList.toggle("d-none", !maintenanceAvailable);
+    }
+
+    const maintenanceCheckbox = row.querySelector(
+      `#maintenance-${building.id}`,
+    );
+
+    if (maintenanceCheckbox) {
+      maintenanceCheckbox.checked = Boolean(building.auto_repair);
     }
 
     const healthElement = row.querySelector("[data-building-health]");
@@ -378,17 +454,6 @@ export function updateBuildings(buildings) {
     if (healthElement) {
       healthElement.querySelector(".building-health-value").textContent =
         `${building.health}/${building.max_health}`;
-
-      const repairButton = healthElement.querySelector(
-        ".building-repair-button",
-      );
-
-      if (repairButton) {
-        repairButton.classList.toggle(
-          "d-none",
-          building.health >= building.max_health,
-        );
-      }
     }
 
     const workersElement = row.querySelector(
@@ -439,6 +504,10 @@ export function updateBuildings(buildings) {
         container = document.getElementById("storage-buildings-body");
         break;
 
+      case "maintenance":
+        container = document.getElementById("maintenance-buildings-body");
+        break;
+
       default:
         return;
     }
@@ -457,4 +526,5 @@ export function updateBuildings(buildings) {
   sortBuildingRows("population-buildings-body");
   sortBuildingRows("production-buildings-body");
   sortBuildingRows("storage-buildings-body");
+  sortBuildingRows("maintenance-buildings-body");
 }

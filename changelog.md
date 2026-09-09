@@ -997,3 +997,100 @@ Repairs restore building health only. Effective worker capacity increases natura
 - Verified building health updates automatically in the building interface.
 - Verified effective worker capacity updates automatically as building health changes.
 - Verified the database continues to store building health as whole numbers.
+
+# [0.6.1] — Automated Building Maintenance
+
+## Added
+
+- Added a new Maintenance building type.
+- Added automatic building maintenance.
+- Added per-building maintenance toggles allowing players to choose which buildings should be repaired automatically.
+- Added persistent automatic maintenance state for player buildings.
+- Added maintenance availability checks requiring at least one functioning Maintenance building.
+- Added a dedicated Maintenance Buildings table to the building interface.
+- Added dynamic Maintenance controls to Housing, Production, Storage and Maintenance buildings.
+- Added a maintenance update route for enabling and disabling automatic repair on individual buildings.
+- Added automatic repair processing using the existing building repair resource requirements.
+- Added Bootstrap switch controls for automatic maintenance.
+- Added a migration to reset existing building production and degradation progress counters.
+
+## Changed
+
+- Updated building management so repair automation is available to all building types rather than only production buildings.
+- Updated building group rendering to support the different column layout used by Maintenance buildings.
+- Updated building displays so Maintenance controls appear automatically when functioning maintenance infrastructure is available.
+- Updated building displays so Maintenance controls disappear when all Maintenance buildings reach 0 health.
+- Updated Maintenance controls so they automatically reappear when a Maintenance building becomes operational again.
+- Updated building health displays to integrate automatic maintenance controls alongside current and maximum health.
+- Updated building grouping and sorting to support Maintenance buildings.
+- Updated building simulation state so existing `production_progress_seconds`, `production_wear_ticks` and `degradation_ticks` values are reset during migration.
+
+## Automatic Maintenance
+
+Buildings can now be individually assigned to automatic maintenance.
+
+When automatic maintenance is enabled, eligible damaged buildings can be repaired automatically using the same repair resources required by manual repairs.
+
+Automatic maintenance is stored per player building, allowing different buildings to be maintained independently.
+
+Maintenance settings persist between simulation updates rather than being treated as temporary frontend state.
+
+## Maintenance Infrastructure
+
+Automatic maintenance requires at least one functioning Maintenance building.
+
+A Maintenance building with health above 0 enables the settlement's automatic maintenance controls.
+
+If all Maintenance buildings reach 0 health, automatic maintenance becomes unavailable and the maintenance switches are hidden from the building interface.
+
+Repairing a Maintenance building above 0 health restores access to automatic maintenance on the next game update.
+
+Maintenance buildings can themselves have automatic maintenance enabled while maintenance infrastructure remains operational.
+
+## Building Interface
+
+Maintenance buildings now appear in their own building table alongside Population, Worker and Storage buildings.
+
+Maintenance buildings use the same expandable grouping system as other building types.
+
+The building group rendering system was updated to support the two-column Maintenance building layout without affecting the existing three-column Housing and Storage layouts or five-column Production layout.
+
+Automatic maintenance is controlled using Bootstrap switches displayed beside building health.
+
+The visibility and current checked state of each switch are refreshed through the normal building update cycle.
+
+## Simulation State Reset
+
+Existing player buildings may contain partial production or degradation progress accumulated under previous simulation behaviour.
+
+A migration resets:
+
+- `production_progress_seconds`
+- `production_wear_ticks`
+- `degradation_ticks`
+
+to 0 for all existing player buildings.
+
+This prevents hidden progress values from carrying into the updated maintenance and simulation behaviour.
+
+## Testing
+
+- Verified Maintenance buildings appear in their own building table.
+- Verified Maintenance buildings are correctly grouped and sorted.
+- Verified Maintenance controls appear for Housing buildings.
+- Verified Maintenance controls appear for Production buildings.
+- Verified Maintenance controls appear for Storage buildings.
+- Verified Maintenance controls appear for Maintenance buildings.
+- Verified individual Maintenance switches can be enabled and disabled.
+- Verified Maintenance switch state persists across frontend updates.
+- Verified automatic maintenance requires a functioning Maintenance building.
+- Verified Maintenance controls disappear when the Maintenance building reaches 0 health.
+- Verified Maintenance controls reappear on the next update after a Maintenance building is restored above 0 health.
+- Verified Maintenance controls update through the existing building refresh cycle without requiring a page reload.
+- Verified Maintenance buildings at 0 health do not provide access to automatic maintenance.
+- Verified automatic repair uses the existing repair resource requirements.
+- Verified building health continues to update correctly while automatic maintenance is enabled.
+- Verified Production building worker and production displays continue to update correctly after the Maintenance interface changes.
+- Verified Housing and Storage building layouts remain correctly aligned after updating building group rendering.
+- Verified Maintenance building group rows use the correct number of table columns.
+- Verified existing building production and degradation progress counters are reset to 0 by migration.

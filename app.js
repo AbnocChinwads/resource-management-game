@@ -19,7 +19,7 @@ import playerStatsRoute from "./routes/playerStats.js";
 import updateWorkersRoute from "./routes/updateWorkers.js";
 import startRoute from "./routes/startTask.js";
 import completeRoute from "./routes/completeTask.js";
-import repairBuildingRouter from "./routes/repairBuilding.js";
+import buildingMaintenanceRoute from "./routes/updateMaintenance.js";
 
 import { requireAdmin } from "./middleware/admin.js";
 import devRoute from "./routes/dev.js";
@@ -83,7 +83,7 @@ app.use("/api/player-stats", playerStatsRoute);
 app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
-app.use("/repair-building", repairBuildingRouter);
+app.use("/update-maintenance", buildingMaintenanceRoute);
 app.use("/feedback", feedbackRoutes);
 app.use("/info", infoRoute);
 

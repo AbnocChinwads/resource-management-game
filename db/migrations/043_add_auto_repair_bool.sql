@@ -1,0 +1,2 @@
+ALTER TABLE player_buildings
+ADD COLUMN auto_repair BOOLEAN NOT NULL DEFAULT FALSE;
