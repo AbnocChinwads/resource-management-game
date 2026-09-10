@@ -59,11 +59,11 @@ td {
 
 .maintenance-switch .form-check-input {
   background-image: url("../images/wrench-adjustable-circle.svg");
-  background-color: #6c757d;
+  background-color: var(--bs-secondary);
   border: none;
 }
 
 .maintenance-switch .form-check-input:checked {
   background-image: url("../images/wrench-adjustable-circle.svg");
-  background-color: #d98c10;
+  background-color: var(--bs-success);
 }

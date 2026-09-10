@@ -1005,6 +1005,8 @@ This phase will expand production systems and introduce additional resource and 
 
 </details>
 
+<details>
+
 <summary>v0.8.x - Reliability, Architecture & Polish</summary>
 
 This phase will focus on improving the reliability, architecture and maintainability of the existing game systems rather than introducing large new mechanics.
