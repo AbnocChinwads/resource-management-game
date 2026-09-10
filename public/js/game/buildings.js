@@ -337,7 +337,7 @@ export function updateBuildings(buildings) {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
           <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
-            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+            <span class="ms-2 form-check form-check-inline form-switch maintenance-switch" data-maintenance-control>
               <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
               <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
             </span>
@@ -350,7 +350,7 @@ export function updateBuildings(buildings) {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
           <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
-            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+            <span class="ms-2 form-check form-check-inline form-switch maintenance-switch" data-maintenance-control>
               <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
               <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
             </span>
@@ -385,7 +385,7 @@ export function updateBuildings(buildings) {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
           <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
-            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+            <span class="ms-2 form-check form-check-inline form-switch maintenance-switch" data-maintenance-control>
               <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
               <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
             </span>
@@ -398,7 +398,7 @@ export function updateBuildings(buildings) {
         row.innerHTML = `
           <td>${building.name} #${building.building_number}</td>
           <td data-building-health><span class="building-health-value">${building.health}/${building.max_health}</span>
-            <span class="ms-2 form-check form-check-inline form-switch" data-maintenance-control>
+            <span class="ms-2 form-check form-check-inline form-switch maintenance-switch" data-maintenance-control>
               <input type="checkbox" class="form-check-input" role="switch" id="maintenance-${building.id}" ${building.auto_repair ? "checked" : ""}>
               <label class="form-check-label" for="maintenance-${building.id}">Maintenance</label>
             </span>
@@ -427,8 +427,6 @@ export function updateBuildings(buildings) {
           });
 
           const data = await res.json();
-
-          console.log(data);
         });
       }
 
