@@ -59,6 +59,7 @@ function getRecipeConsumption(workingBuildings) {
         input,
         building.workers_assigned,
         building.craft_time_seconds,
+        building.toolEfficiencyMultiplier,
       );
 
       const existing = consumptionMap.get(input.resource_type_id);

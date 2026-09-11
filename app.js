@@ -20,6 +20,7 @@ import updateWorkersRoute from "./routes/updateWorkers.js";
 import startRoute from "./routes/startTask.js";
 import completeRoute from "./routes/completeTask.js";
 import buildingMaintenanceRoute from "./routes/updateMaintenance.js";
+import updateToolPolicyRoute from "./routes/updateToolPolicy.js";
 
 import { requireAdmin } from "./middleware/admin.js";
 import devRoute from "./routes/dev.js";
@@ -84,6 +85,7 @@ app.use("/update-workers", updateWorkersRoute);
 app.use("/start-task", startRoute);
 app.use("/complete-task", completeRoute);
 app.use("/update-maintenance", buildingMaintenanceRoute);
+app.use("/update-tool-policy", updateToolPolicyRoute);
 app.use("/feedback", feedbackRoutes);
 app.use("/info", infoRoute);
 

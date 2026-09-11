@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.6.1**
+**Alpha v0.6.2**
 
 ---
 
@@ -113,13 +113,89 @@ The game is designed around **persistent settlement progression** rather than a 
 
 <details>
 
+<details>
+
+<summary>Alpha v0.6.2 — Tool Efficiency & Production Economy</summary>
+
+### Stone and Iron Tools
+
+Tools are now divided into two production tiers:
+
+* **Stone Tools** — increase production speed by **10%**
+* **Iron Tools** — increase production speed by **20%**
+
+Production buildings can be configured individually to use no tools, Stone Tools, or Iron Tools.
+
+### Tool Usage
+
+Each equipped worker requires one tool.
+
+A tool lasts for **5 minutes of active production**. Tool durability pauses whenever the building is unable to produce, such as when it has no workers, insufficient resources, insufficient storage, or is too damaged to operate.
+
+Iron Tool policies prefer Iron Tools but can fall back to Stone Tools when insufficient Iron Tools are available.
+
+### Production Efficiency
+
+Tools increase production speed rather than increasing the amount produced by an individual craft.
+
+Faster production therefore also increases the rate at which recipe inputs are consumed.
+
+Production and consumption displays now show the actual boosted rates.
+
+Buildings also display their current **Active bonus**, allowing players to see the efficiency actually being provided by equipped tools.
+
+### Toolmaker
+
+A new **Toolmaker** production building has been added.
+
+The Toolmaker produces Stone Tools from:
+
+* **2 Stone**
+* **1 Wood**
+
+This provides an early production route for Stone Tools before the settlement develops the infrastructure required for Iron Tools.
+
+### Iron Tools and Maintenance
+
+Iron Tools now have competing uses within the settlement.
+
+They can be equipped to workers for the stronger production bonus or retained for automatic building maintenance.
+
+Players therefore need to decide how much Iron Tool production should support increased productivity and how much should be reserved for maintaining settlement infrastructure.
+
+### Production Improvements
+
+Production now tracks fractional progress internally while continuing to consume and produce whole resource units.
+
+This allows production-speed bonuses to work accurately without introducing fractional stored resources.
+
+### Construction Progression
+
+Construction recipes now have an explicit display order rather than relying on internal database IDs.
+
+This allows new buildings such as the Toolmaker to appear at the appropriate point in settlement progression.
+
+### Why This Matters
+
+Tools are now part of the settlement's wider production economy.
+
+Stone Tools provide an accessible early efficiency upgrade, while Iron Tools provide a stronger bonus but also compete with the settlement's maintenance requirements.
+
+Choosing where and when to use tools now creates another production and resource-allocation decision as the settlement grows.
+
+---
+
+</details>
+
+<details>
+
 <summary>Alpha v0.6.1 — Automated Building Maintenance</summary>
 
 ### Maintenance Buildings
 
 A new **Maintenance** building type has been introduced.
 
-Maintenance buildings allow the settlement to automatically maintain damaged buildings without requiring the player to manually repair each one.
+Maintenance buildings allow the settlement to automatically maintain damaged buildings.
 
 A functioning Maintenance building is required before automatic maintenance can be enabled.
 
@@ -127,7 +203,7 @@ A functioning Maintenance building is required before automatic maintenance can 
 
 Buildings can now be individually assigned to automatic maintenance.
 
-When maintenance is enabled for a building, the settlement will automatically repair it when required, using the same repair resources as manual repairs.
+When maintenance is enabled for a building, the settlement will automatically repair it when required using iron tools.
 
 Maintenance can be enabled or disabled using the **Maintenance** switch displayed alongside each building's health.
 
@@ -976,8 +1052,8 @@ This phase will introduce meaningful uses for tools, expand settlement automatio
 
 * [x] Add building degradation
 * [x] Add building repair mechanics requiring tools
-* [ ] Add tool-based worker efficiency
-* [ ] Introduce tools as a resource with competing uses between production and repairs
+* [x] Add tool-based worker efficiency
+* [x] Introduce tools as a resource with competing uses between production efficiency and maintenance
 * [x] Introduce additional automation options
 * [ ] Introduce child, adult and elderly population categories
 * [ ] Add population ageing between life stages
@@ -997,6 +1073,7 @@ This phase will expand production systems and introduce additional resource and 
 
 ### Planned
 
+* [ ] Add production targets and limits
 * [ ] Expand production chains
 * [ ] Introduce more resource interactions
 * [ ] Introduce additional consumable resources and production choices

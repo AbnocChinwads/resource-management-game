@@ -4,9 +4,8 @@ import {
   addPlayerResource,
 } from "./resourceService.js";
 import { getPlayerStorage } from "./storageService.js";
-import {
-  getProductionStatus,
-} from "./productionService.js";
+import { getProductionStatus } from "./productionService.js";
+import { processBuildingToolTick } from "./toolEfficiencyService.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 
 async function consumeInputs(
@@ -82,6 +81,7 @@ export async function processResourceTick(playerId) {
         pb.workers_assigned,
         pb.health,
         pb.production_progress_seconds,
+        pb.tool_policy,
         r.id AS recipe_id,
         r.name,
         r.craft_time_seconds,
@@ -116,10 +116,17 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
+      const efficiencyMultiplier = await processBuildingToolTick(
+        playerId,
+        building,
+        resources,
+        storage,
+      );
+
       workingBuildings.push(building.player_building_id);
 
       const progress =
-        Number(building.production_progress_seconds) + SIMULATION_TICK_SECONDS;
+        Number(building.production_progress_seconds) + SIMULATION_TICK_SECONDS * efficiencyMultiplier;
       const craftTime = Number(building.craft_time_seconds);
       const potentialCrafts = Math.floor(progress / craftTime);
 

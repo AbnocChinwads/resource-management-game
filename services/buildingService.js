@@ -4,6 +4,7 @@ import {
   calculateConsumptionRate,
   getProductionStatus,
 } from "./productionService.js";
+import { getPlayerToolEfficiencyMultipliers } from "./toolEfficiencyService.js";
 
 export function degradeBuilding(building) {
   return Math.max(0, building.health - building.degradation);
@@ -60,7 +61,8 @@ export async function getPlayerBuildings(
   );
 
   const buildings = result.rows;
-
+  const toolEfficiencyMultipliers =
+    await getPlayerToolEfficiencyMultipliers(playerId);
   const recipeInputsMap = new Map();
 
   for (const input of recipeInputs) {
@@ -73,6 +75,8 @@ export async function getPlayerBuildings(
 
   for (const building of buildings) {
     building.effectiveWorkerCapacity = getEffectiveWorkerCapacity(building);
+    building.toolEfficiencyMultiplier =
+      toolEfficiencyMultipliers.get(Number(building.id)) ?? 1;
 
     if (!building.recipe_id) {
       building.productionRate = 0;
@@ -91,6 +95,7 @@ export async function getPlayerBuildings(
         input,
         building.workers_assigned,
         building.craft_time_seconds,
+        building.toolEfficiencyMultiplier,
       ),
     }));
 
@@ -103,96 +108,4 @@ export async function getPlayerBuildings(
   }
 
   return buildings;
-}
-
-export async function repairBuilding(playerId, buildingId) {
-  await db.query("BEGIN");
-
-  try {
-    const buildingResult = await db.query(
-      `
-      SELECT
-        pb.health,
-        b.max_health
-      FROM player_buildings pb
-      JOIN buildings b
-        ON b.id = pb.building_id
-      WHERE pb.id = $1
-        AND pb.player_id = $2
-      FOR UPDATE
-      `,
-      [buildingId, playerId],
-    );
-
-    if (!buildingResult.rows.length) {
-      await db.query("ROLLBACK");
-      return {
-        success: false,
-        error: "InvalidBuilding",
-      };
-    }
-
-    const { health, max_health } = buildingResult.rows[0];
-
-    if (health >= max_health) {
-      await db.query("ROLLBACK");
-      return {
-        success: false,
-        error: "BuildingAlreadyRepaired",
-      };
-    }
-
-    const toolResult = await db.query(
-      `
-      SELECT amount
-      FROM player_resources
-      WHERE player_id = $1
-        AND resource_type_id = 6
-      FOR UPDATE
-      `,
-      [playerId],
-    );
-
-    const tools = toolResult.rows[0]?.amount ?? 0;
-
-    if (Number(tools) < 1) {
-      await db.query("ROLLBACK");
-      return {
-        success: false,
-        error: "InsufficientTools",
-      };
-    }
-
-    const newHealth = Math.min(Number(max_health), Number(health) + 10);
-
-    await db.query(
-      `
-      UPDATE player_resources
-      SET amount = amount - 1
-      WHERE player_id = $1
-        AND resource_type_id = 6
-      `,
-      [playerId],
-    );
-
-    await db.query(
-      `
-      UPDATE player_buildings
-      SET health = $1
-      WHERE id = $2
-        AND player_id = $3
-      `,
-      [newHealth, buildingId, playerId],
-    );
-
-    await db.query("COMMIT");
-
-    return {
-      success: true,
-      health: newHealth,
-    };
-  } catch (err) {
-    await db.query("ROLLBACK");
-    throw err;
-  }
 }

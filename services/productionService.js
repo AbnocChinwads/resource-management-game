@@ -1,4 +1,5 @@
 import db from "../db.js";
+import { getPlayerToolEfficiencyMultipliers } from "./toolEfficiencyService.js";
 
 export async function getProductionBuildings(playerId) {
   const buildingsResult = await db.query(
@@ -43,23 +44,39 @@ export async function getProductionBuildings(playerId) {
     inputsMap.get(input.recipe_id).push(input);
   }
 
+  const toolEfficiencyMultipliers =
+    await getPlayerToolEfficiencyMultipliers(playerId);
+
   return buildingsResult.rows.map((building) => ({
     ...building,
+    toolEfficiencyMultiplier:
+      toolEfficiencyMultipliers.get(Number(building.id)) ?? 1,
     inputs: inputsMap.get(building.recipe_id) ?? [],
   }));
 }
 
 export function calculateProductionRate(building) {
+  const efficiencyMultiplier = Number(building.toolEfficiencyMultiplier ?? 1);
+
   return (
     Number(building.output_amount) *
     Number(building.workers_assigned) *
-    (60 / Number(building.craft_time_seconds))
+    (60 / Number(building.craft_time_seconds)) *
+    efficiencyMultiplier
   );
 }
 
-export function calculateConsumptionRate(input, workers, craftTimeSeconds) {
+export function calculateConsumptionRate(
+  input,
+  workers,
+  craftTimeSeconds,
+  efficiencyMultiplier = 1,
+) {
   return (
-    Number(input.amount) * Number(workers) * (60 / Number(craftTimeSeconds))
+    Number(input.amount) *
+    Number(workers) *
+    (60 / Number(craftTimeSeconds)) *
+    Number(efficiencyMultiplier)
   );
 }
 

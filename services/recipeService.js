@@ -30,7 +30,7 @@ export async function getRecipes(recipeInputs) {
     FROM recipes r
     LEFT JOIN buildings b
       ON b.id = r.output_building_id
-    ORDER BY r.id ASC
+    ORDER BY r.display_order NULLS LAST, r.id ASC
     `,
   );
 

@@ -1094,3 +1094,65 @@ This prevents hidden progress values from carrying into the updated maintenance 
 - Verified Housing and Storage building layouts remain correctly aligned after updating building group rendering.
 - Verified Maintenance building group rows use the correct number of table columns.
 - Verified existing building production and degradation progress counters are reset to 0 by migration.
+
+# [0.6.2] - Tool Efficiency & Production Economy
+
+### Added
+
+- Added separate **Stone Tools** and **Iron Tools** resource tiers.
+- Added tool-based production efficiency for worker buildings.
+- Stone Tools increase production speed by **10%** per equipped worker.
+- Iron Tools increase production speed by **20%** per equipped worker.
+- Added configurable tool policies for individual production buildings:
+
+  * None
+  * Stone Tools
+  * Iron Tools
+- Added automatic fallback from Iron Tools to Stone Tools when insufficient Iron Tools are available.
+- Added persistent equipped-tool state for production buildings.
+- Added tool durability based on active production time.
+- Tools last **5 active minutes** and only lose durability while their building is actively producing.
+- Added weighted production bonuses for partially equipped buildings.
+- Added player-facing active efficiency bonus information.
+- Added **Toolmaker** production building for crafting Stone Tools.
+- Added explicit recipe display ordering so new construction recipes can be positioned according to progression rather than database ID.
+
+### Changed
+
+- Production progress now supports fractional values so efficiency bonuses can accurately increase production speed.
+- Production and consumption rates now include active tool-efficiency bonuses.
+- Grouped production summaries and resource-flow calculations now reflect actual equipped-tool efficiency.
+- Iron Tools are now used for automatic building maintenance.
+- Blacksmith production time for Iron Tools reduced to **15 seconds**.
+- Production now tracks progress toward whole completed crafts rather than producing fractional resources.
+- Tool policy represents the player's preferred tool tier while the interface separately displays the actual active bonus.
+- Build recipes are now displayed using explicit progression ordering rather than recipe ID.
+
+### Removed
+
+- Removed the obsolete manual building repair system.
+- Removed unused manual repair frontend and backend code.
+
+### Interface
+
+- Added tool-policy controls directly to individual production buildings.
+- Added visible production-speed bonuses to tool choices.
+- Added tool usage information showing that one tool is required per worker and lasts five active minutes.
+- Added live **Active bonus** feedback so players can see the efficiency currently being provided by equipped tools.
+- Production and consumption `/min` values now update to reflect tool efficiency.
+
+### Balance
+
+- Stone Tools require:
+
+  * 2 Stone
+  * 1 Wood
+- Stone Tools provide a lower-cost early production-efficiency option.
+- Iron Tools now compete between production efficiency and automatic maintenance, creating an additional settlement resource-management decision.
+
+### Reason
+
+- Tools now form a complete progression system rather than serving only as a maintenance resource.
+- Players can choose whether to spend tools increasing production efficiency or preserve higher-tier Iron Tools for settlement maintenance.
+- Stone Tools provide an accessible early-game efficiency option while Iron Tools provide a stronger bonus at a higher economic cost.
+- This release establishes a stable production-efficiency baseline before production targets and production limits are introduced.
