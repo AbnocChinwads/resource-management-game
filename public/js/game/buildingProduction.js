@@ -168,11 +168,7 @@ function renderToolTimer(row, buildingId, state) {
     return;
   }
 
-  const elapsedSeconds = state.running
-    ? (Date.now() - state.syncedAt) / 1000
-    : 0;
-
-  const remaining = Math.max(0, state.remaining - elapsedSeconds);
+  const remaining = Math.max(0, state.displayRemaining);
 
   if (remaining <= 0) {
     timer.classList.add("d-none");
@@ -192,26 +188,71 @@ function renderToolTimer(row, buildingId, state) {
 
   progress.setAttribute("aria-valuenow", String(Math.round(percentage)));
 
-  text.textContent = `Tool time remaining: ${formatToolTimer(remaining)}`;
+  text.textContent = formatToolTimer(remaining);
 }
 
 export function updateToolTimer(row, building) {
   const buildingId = Number(building.id);
 
-  const remaining = Math.max(0, Number(building.toolRemainingSeconds ?? 0));
+  const serverRemaining = Math.max(
+    0,
+    Number(building.toolRemainingSeconds ?? 0),
+  );
 
   const duration = Math.max(1, Number(building.toolDurationSeconds ?? 1));
 
   const running = building.productionStatus?.status === "working";
 
-  const state = {
-    remaining,
-    duration,
-    running,
-    syncedAt: Date.now(),
-  };
+  let state = toolTimerStates.get(buildingId);
 
-  toolTimerStates.set(buildingId, state);
+  if (!state) {
+    state = {
+      serverRemaining,
+      displayRemaining: serverRemaining,
+      duration,
+      running,
+      holdSeconds: 0,
+    };
+
+    toolTimerStates.set(buildingId, state);
+  } else {
+    /*
+     * remaining_seconds never increases during
+     * one tool cohort.
+     *
+     * If the server value increases, a fresh
+     * cohort has been equipped.
+     */
+    const newToolCohort = serverRemaining > state.serverRemaining;
+
+    if (newToolCohort) {
+      state.displayRemaining = serverRemaining;
+
+      state.holdSeconds = 0;
+    } else if (serverRemaining < state.displayRemaining) {
+      /*
+       * Server is authoritative if the local
+       * timer happens to be behind it.
+       */
+      state.displayRemaining = serverRemaining;
+
+      state.holdSeconds = 0;
+    } else if (running && serverRemaining > state.displayRemaining) {
+      /*
+       * Browser counted slightly too far while
+       * waiting to learn that production stopped.
+       *
+       * Don't jump backwards. Hold the display
+       * until the server catches up.
+       */
+      state.holdSeconds = Math.ceil(serverRemaining - state.displayRemaining);
+    }
+
+    state.serverRemaining = serverRemaining;
+
+    state.duration = duration;
+    state.running = running;
+  }
 
   renderToolTimer(row, buildingId, state);
 }
@@ -222,7 +263,16 @@ setInterval(() => {
 
     if (!row) {
       toolTimerStates.delete(buildingId);
+
       continue;
+    }
+
+    if (state.running && state.displayRemaining > 0) {
+      if (state.holdSeconds > 0) {
+        state.holdSeconds -= 1;
+      } else {
+        state.displayRemaining = Math.max(0, state.displayRemaining - 1);
+      }
     }
 
     renderToolTimer(row, buildingId, state);
