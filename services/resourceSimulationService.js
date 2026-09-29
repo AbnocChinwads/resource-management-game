@@ -52,6 +52,7 @@ async function consumeInputs(
 export async function processResourceTick(playerId) {
   return withTransaction(async (client) => {
     const workingBuildings = [];
+    const progressUpdates = [];
 
     const inputsResult = await client.query(
       `
@@ -132,14 +133,10 @@ export async function processResourceTick(playerId) {
       const potentialCrafts = Math.floor(progress / craftTime);
 
       if (potentialCrafts <= 0) {
-        client.query(
-          `
-          UPDATE player_buildings
-          SET production_progress_seconds = $1
-          WHERE id = $2
-          `,
-          [progress, building.player_building_id],
-        );
+        progressUpdates.push({
+          id: building.player_building_id,
+          progress,
+        });
 
         continue;
       }
@@ -209,13 +206,35 @@ export async function processResourceTick(playerId) {
 
       const remainingProgress = progress - completedCrafts * craftTime;
 
-      client.query(
+      progressUpdates.push({
+        id: building.player_building_id,
+        progress: remainingProgress,
+      });
+    }
+
+    if (progressUpdates.length > 0) {
+      await client.query(
         `
-        UPDATE player_buildings
-        SET production_progress_seconds = $1
-        WHERE id = $2
+        UPDATE player_buildings AS pb
+        SET production_progress_seconds =
+          update_data.production_progress_seconds
+        FROM (
+          SELECT *
+          FROM UNNEST(
+            $1::integer[],
+            $2::numeric[]
+          )
+          AS data(
+            id,
+            production_progress_seconds
+          )
+        ) AS update_data
+        WHERE pb.id = update_data.id
         `,
-        [remainingProgress, building.player_building_id],
+        [
+          progressUpdates.map((update) => update.id),
+          progressUpdates.map((update) => update.progress),
+        ],
       );
     }
 
