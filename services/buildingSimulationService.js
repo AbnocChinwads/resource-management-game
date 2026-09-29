@@ -31,6 +31,8 @@ export async function processBuildingDegradationTick(
     [playerId],
   );
 
+  const updates = [];
+
   for (const building of buildings.rows) {
     const isWorking = workingBuildings.includes(building.player_building_id);
 
@@ -72,23 +74,52 @@ export async function processBuildingDegradationTick(
       effectiveWorkerCapacity,
     );
 
-    await db.query(
-      `
-      UPDATE player_buildings
-      SET
-        health = $1,
-        workers_assigned = $2,
-        degradation_ticks = $3,
-        production_wear_ticks = $4
-      WHERE id = $5
-      `,
-      [
-        newHealth,
-        newWorkers,
-        degradationTicks,
-        productionWearTicks,
-        building.player_building_id,
-      ],
-    );
+    updates.push({
+      id: building.player_building_id,
+      health: newHealth,
+      workersAssigned: newWorkers,
+      degradationTicks,
+      productionWearTicks,
+    });
   }
+
+  if (updates.length === 0) {
+    return;
+  }
+
+  await db.query(
+    `
+    UPDATE player_buildings AS pb
+    SET
+      health = update_data.health,
+      workers_assigned = update_data.workers_assigned,
+      degradation_ticks = update_data.degradation_ticks,
+      production_wear_ticks = update_data.production_wear_ticks
+    FROM (
+      SELECT *
+      FROM UNNEST(
+        $1::integer[],
+        $2::integer[],
+        $3::integer[],
+        $4::integer[],
+        $5::integer[]
+      )
+      AS data(
+        id,
+        health,
+        workers_assigned,
+        degradation_ticks,
+        production_wear_ticks
+      )
+    ) AS update_data
+    WHERE pb.id = update_data.id
+    `,
+    [
+      updates.map((update) => update.id),
+      updates.map((update) => update.health),
+      updates.map((update) => update.workersAssigned),
+      updates.map((update) => update.degradationTicks),
+      updates.map((update) => update.productionWearTicks),
+    ],
+  );
 }
