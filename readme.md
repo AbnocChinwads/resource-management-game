@@ -16,7 +16,7 @@ Players begin by manually gathering resources before expanding their settlement 
 
 # Current Version
 
-**Alpha v0.6.2**
+**Alpha v0.6.3**
 
 ---
 
@@ -112,6 +112,32 @@ The game is designed around **persistent settlement progression** rather than a 
 # Recent Updates
 
 <details>
+
+<summary>Alpha v0.6.3 — Tool Durability & Simulation Improvements</summary>
+
+### Tool Durability Display
+
+Production buildings now display a countdown showing how much active production time remains on their equipped tools.
+
+The countdown includes a progress bar and updates smoothly between simulation ticks.
+
+Tool durability continues to pause whenever the building is unable to produce, allowing the remaining tool lifetime to be seen more clearly.
+
+### Simulation Improvements
+
+Several parts of the settlement simulation have been reworked to reduce unnecessary processing and database activity as settlements grow.
+
+Production, resources, building degradation, workers, and equipped tools are now processed more efficiently while preserving the existing gameplay behaviour.
+
+### Why This Matters
+
+Tool usage is now easier to monitor without needing to estimate when equipped tools will expire.
+
+The underlying simulation is also better prepared for larger settlements and future systems without increasing the amount of processing required for every individual building.
+
+---
+
+</details>
 
 <details>
 
