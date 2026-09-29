@@ -51,6 +51,12 @@ function createProductionRow(building) {
             <div class="form-text" id="building-${building.id}-tool-active">
               Active bonus: none
             </div>
+            <div class="mt-1 d-none" id="building-${building.id}-tool-timer">
+              <div class="progress" role="progressbar" aria-label="Tool durability remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="building-${building.id}-tool-progress" style="height: 6px;">
+                <div class="progress-bar" id="building-${building.id}-tool-timer-bar" style="width: 0%; transition: width 3s linear;"></div>
+              </div>
+              <div class="form-text" id="building-${building.id}-tool-timer-text"></div>
+            </div>
             <div class="form-text">
               1 tool per worker • lasts 5 active minutes
             </div>

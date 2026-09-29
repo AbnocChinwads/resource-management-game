@@ -4,7 +4,7 @@ import {
   calculateConsumptionRate,
   getProductionStatus,
 } from "./productionService.js";
-import { getPlayerToolEfficiencyMultipliers } from "./toolEfficiencyService.js";
+import { getPlayerToolStates } from "./toolEfficiencyService.js";
 
 export function degradeBuilding(building) {
   return Math.max(0, building.health - building.degradation);
@@ -61,8 +61,7 @@ export async function getPlayerBuildings(
   );
 
   const buildings = result.rows;
-  const toolEfficiencyMultipliers =
-    await getPlayerToolEfficiencyMultipliers(playerId);
+  const toolStates = await getPlayerToolStates(playerId);
   const recipeInputsMap = new Map();
 
   for (const input of recipeInputs) {
@@ -74,9 +73,15 @@ export async function getPlayerBuildings(
   }
 
   for (const building of buildings) {
+    const toolState = toolStates.get(Number(building.id));
+
     building.effectiveWorkerCapacity = getEffectiveWorkerCapacity(building);
-    building.toolEfficiencyMultiplier =
-      toolEfficiencyMultipliers.get(Number(building.id)) ?? 1;
+    
+    building.toolEfficiencyMultiplier = toolState?.multiplier ?? 1;
+    
+    building.toolRemainingSeconds = toolState?.remainingSeconds ?? 0;
+
+    building.toolDurationSeconds = toolState?.durationSeconds ?? 0;
 
     if (!building.recipe_id) {
       building.productionRate = 0;

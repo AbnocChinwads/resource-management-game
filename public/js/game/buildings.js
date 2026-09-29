@@ -9,6 +9,7 @@ import {
   setupToolPolicyControl,
   updateToolPolicyControl,
   updateActiveToolBonus,
+  updateToolTimer,
 } from "./buildingProduction.js";
 import {
   setupMaintenanceControl,
@@ -116,6 +117,8 @@ export function updateBuildings(buildings) {
       updateToolPolicyControl(row, building);
 
       updateActiveToolBonus(row, building);
+
+      updateToolTimer(row, building);
     }
   });
 

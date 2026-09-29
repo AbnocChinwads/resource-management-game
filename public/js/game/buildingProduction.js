@@ -82,8 +82,7 @@ export function setupToolPolicyControl(row, building) {
   toolPolicySelect.addEventListener("change", async (event) => {
     const select = event.target;
 
-    const previousPolicy =
-      select.dataset.currentPolicy ?? "none";
+    const previousPolicy = select.dataset.currentPolicy ?? "none";
 
     const toolPolicy = select.value;
 
@@ -140,7 +139,49 @@ export function updateActiveToolBonus(row, building) {
   );
 
   activeToolElement.textContent =
-    activeBonus > 0
-      ? `Active bonus: +${activeBonus}%`
-      : "Active bonus: none";
+    activeBonus > 0 ? `Active bonus: +${activeBonus}%` : "Active bonus: none";
+}
+
+export function updateToolTimer(row, building) {
+  const timer = row.querySelector(`#building-${building.id}-tool-timer`);
+
+  const progress = row.querySelector(`#building-${building.id}-tool-progress`);
+
+  const bar = row.querySelector(`#building-${building.id}-tool-timer-bar`);
+
+  const text = row.querySelector(`#building-${building.id}-tool-timer-text`);
+
+  if (!timer || !progress || !bar || !text) {
+    return;
+  }
+
+  const remaining = Math.max(0, Number(building.toolRemainingSeconds ?? 0));
+
+  const duration = Math.max(1, Number(building.toolDurationSeconds ?? 1));
+
+  if (remaining <= 0) {
+    timer.classList.add("d-none");
+
+    bar.style.width = "0%";
+
+    progress.setAttribute("aria-valuenow", "0");
+
+    return;
+  }
+
+  timer.classList.remove("d-none");
+
+  const percentage = Math.min(100, (remaining / duration) * 100);
+
+  const minutes = Math.floor(remaining / 60);
+
+  const seconds = Math.floor(remaining % 60);
+
+  bar.style.width = `${percentage}%`;
+
+  progress.setAttribute("aria-valuenow", String(Math.round(percentage)));
+
+  text.textContent = `Tool time remaining: ${minutes}:${String(
+    seconds,
+  ).padStart(2, "0")}`;
 }

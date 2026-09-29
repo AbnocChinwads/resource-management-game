@@ -8,28 +8,23 @@ import { getProductionStatus } from "./productionService.js";
 import { processBuildingToolTick } from "./toolEfficiencyService.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 
-async function consumeInputs(
-  playerId,
+function addResourceChange(resourceChanges, resourceTypeId, amount) {
+  const current = resourceChanges.get(resourceTypeId) ?? 0;
+
+  resourceChanges.set(resourceTypeId, current + Number(amount));
+}
+
+function consumeInputs(
   inputs,
   workers,
   completedCrafts,
   resources,
   storage,
-  queryRunner,
+  resourceChanges,
 ) {
   for (const input of inputs) {
     const amount =
       Number(input.amount) * Number(workers) * Number(completedCrafts);
-
-    await queryRunner.query(
-      `
-      UPDATE player_resources
-      SET amount = amount - $1
-      WHERE player_id = $2
-      AND resource_type_id = $3
-      `,
-      [amount, playerId, input.resource_type_id],
-    );
 
     const resource = resources.find(
       (resource) => resource.resource_type_id === input.resource_type_id,
@@ -37,6 +32,8 @@ async function consumeInputs(
 
     if (resource) {
       resource.amount -= amount;
+
+      addResourceChange(resourceChanges, input.resource_type_id, -amount);
 
       const storageEntry = storage.find(
         (entry) => entry.storage_category === resource.storageCategory,
@@ -53,6 +50,7 @@ export async function processResourceTick(playerId) {
   return withTransaction(async (client) => {
     const workingBuildings = [];
     const progressUpdates = [];
+    const resourceChanges = new Map();
 
     const inputsResult = await client.query(
       `
@@ -99,7 +97,7 @@ export async function processResourceTick(playerId) {
       [playerId],
     );
 
-    const resources = await getPlayerResourceState(playerId, client);
+    const resources = await getPlayerResourceState(playerId, client, true);
     const storage = await getPlayerStorage(playerId, client);
 
     for (const building of buildings.rows) {
@@ -121,6 +119,7 @@ export async function processResourceTick(playerId) {
         building,
         resources,
         storage,
+        resourceChanges,
         client,
       );
 
@@ -181,23 +180,21 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
-      await consumeInputs(
-        playerId,
+      consumeInputs(
         inputs,
         building.workers_assigned,
         completedCrafts,
         resources,
         storage,
-        client,
+        resourceChanges,
       );
 
       const outputAmount = outputPerCraft * completedCrafts;
 
-      await addPlayerResource(
-        playerId,
+      addResourceChange(
+        resourceChanges,
         building.output_resource_id,
         outputAmount,
-        client,
       );
 
       outputResource.amount = Number(outputResource.amount) + outputAmount;
@@ -234,6 +231,37 @@ export async function processResourceTick(playerId) {
         [
           progressUpdates.map((update) => update.id),
           progressUpdates.map((update) => update.progress),
+        ],
+      );
+    }
+
+    const changedResources = [...resourceChanges.entries()].filter(
+      ([, amount]) => amount !== 0,
+    );
+
+    if (changedResources.length > 0) {
+      await client.query(
+        `
+        UPDATE player_resources AS pr
+        SET amount = pr.amount + changes.amount
+        FROM (
+          SELECT *
+          FROM UNNEST(
+            $1::integer[],
+            $2::integer[]
+          )
+          AS data(
+            resource_type_id,
+            amount
+          )
+        ) AS changes
+        WHERE pr.player_id = $3
+          AND pr.resource_type_id = changes.resource_type_id
+        `,
+        [
+          changedResources.map(([resourceTypeId]) => resourceTypeId),
+          changedResources.map(([, amount]) => amount),
+          playerId,
         ],
       );
     }

@@ -42,13 +42,14 @@ export function calculateToolEfficiencyMultiplier(workers, equippedTools) {
   return totalEfficiency / workerCount;
 }
 
-export async function getPlayerToolEfficiencyMultipliers(playerId) {
+export async function getPlayerToolStates(playerId) {
   const result = await db.query(
     `
     SELECT
       pb.id AS player_building_id,
       pb.workers_assigned,
       pbt.equipped_count,
+      pbt.remaining_seconds,
       rt.name
     FROM player_buildings pb
     LEFT JOIN player_building_tools pbt
@@ -78,29 +79,49 @@ export async function getPlayerToolEfficiencyMultipliers(playerId) {
       buildings.get(buildingId).tools.push({
         name: row.name,
         equipped_count: Number(row.equipped_count),
+        remaining_seconds: Number(row.remaining_seconds),
       });
     }
   }
 
-  const multipliers = new Map();
+  const states = new Map();
 
   for (const [buildingId, building] of buildings) {
-    multipliers.set(
-      buildingId,
-      calculateToolEfficiencyMultiplier(building.workers, building.tools),
-    );
+    const remainingSeconds =
+      building.tools.length > 0
+        ? Math.max(...building.tools.map((tool) => tool.remaining_seconds))
+        : 0;
+
+    states.set(buildingId, {
+      multiplier: calculateToolEfficiencyMultiplier(
+        building.workers,
+        building.tools,
+      ),
+      remainingSeconds,
+      durationSeconds: TOOL_DURABILITY_SECONDS,
+    });
   }
 
-  return multipliers;
+  return states;
 }
 
-async function claimTools(
-  playerId,
+export async function getPlayerToolEfficiencyMultipliers(playerId) {
+  const states = await getPlayerToolStates(playerId);
+
+  return new Map(
+    [...states.entries()].map(([buildingId, state]) => [
+      buildingId,
+      state.multiplier,
+    ]),
+  );
+}
+
+function claimTools(
   toolName,
   requestedCount,
   resources,
   storage,
-  queryRunner,
+  resourceChanges,
 ) {
   const requested = Number(requestedCount);
 
@@ -108,33 +129,16 @@ async function claimTools(
     return null;
   }
 
-  const result = await queryRunner.query(
-    `
-        SELECT
-        pr.resource_type_id,
-        pr.amount,
-        rt.storage_category
-        FROM player_resources pr
-        JOIN resource_types rt
-        ON rt.id = pr.resource_type_id
-        WHERE pr.player_id = $1
-        AND rt.name = $2
-        FOR UPDATE OF pr
-        `,
-    [playerId, toolName],
-  );
+  const tool = resources.find((resource) => resource.name === toolName);
 
-  if (!result.rows.length) {
+  if (!tool) {
     return null;
   }
 
-  const tool = result.rows[0];
   const available = Number(tool.amount);
 
   if (!Number.isFinite(available)) {
-    throw new Error(
-      `Invalid ${toolName} amount for player ${playerId}: ${tool.amount}`,
-    );
+    throw new Error(`Invalid ${toolName} amount: ${tool.amount}`);
   }
 
   const claimedCount = Math.min(available, requested);
@@ -143,23 +147,9 @@ async function claimTools(
     return null;
   }
 
-  await queryRunner.query(
-    `
-        UPDATE player_resources
-        SET amount = amount - $1
-        WHERE player_id = $2
-        AND resource_type_id = $3
-        `,
-    [claimedCount, playerId, tool.resource_type_id],
-  );
+  const currentChange = resourceChanges.get(tool.resource_type_id) ?? 0;
 
-  const resource = resources.find(
-    (resource) => resource.resource_type_id === tool.resource_type_id,
-  );
-
-  if (resource) {
-    resource.amount -= claimedCount;
-  }
+  resourceChanges.set(tool.resource_type_id, currentChange - claimedCount);
 
   const storageEntry = storage.find(
     (entry) => entry.storage_category === tool.storage_category,
@@ -175,7 +165,12 @@ async function claimTools(
   };
 }
 
-async function saveEquippedTools(playerBuildingId, resourceTypeId, count, queryRunner = db) {
+async function saveEquippedTools(
+  playerBuildingId,
+  resourceTypeId,
+  count,
+  queryRunner = db,
+) {
   if (count <= 0) {
     return;
   }
@@ -201,7 +196,8 @@ export async function processBuildingToolTick(
   building,
   resources,
   storage,
-  queryRunner = db
+  resourceChanges,
+  queryRunner = db,
 ) {
   const workers = Number(building.workers_assigned);
 
@@ -267,13 +263,12 @@ export async function processBuildingToolTick(
   const equippedTools = [];
 
   if (building.tool_policy === "iron") {
-    const ironTools = await claimTools(
-      playerId,
+    const ironTools = claimTools(
       "Iron Tools",
       workersWithoutTools,
       resources,
       storage,
-      queryRunner,
+      resourceChanges,
     );
 
     if (ironTools) {
@@ -299,13 +294,12 @@ export async function processBuildingToolTick(
     workersWithoutTools > 0 &&
     (building.tool_policy === "iron" || building.tool_policy === "stone")
   ) {
-    const stoneTools = await claimTools(
-      playerId,
+    const stoneTools = claimTools(
       "Stone Tools",
       workersWithoutTools,
       resources,
       storage,
-      queryRunner,
+      resourceChanges,
     );
 
     if (stoneTools) {

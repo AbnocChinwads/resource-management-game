@@ -35,7 +35,7 @@ export async function addPlayerResource(playerId, resourceTypeId, amount, queryR
   );
 }
 
-export async function getPlayerResourceState(playerId, queryRunner = db) {
+export async function getPlayerResourceState(playerId, queryRunner = db, lockForUpdate = false) {
   const result = await queryRunner.query(
     `
     SELECT
@@ -49,6 +49,7 @@ export async function getPlayerResourceState(playerId, queryRunner = db) {
       ON rt.id = pr.resource_type_id
     WHERE pr.player_id = $1
     ORDER BY rt.id ASC
+    ${lockForUpdate ? "FOR UPDATE OF pr" : ""}
     `,
     [playerId],
   );
