@@ -5,6 +5,117 @@ import {
   TOOL_EFFICIENCY,
 } from "../config/simulation.js";
 
+function claimTools(
+  toolName,
+  requestedCount,
+  resources,
+  storage,
+  resourceChanges,
+) {
+  const requested = Number(requestedCount);
+
+  if (!Number.isInteger(requested) || requested <= 0) {
+    return null;
+  }
+
+  const tool = resources.find((resource) => resource.name === toolName);
+
+  if (!tool) {
+    return null;
+  }
+
+  const available = Number(tool.amount);
+
+  if (!Number.isFinite(available)) {
+    throw new Error(`Invalid ${toolName} amount: ${tool.amount}`);
+  }
+
+  const claimedCount = Math.min(available, requested);
+
+  if (claimedCount <= 0) {
+    return null;
+  }
+
+  tool.amount -= claimedCount;
+
+  const currentChange = resourceChanges.get(tool.resource_type_id) ?? 0;
+
+  resourceChanges.set(tool.resource_type_id, currentChange - claimedCount);
+
+  const storageEntry = storage.find(
+    (entry) => entry.storage_category === tool.storage_category,
+  );
+
+  if (storageEntry) {
+    storageEntry.used = Number(storageEntry.used) - claimedCount;
+  }
+
+  return {
+    resourceTypeId: tool.resource_type_id,
+    count: claimedCount,
+  };
+}
+
+function setToolUpdate(
+  toolUpdates,
+  playerBuildingId,
+  resourceTypeId,
+  equippedCount,
+  remainingSeconds,
+) {
+  const key = `${playerBuildingId}:${resourceTypeId}`;
+
+  toolUpdates.set(key, {
+    playerBuildingId,
+    resourceTypeId,
+    equippedCount,
+    remainingSeconds,
+  });
+}
+
+export async function getPlayerBuildingToolsForSimulation(
+  playerId,
+  queryRunner = db,
+) {
+  const result = await queryRunner.query(
+    `
+    SELECT
+      pbt.player_building_id,
+      pbt.resource_type_id,
+      pbt.equipped_count,
+      pbt.remaining_seconds,
+      rt.name
+    FROM player_building_tools pbt
+    JOIN player_buildings pb
+      ON pb.id = pbt.player_building_id
+    JOIN resource_types rt
+      ON rt.id = pbt.resource_type_id
+    WHERE pb.player_id = $1
+    FOR UPDATE OF pbt
+    `,
+    [playerId],
+  );
+
+  const toolsByBuilding = new Map();
+
+  for (const row of result.rows) {
+    const buildingId = Number(row.player_building_id);
+
+    if (!toolsByBuilding.has(buildingId)) {
+      toolsByBuilding.set(buildingId, []);
+    }
+
+    toolsByBuilding.get(buildingId).push({
+      resource_type_id: Number(row.resource_type_id),
+      equipped_count: Number(row.equipped_count),
+      remaining_seconds: Number(row.remaining_seconds),
+      name: row.name,
+    });
+  }
+
+  return toolsByBuilding;
+}
+
 export function calculateToolEfficiencyMultiplier(workers, equippedTools) {
   const workerCount = Number(workers);
 
@@ -116,88 +227,14 @@ export async function getPlayerToolEfficiencyMultipliers(playerId) {
   );
 }
 
-function claimTools(
-  toolName,
-  requestedCount,
-  resources,
-  storage,
-  resourceChanges,
-) {
-  const requested = Number(requestedCount);
-
-  if (!Number.isInteger(requested) || requested <= 0) {
-    return null;
-  }
-
-  const tool = resources.find((resource) => resource.name === toolName);
-
-  if (!tool) {
-    return null;
-  }
-
-  const available = Number(tool.amount);
-
-  if (!Number.isFinite(available)) {
-    throw new Error(`Invalid ${toolName} amount: ${tool.amount}`);
-  }
-
-  const claimedCount = Math.min(available, requested);
-
-  if (claimedCount <= 0) {
-    return null;
-  }
-
-  const currentChange = resourceChanges.get(tool.resource_type_id) ?? 0;
-
-  resourceChanges.set(tool.resource_type_id, currentChange - claimedCount);
-
-  const storageEntry = storage.find(
-    (entry) => entry.storage_category === tool.storage_category,
-  );
-
-  if (storageEntry) {
-    storageEntry.used = Number(storageEntry.used) - claimedCount;
-  }
-
-  return {
-    resourceTypeId: tool.resource_type_id,
-    count: claimedCount,
-  };
-}
-
-async function saveEquippedTools(
-  playerBuildingId,
-  resourceTypeId,
-  count,
-  queryRunner = db,
-) {
-  if (count <= 0) {
-    return;
-  }
-
-  await queryRunner.query(
-    `
-        INSERT INTO player_building_tools(player_building_id, resource_type_id, equipped_count, remaining_seconds)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (player_building_id, resource_type_id)
-        DO UPDATE SET equipped_count = EXCLUDED.equipped_count, remaining_seconds = EXCLUDED.remaining_seconds
-        `,
-    [
-      playerBuildingId,
-      resourceTypeId,
-      count,
-      TOOL_DURABILITY_SECONDS - SIMULATION_TICK_SECONDS,
-    ],
-  );
-}
-
-export async function processBuildingToolTick(
-  playerId,
+export function processBuildingToolTick(
   building,
   resources,
   storage,
   resourceChanges,
-  queryRunner = db,
+  toolsByBuilding,
+  toolUpdates,
+  toolClearBuildingIds,
 ) {
   const workers = Number(building.workers_assigned);
 
@@ -207,19 +244,11 @@ export async function processBuildingToolTick(
     );
   }
 
-  const equippedResult = await queryRunner.query(
-    `
-    SELECT pbt.resource_type_id, pbt.equipped_count, pbt.remaining_seconds, rt.name
-    FROM player_building_tools pbt
-    JOIN resource_types rt
-    ON rt.id = pbt.resource_type_id
-    WHERE pbt.player_building_id = $1
-    FOR UPDATE OF pbt
-    `,
-    [building.player_building_id],
-  );
+  const buildingId = Number(building.player_building_id);
 
-  const activeTools = equippedResult.rows.filter(
+  const equippedTools = toolsByBuilding.get(buildingId) ?? [];
+
+  const activeTools = equippedTools.filter(
     (tool) =>
       Number(tool.equipped_count) > 0 && Number(tool.remaining_seconds) > 0,
   );
@@ -231,28 +260,24 @@ export async function processBuildingToolTick(
         Number(tool.remaining_seconds) - SIMULATION_TICK_SECONDS,
       );
 
-      await queryRunner.query(
-        `
-        UPDATE player_building_tools
-        SET remaining_seconds = $1
-        WHERE player_building_id = $2
-        AND resource_type_id = $3
-        `,
-        [remainingSeconds, building.player_building_id, tool.resource_type_id],
+      tool.remaining_seconds = remainingSeconds;
+
+      setToolUpdate(
+        toolUpdates,
+        buildingId,
+        tool.resource_type_id,
+        tool.equipped_count,
+        remainingSeconds,
       );
     }
 
     return calculateToolEfficiencyMultiplier(workers, activeTools);
   }
 
-  // Previous tools have expired.
-  await queryRunner.query(
-    `
-    DELETE FROM player_building_tools
-    WHERE player_building_id = $1
-    `,
-    [building.player_building_id],
-  );
+  // Any previous tool cohort has expired.
+  toolClearBuildingIds.add(buildingId);
+
+  toolsByBuilding.set(buildingId, []);
 
   if (workers === 0 || building.tool_policy === "none") {
     return 1;
@@ -260,7 +285,7 @@ export async function processBuildingToolTick(
 
   let workersWithoutTools = workers;
 
-  const equippedTools = [];
+  const newTools = [];
 
   if (building.tool_policy === "iron") {
     const ironTools = claimTools(
@@ -272,24 +297,27 @@ export async function processBuildingToolTick(
     );
 
     if (ironTools) {
-      await saveEquippedTools(
-        building.player_building_id,
-        ironTools.resourceTypeId,
-        ironTools.count,
-        queryRunner,
-      );
-
-      equippedTools.push({
+      const tool = {
+        resource_type_id: ironTools.resourceTypeId,
         name: "Iron Tools",
         equipped_count: ironTools.count,
-      });
+        remaining_seconds: TOOL_DURABILITY_SECONDS - SIMULATION_TICK_SECONDS,
+      };
+
+      newTools.push(tool);
+
+      setToolUpdate(
+        toolUpdates,
+        buildingId,
+        tool.resource_type_id,
+        tool.equipped_count,
+        tool.remaining_seconds,
+      );
 
       workersWithoutTools -= ironTools.count;
     }
   }
 
-  /* Stone is used directly for Stone policy,
-   or as fallback when Iron Tools are unavailable. */
   if (
     workersWithoutTools > 0 &&
     (building.tool_policy === "iron" || building.tool_policy === "stone")
@@ -303,19 +331,90 @@ export async function processBuildingToolTick(
     );
 
     if (stoneTools) {
-      await saveEquippedTools(
-        building.player_building_id,
-        stoneTools.resourceTypeId,
-        stoneTools.count,
-        queryRunner,
-      );
-
-      equippedTools.push({
+      const tool = {
+        resource_type_id: stoneTools.resourceTypeId,
         name: "Stone Tools",
         equipped_count: stoneTools.count,
-      });
+        remaining_seconds: TOOL_DURABILITY_SECONDS - SIMULATION_TICK_SECONDS,
+      };
+
+      newTools.push(tool);
+
+      setToolUpdate(
+        toolUpdates,
+        buildingId,
+        tool.resource_type_id,
+        tool.equipped_count,
+        tool.remaining_seconds,
+      );
     }
   }
 
-  return calculateToolEfficiencyMultiplier(workers, equippedTools);
+  toolsByBuilding.set(buildingId, newTools);
+
+  return calculateToolEfficiencyMultiplier(workers, newTools);
+}
+
+export async function savePlayerBuildingToolChanges(
+  toolClearBuildingIds,
+  toolUpdates,
+  queryRunner = db,
+) {
+  const clearIds = [...toolClearBuildingIds];
+
+  if (clearIds.length > 0) {
+    await queryRunner.query(
+      `
+      DELETE FROM player_building_tools
+      WHERE player_building_id =
+        ANY($1::integer[])
+      `,
+      [clearIds],
+    );
+  }
+
+  const updates = [...toolUpdates.values()];
+
+  if (updates.length === 0) {
+    return;
+  }
+
+  await queryRunner.query(
+    `
+    INSERT INTO player_building_tools (
+      player_building_id,
+      resource_type_id,
+      equipped_count,
+      remaining_seconds
+    )
+    SELECT *
+    FROM UNNEST(
+      $1::integer[],
+      $2::integer[],
+      $3::integer[],
+      $4::integer[]
+    )
+    AS tool_data(
+      player_building_id,
+      resource_type_id,
+      equipped_count,
+      remaining_seconds
+    )
+    ON CONFLICT (
+      player_building_id,
+      resource_type_id
+    )
+    DO UPDATE SET
+      equipped_count =
+        EXCLUDED.equipped_count,
+      remaining_seconds =
+        EXCLUDED.remaining_seconds
+    `,
+    [
+      updates.map((update) => update.playerBuildingId),
+      updates.map((update) => update.resourceTypeId),
+      updates.map((update) => update.equippedCount),
+      updates.map((update) => update.remainingSeconds),
+    ],
+  );
 }

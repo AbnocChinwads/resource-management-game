@@ -1,11 +1,12 @@
-import db, { withTransaction } from "../db.js";
-import {
-  getPlayerResourceState,
-  addPlayerResource,
-} from "./resourceService.js";
+import { withTransaction } from "../db.js";
+import { getPlayerResourceState } from "./resourceService.js";
 import { getPlayerStorage } from "./storageService.js";
 import { getProductionStatus } from "./productionService.js";
-import { processBuildingToolTick } from "./toolEfficiencyService.js";
+import {
+  getPlayerBuildingToolsForSimulation,
+  processBuildingToolTick,
+  savePlayerBuildingToolChanges,
+} from "./toolEfficiencyService.js";
 import { SIMULATION_TICK_SECONDS } from "../config/simulation.js";
 
 function addResourceChange(resourceChanges, resourceTypeId, amount) {
@@ -99,6 +100,12 @@ export async function processResourceTick(playerId) {
 
     const resources = await getPlayerResourceState(playerId, client, true);
     const storage = await getPlayerStorage(playerId, client);
+    const toolsByBuilding = await getPlayerBuildingToolsForSimulation(
+      playerId,
+      client,
+    );
+    const toolUpdates = new Map();
+    const toolClearBuildingIds = new Set();
 
     for (const building of buildings.rows) {
       const inputs = inputsMap.get(building.recipe_id) ?? [];
@@ -114,13 +121,14 @@ export async function processResourceTick(playerId) {
         continue;
       }
 
-      const efficiencyMultiplier = await processBuildingToolTick(
-        playerId,
+      const efficiencyMultiplier = processBuildingToolTick(
         building,
         resources,
         storage,
         resourceChanges,
-        client,
+        toolsByBuilding,
+        toolUpdates,
+        toolClearBuildingIds,
       );
 
       workingBuildings.push(building.player_building_id);
@@ -208,6 +216,12 @@ export async function processResourceTick(playerId) {
         progress: remainingProgress,
       });
     }
+
+    await savePlayerBuildingToolChanges(
+      toolClearBuildingIds,
+      toolUpdates,
+      client,
+    );
 
     if (progressUpdates.length > 0) {
       await client.query(

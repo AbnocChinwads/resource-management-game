@@ -1,3 +1,16 @@
+const toolTimerStates = new Map();
+
+function formatToolTimer(seconds) {
+  seconds = Math.max(0, Math.floor(seconds));
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(
+    remainingSeconds,
+  ).padStart(2, "0")}`;
+}
+
 function getProductionStatusMessage(building) {
   const reasonMessages = {
     insufficient_storage: "Insufficient storage capacity",
@@ -142,22 +155,24 @@ export function updateActiveToolBonus(row, building) {
     activeBonus > 0 ? `Active bonus: +${activeBonus}%` : "Active bonus: none";
 }
 
-export function updateToolTimer(row, building) {
-  const timer = row.querySelector(`#building-${building.id}-tool-timer`);
+function renderToolTimer(row, buildingId, state) {
+  const timer = row.querySelector(`#building-${buildingId}-tool-timer`);
 
-  const progress = row.querySelector(`#building-${building.id}-tool-progress`);
+  const progress = row.querySelector(`#building-${buildingId}-tool-progress`);
 
-  const bar = row.querySelector(`#building-${building.id}-tool-timer-bar`);
+  const bar = row.querySelector(`#building-${buildingId}-tool-timer-bar`);
 
-  const text = row.querySelector(`#building-${building.id}-tool-timer-text`);
+  const text = row.querySelector(`#building-${buildingId}-tool-timer-text`);
 
   if (!timer || !progress || !bar || !text) {
     return;
   }
 
-  const remaining = Math.max(0, Number(building.toolRemainingSeconds ?? 0));
+  const elapsedSeconds = state.running
+    ? (Date.now() - state.syncedAt) / 1000
+    : 0;
 
-  const duration = Math.max(1, Number(building.toolDurationSeconds ?? 1));
+  const remaining = Math.max(0, state.remaining - elapsedSeconds);
 
   if (remaining <= 0) {
     timer.classList.add("d-none");
@@ -171,17 +186,45 @@ export function updateToolTimer(row, building) {
 
   timer.classList.remove("d-none");
 
-  const percentage = Math.min(100, (remaining / duration) * 100);
-
-  const minutes = Math.floor(remaining / 60);
-
-  const seconds = Math.floor(remaining % 60);
+  const percentage = Math.min(100, (remaining / state.duration) * 100);
 
   bar.style.width = `${percentage}%`;
 
   progress.setAttribute("aria-valuenow", String(Math.round(percentage)));
 
-  text.textContent = `Tool time remaining: ${minutes}:${String(
-    seconds,
-  ).padStart(2, "0")}`;
+  text.textContent = `Tool time remaining: ${formatToolTimer(remaining)}`;
 }
+
+export function updateToolTimer(row, building) {
+  const buildingId = Number(building.id);
+
+  const remaining = Math.max(0, Number(building.toolRemainingSeconds ?? 0));
+
+  const duration = Math.max(1, Number(building.toolDurationSeconds ?? 1));
+
+  const running = building.productionStatus?.status === "working";
+
+  const state = {
+    remaining,
+    duration,
+    running,
+    syncedAt: Date.now(),
+  };
+
+  toolTimerStates.set(buildingId, state);
+
+  renderToolTimer(row, buildingId, state);
+}
+
+setInterval(() => {
+  for (const [buildingId, state] of toolTimerStates) {
+    const row = document.querySelector(`[data-building-id="${buildingId}"]`);
+
+    if (!row) {
+      toolTimerStates.delete(buildingId);
+      continue;
+    }
+
+    renderToolTimer(row, buildingId, state);
+  }
+}, 1000);
