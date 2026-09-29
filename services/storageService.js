@@ -80,8 +80,8 @@ async function getStorageForResource(playerId, resourceTypeId) {
   };
 }
 
-async function getPlayerStorage(playerId) {
-  const result = await db.query(
+async function getPlayerStorage(playerId, queryRunner = db) {
+  const result = await queryRunner.query(
     `
     SELECT
       ps.storage_category,

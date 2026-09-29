@@ -18,8 +18,8 @@ export async function getPlayerResources(playerId) {
   return result.rows;
 }
 
-export async function addPlayerResource(playerId, resourceTypeId, amount) {
-  await db.query(
+export async function addPlayerResource(playerId, resourceTypeId, amount, queryRunner = db) {
+  await queryRunner.query(
     `
     INSERT INTO player_resources (
       player_id,
@@ -35,8 +35,8 @@ export async function addPlayerResource(playerId, resourceTypeId, amount) {
   );
 }
 
-export async function getPlayerResourceState(playerId) {
-  const result = await db.query(
+export async function getPlayerResourceState(playerId, queryRunner = db) {
+  const result = await queryRunner.query(
     `
     SELECT
       pr.resource_type_id,

@@ -1,7 +1,7 @@
 import db from "../db.js";
 
-export async function reconcileWorkers(playerId, availableWorkers) {
-  const buildingsRes = await db.query(
+export async function reconcileWorkers(playerId, availableWorkers, queryRunner = db) {
+  const buildingsRes = await queryRunner.query(
     `
     SELECT id, workers_assigned 
     FROM player_buildings 
@@ -18,7 +18,7 @@ export async function reconcileWorkers(playerId, availableWorkers) {
 
     remainingWorkers -= assigned;
 
-    await db.query(
+    await queryRunner.query(
       `
       UPDATE player_buildings
       SET workers_assigned = $1
@@ -29,8 +29,8 @@ export async function reconcileWorkers(playerId, availableWorkers) {
   }
 }
 
-export async function calculateAvailableWorkers(playerId) {
-  const playerRes = await db.query(
+export async function calculateAvailableWorkers(playerId, queryRunner = db) {
+  const playerRes = await queryRunner.query(
     `
     SELECT population
     FROM players
@@ -45,7 +45,7 @@ export async function calculateAvailableWorkers(playerId) {
 
   const workers = Number(playerRes.rows[0].population);
 
-  await db.query(
+  await queryRunner.query(
     `
     UPDATE players
     SET workers = $1
@@ -54,7 +54,7 @@ export async function calculateAvailableWorkers(playerId) {
     [workers, playerId],
   );
 
-  await reconcileWorkers(playerId, workers);
+  await reconcileWorkers(playerId, workers, queryRunner);
 
   return workers;
 }

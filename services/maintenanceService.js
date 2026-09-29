@@ -1,12 +1,10 @@
-import db from "../db.js";
+import db, { withTransaction } from "../db.js";
 
 const MAINTENANCE_HEALTH_RESTORE = 10;
 
 export async function processMaintenanceTick(playerId) {
-  await db.query("BEGIN");
-
-  try {
-    const workshopResult = await db.query(
+  return withTransaction(async (client) => {
+    const workshopResult = await client.query(
       `
       SELECT EXISTS (
         SELECT 1
@@ -25,11 +23,10 @@ export async function processMaintenanceTick(playerId) {
       workshopResult.rows[0]?.has_functional_workshop === true;
 
     if (!hasFunctionalWorkshop) {
-      await db.query("COMMIT");
       return [];
     }
 
-    const toolsResult = await db.query(
+    const toolsResult = await client.query(
       `
       SELECT
         pr.resource_type_id,
@@ -45,7 +42,6 @@ export async function processMaintenanceTick(playerId) {
     );
 
     if (!toolsResult.rows.length) {
-      await db.query("COMMIT");
       return [];
     }
 
@@ -53,11 +49,10 @@ export async function processMaintenanceTick(playerId) {
     let availableTools = Number(toolsResult.rows[0].amount);
 
     if (availableTools <= 0) {
-      await db.query("COMMIT");
       return [];
     }
 
-    const buildingsResult = await db.query(
+    const buildingsResult = await client.query(
       `
       SELECT
         pb.id,
@@ -87,7 +82,7 @@ export async function processMaintenanceTick(playerId) {
         Number(building.health) + MAINTENANCE_HEALTH_RESTORE,
       );
 
-      await db.query(
+      await client.query(
         `
         UPDATE player_buildings
         SET health = $1
@@ -105,7 +100,7 @@ export async function processMaintenanceTick(playerId) {
     }
 
     if (repairedBuildings.length > 0) {
-      await db.query(
+      await client.query(
         `
         UPDATE player_resources
         SET amount = amount - $1
@@ -116,11 +111,6 @@ export async function processMaintenanceTick(playerId) {
       );
     }
 
-    await db.query("COMMIT");
-
     return repairedBuildings;
-  } catch (err) {
-    await db.query("ROLLBACK");
-    throw err;
-  }
+  });
 }

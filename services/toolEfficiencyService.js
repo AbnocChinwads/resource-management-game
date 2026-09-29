@@ -100,6 +100,7 @@ async function claimTools(
   requestedCount,
   resources,
   storage,
+  queryRunner,
 ) {
   const requested = Number(requestedCount);
 
@@ -107,7 +108,7 @@ async function claimTools(
     return null;
   }
 
-  const result = await db.query(
+  const result = await queryRunner.query(
     `
         SELECT
         pr.resource_type_id,
@@ -142,7 +143,7 @@ async function claimTools(
     return null;
   }
 
-  await db.query(
+  await queryRunner.query(
     `
         UPDATE player_resources
         SET amount = amount - $1
@@ -174,12 +175,12 @@ async function claimTools(
   };
 }
 
-async function saveEquippedTools(playerBuildingId, resourceTypeId, count) {
+async function saveEquippedTools(playerBuildingId, resourceTypeId, count, queryRunner = db) {
   if (count <= 0) {
     return;
   }
 
-  await db.query(
+  await queryRunner.query(
     `
         INSERT INTO player_building_tools(player_building_id, resource_type_id, equipped_count, remaining_seconds)
         VALUES ($1, $2, $3, $4)
@@ -200,6 +201,7 @@ export async function processBuildingToolTick(
   building,
   resources,
   storage,
+  queryRunner = db
 ) {
   const workers = Number(building.workers_assigned);
 
@@ -209,7 +211,7 @@ export async function processBuildingToolTick(
     );
   }
 
-  const equippedResult = await db.query(
+  const equippedResult = await queryRunner.query(
     `
     SELECT pbt.resource_type_id, pbt.equipped_count, pbt.remaining_seconds, rt.name
     FROM player_building_tools pbt
@@ -233,7 +235,7 @@ export async function processBuildingToolTick(
         Number(tool.remaining_seconds) - SIMULATION_TICK_SECONDS,
       );
 
-      await db.query(
+      await queryRunner.query(
         `
         UPDATE player_building_tools
         SET remaining_seconds = $1
@@ -248,7 +250,7 @@ export async function processBuildingToolTick(
   }
 
   // Previous tools have expired.
-  await db.query(
+  await queryRunner.query(
     `
     DELETE FROM player_building_tools
     WHERE player_building_id = $1
@@ -271,6 +273,7 @@ export async function processBuildingToolTick(
       workersWithoutTools,
       resources,
       storage,
+      queryRunner,
     );
 
     if (ironTools) {
@@ -278,6 +281,7 @@ export async function processBuildingToolTick(
         building.player_building_id,
         ironTools.resourceTypeId,
         ironTools.count,
+        queryRunner,
       );
 
       equippedTools.push({
@@ -301,6 +305,7 @@ export async function processBuildingToolTick(
       workersWithoutTools,
       resources,
       storage,
+      queryRunner,
     );
 
     if (stoneTools) {
@@ -308,6 +313,7 @@ export async function processBuildingToolTick(
         building.player_building_id,
         stoneTools.resourceTypeId,
         stoneTools.count,
+        queryRunner,
       );
 
       equippedTools.push({

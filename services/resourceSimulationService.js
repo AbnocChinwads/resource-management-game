@@ -1,4 +1,4 @@
-import db from "../db.js";
+import db, { withTransaction } from "../db.js";
 import {
   getPlayerResourceState,
   addPlayerResource,
@@ -15,12 +15,13 @@ async function consumeInputs(
   completedCrafts,
   resources,
   storage,
+  queryRunner,
 ) {
   for (const input of inputs) {
     const amount =
       Number(input.amount) * Number(workers) * Number(completedCrafts);
 
-    await db.query(
+    await queryRunner.query(
       `
       UPDATE player_resources
       SET amount = amount - $1
@@ -49,12 +50,10 @@ async function consumeInputs(
 }
 
 export async function processResourceTick(playerId) {
-  const workingBuildings = [];
+  return withTransaction(async (client) => {
+    const workingBuildings = [];
 
-  await db.query("BEGIN");
-
-  try {
-    const inputsResult = await db.query(
+    const inputsResult = await client.query(
       `
       SELECT
       recipe_id,
@@ -74,7 +73,7 @@ export async function processResourceTick(playerId) {
       inputsMap.get(input.recipe_id).push(input);
     }
 
-    const buildings = await db.query(
+    const buildings = await client.query(
       `
         SELECT
         pb.id AS player_building_id,
@@ -99,8 +98,8 @@ export async function processResourceTick(playerId) {
       [playerId],
     );
 
-    const resources = await getPlayerResourceState(playerId);
-    const storage = await getPlayerStorage(playerId);
+    const resources = await getPlayerResourceState(playerId, client);
+    const storage = await getPlayerStorage(playerId, client);
 
     for (const building of buildings.rows) {
       const inputs = inputsMap.get(building.recipe_id) ?? [];
@@ -121,17 +120,19 @@ export async function processResourceTick(playerId) {
         building,
         resources,
         storage,
+        client,
       );
 
       workingBuildings.push(building.player_building_id);
 
       const progress =
-        Number(building.production_progress_seconds) + SIMULATION_TICK_SECONDS * efficiencyMultiplier;
+        Number(building.production_progress_seconds) +
+        SIMULATION_TICK_SECONDS * efficiencyMultiplier;
       const craftTime = Number(building.craft_time_seconds);
       const potentialCrafts = Math.floor(progress / craftTime);
 
       if (potentialCrafts <= 0) {
-        await db.query(
+        client.query(
           `
           UPDATE player_buildings
           SET production_progress_seconds = $1
@@ -190,6 +191,7 @@ export async function processResourceTick(playerId) {
         completedCrafts,
         resources,
         storage,
+        client,
       );
 
       const outputAmount = outputPerCraft * completedCrafts;
@@ -198,6 +200,7 @@ export async function processResourceTick(playerId) {
         playerId,
         building.output_resource_id,
         outputAmount,
+        client,
       );
 
       outputResource.amount = Number(outputResource.amount) + outputAmount;
@@ -206,7 +209,7 @@ export async function processResourceTick(playerId) {
 
       const remainingProgress = progress - completedCrafts * craftTime;
 
-      await db.query(
+      client.query(
         `
         UPDATE player_buildings
         SET production_progress_seconds = $1
@@ -216,11 +219,6 @@ export async function processResourceTick(playerId) {
       );
     }
 
-    await db.query("COMMIT");
-
     return workingBuildings;
-  } catch (err) {
-    await db.query("ROLLBACK");
-    throw err;
-  }
+  });
 }

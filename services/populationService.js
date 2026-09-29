@@ -15,8 +15,8 @@ export async function establishInitialPopulation(playerId, populationGain) {
   );
 }
 
-export async function getPopulation(playerId) {
-  const result = await db.query(
+export async function getPopulation(playerId, queryRunner = db) {
+  const result = await queryRunner.query(
     `
     SELECT
       population,
@@ -38,8 +38,8 @@ export async function getPopulation(playerId) {
   return result.rows[0];
 }
 
-export async function getPopulationCapacity(playerId) {
-  const result = await db.query(
+export async function getPopulationCapacity(playerId, queryRunner = db) {
+  const result = await queryRunner.query(
     `
     SELECT COALESCE(SUM(b.population_gain), 0) AS population_capacity
     FROM player_buildings pb
@@ -54,9 +54,9 @@ export async function getPopulationCapacity(playerId) {
   return Number(result.rows[0].population_capacity);
 }
 
-export async function increasePopulation(playerId, amount) {
-  const player = await getPopulation(playerId);
-  const capacity = await getPopulationCapacity(playerId);
+export async function increasePopulation(playerId, amount, queryRunner = db) {
+  const player = await getPopulation(playerId, queryRunner);
+  const capacity = await getPopulationCapacity(playerId, queryRunner);
 
   const population = Number(player.population);
   const historicalMaxPopulation = Number(player.historical_max_population);
@@ -73,7 +73,7 @@ export async function increasePopulation(playerId, amount) {
 
   const newHistoricalMax = Math.max(historicalMaxPopulation, newPopulation);
 
-  await db.query(
+  await queryRunner.query(
     `
     UPDATE players
     SET
@@ -87,8 +87,8 @@ export async function increasePopulation(playerId, amount) {
   return actualIncrease;
 }
 
-export async function reducePopulation(playerId) {
-  const player = await getPopulation(playerId);
+export async function reducePopulation(playerId, queryRunner = db) {
+  const player = await getPopulation(playerId, queryRunner);
 
   const population = Number(player.population);
   const historicalMaxPopulation = Number(player.historical_max_population);
@@ -105,7 +105,7 @@ export async function reducePopulation(playerId) {
     return 0;
   }
 
-  await db.query(
+  await queryRunner.query(
     `
     UPDATE players
     SET population = $1

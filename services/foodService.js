@@ -1,4 +1,4 @@
-import db from "../db.js";
+import db, { withTransaction } from "../db.js";
 import { reconcileWorkers } from "./workerService.js";
 import {
   increasePopulation,
@@ -46,10 +46,8 @@ export function calculateFoodConsumption(foods, nutritionNeeded) {
 }
 
 export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
-  await db.query("BEGIN");
-
-  try {
-    const playerRes = await db.query(
+  return withTransaction(async (client) => {
+    const playerRes = await client.query(
       `
       SELECT
         id,
@@ -74,7 +72,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     const now = new Date();
 
     if (player.last_food_tick === null) {
-      await db.query(
+      await client.query(
         `UPDATE players
         SET last_food_tick = $1
         WHERE id = $2`,
@@ -100,7 +98,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     let foodSurplusStartedAt = player.food_surplus_started_at;
 
     // Get actual food currently stored
-    const foodRes = await db.query(
+    const foodRes = await client.query(
       `
       SELECT
         pr.resource_type_id,
@@ -124,7 +122,6 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     );
 
     if (ticks <= 0) {
-      await db.query("COMMIT");
       return {
         food: nutritionBefore,
         population,
@@ -144,7 +141,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
         continue;
       }
 
-      await db.query(
+      await client.query(
         `
         UPDATE player_resources
         SET amount = amount - $1
@@ -180,7 +177,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     } else {
       starvationStartedAt = null;
 
-      const populationCapacity = await getPopulationCapacity(playerId);
+      const populationCapacity = await getPopulationCapacity(playerId, client);
 
       if (
         foodPotentialBalancePerMinute > 0 &&
@@ -206,6 +203,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
         const populationIncrease = await increasePopulation(
           playerId,
           growthCycles,
+          client,
         );
 
         population += populationIncrease;
@@ -224,7 +222,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
       );
 
       if (starvationCycles > 0) {
-        const populationReduction = await reducePopulation(playerId);
+        const populationReduction = await reducePopulation(playerId, client);
 
         population -= populationReduction;
         workers = population;
@@ -234,7 +232,7 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
     }
 
     // Save food state
-    await db.query(
+    await client.query(
       `
       UPDATE players
       SET
@@ -254,19 +252,14 @@ export async function processFoodTick(playerId, foodPotentialBalancePerMinute) {
       ],
     );
 
-    await reconcileWorkers(playerId, workers);
-
-    await db.query("COMMIT");
+    await reconcileWorkers(playerId, workers, client);
 
     return {
       food: nutritionAfter,
       population,
       workers,
     };
-  } catch (err) {
-    await db.query("ROLLBACK");
-    throw err;
-  }
+  });
 }
 
 // Population food demand
