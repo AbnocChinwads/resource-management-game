@@ -21,6 +21,7 @@ import startRoute from "./routes/startTask.js";
 import completeRoute from "./routes/completeTask.js";
 import buildingMaintenanceRoute from "./routes/updateMaintenance.js";
 import updateToolPolicyRoute from "./routes/updateToolPolicy.js";
+import settlementRoute from "./routes/settlement.js";
 
 import { requireAdmin } from "./middleware/admin.js";
 import devRoute from "./routes/dev.js";
@@ -88,6 +89,7 @@ app.use("/update-maintenance", buildingMaintenanceRoute);
 app.use("/update-tool-policy", updateToolPolicyRoute);
 app.use("/feedback", feedbackRoutes);
 app.use("/info", infoRoute);
+app.use("/settlement", settlementRoute);
 
 /* END OF ROUTES */
 
