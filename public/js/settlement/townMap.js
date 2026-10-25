@@ -1,0 +1,125 @@
+import { fetchGameData } from "../api/gameData.js";
+import {
+  createTileMap,
+  createHorizontalPath,
+  createVerticalPath,
+} from "./terrainMap.js";
+import {
+  drawTileMap,
+  drawBuilding,
+  drawSelectedBuilding,
+} from "./townRenderer.js";
+import { updateBuildingInfo } from "./buildingInfo.js";
+import { requestWorkerChange } from "../game/actions.js";
+
+const canvas = document.querySelector("#town-map");
+const ctx = canvas.getContext("2d");
+
+let selectedBuildingId = null;
+const tileSize = 32;
+const tileTypes = {
+  0: {
+    name: "Grass",
+    colour: "#348C31",
+  },
+  1: {
+    name: "Dirt",
+    colour: "#BA6742",
+  },
+};
+const drawableBuildings = [];
+
+canvas.addEventListener("click", (event) => {
+  const rect = canvas.getBoundingClientRect();
+
+  //column
+  const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+  const left = Math.floor(x / tileSize);
+  //row
+  const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+  const top = Math.floor(y / tileSize);
+
+  selectedBuildingId = null;
+  let selectedBuilding = null;
+
+  drawableBuildings.forEach((building) => {
+    if (top >= building.row && top < building.row + building.height) {
+      if (left >= building.column && left < building.column + building.width) {
+        console.log("clicked:", building.name, "ID:", building.id);
+        selectedBuildingId = building.id;
+        selectedBuilding = building;
+      }
+    }
+  });
+  console.log("ID:", selectedBuildingId);
+  updateBuildingInfo(selectedBuilding);
+  drawMap();
+});
+
+document.querySelectorAll("[data-worker-delta]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const delta = Number(button.dataset.workerDelta);
+
+    console.log(selectedBuildingId, delta);
+    if (building != null) {
+      const data = await requestWorkerChange(selectedBuildingId, delta);
+      console.log(data);
+    }
+  });
+});
+
+async function buildingsArray() {
+  const data = await fetchGameData();
+
+  return data.buildings;
+}
+
+const bounds = canvas.parentElement.getBoundingClientRect();
+canvas.width = bounds.width;
+canvas.height = bounds.height;
+
+const columns = Math.ceil(canvas.width / tileSize);
+const rows = Math.ceil(canvas.height / tileSize);
+
+const terrainMap = createTileMap(rows, columns);
+createHorizontalPath(terrainMap, Math.floor(rows / 2), 0, columns);
+createVerticalPath(terrainMap, 0, Math.floor(columns / 2), rows);
+
+async function loadBuildings() {
+  const buildings = await buildingsArray();
+
+  buildings.forEach((building, index) => {
+    const drawableBuilding = {
+      id: building.id,
+      type: building.type,
+      name: building.name,
+      building_number: building.building_number,
+      health: building.health,
+      max_health: building.max_health,
+      workers_assigned: building.workers_assigned,
+      effectiveWorkerCapacity: building.effectiveWorkerCapacity,
+      width: 2,
+      height: 2,
+      row: 0 + Math.floor(index / 5) * 2,
+      column: 5 + (index % 5) * 2,
+      colour: "yellow",
+    };
+    drawableBuildings.push(drawableBuilding);
+  });
+  drawMap();
+}
+
+function drawMap() {
+  drawTileMap(ctx, canvas, terrainMap, tileSize, tileTypes);
+  drawableBuildings.forEach((building) => {
+    drawBuilding(ctx, building, tileSize);
+  });
+  drawableBuildings.forEach((building) => {
+    if (selectedBuildingId === building.id) {
+      drawSelectedBuilding(ctx, building, tileSize);
+    }
+  });
+}
+
+drawMap();
+loadBuildings();

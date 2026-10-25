@@ -1,12 +1,32 @@
 <%- include("partials/header") %>
-<link rel="stylesheet" href="/styles/settlement.css">
+    <link rel="stylesheet" href="/styles/settlement.css">
 
-<h1>Settlement</h1>
+    <h1>Settlement</h1>
 
-<div id="settlement-map">
-    
-</div>
+    <div id="town-map-container">
+        <canvas id="town-map"></canvas>
+        <aside id="building-info">
+            <h5 id="building-name">No building selected</h5>
+            <p id="building-number"></p>
+            <p id="building-health"></p>
+            <div id="building-health-progress" class="progress d-none" role="progressbar" aria-label="Building health">
+                <div id="building-health-bar" class="progress-bar"></div>
+            </div>
+            <div id="building-worker-section" class="d-none">
+                <p id="building-workers"></p>
 
-<script type="module" src="/js/settlement/settlement.js"></script>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-danger px-2" aria-label="Remove worker" data-worker-delta="-1">
+                        -
+                    </button>
+                    <button class="btn btn-sm btn-success px-2" aria-label="Add worker" data-worker-delta="1">
+                        +
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
 
-<%- include("partials/footer") %>
+    <script type="module" src="/js/settlement/townMap.js"></script>
+
+    <%- include("partials/footer") %>

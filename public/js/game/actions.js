@@ -7,22 +7,27 @@ function showStorageFeedback(message) {
   feedbackEl.classList.remove("d-none");
 }
 
+export async function requestWorkerChange(buildingId, delta) {
+  const res = await fetch("/update-workers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      buildingId,
+      delta,
+    }),
+  });
+
+  const data = res.json();
+  return data;
+}
+
 export function initialiseGameActions(refreshStats) {
   window.changeWorkers = async function (buildingId, delta) {
     try {
-      const res = await fetch("/update-workers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          buildingId,
-          delta,
-        }),
-      });
-
-      const data = await res.json();
+      const data = await requestWorkerChange(buildingId, delta);
 
       if (data.success) {
         const workersEl = document.getElementById(
