@@ -24,6 +24,34 @@ export async function requestWorkerChange(buildingId, delta) {
   return data;
 }
 
+export function initialiseWorkerButtons(
+  getSelectedBuildingId,
+  onWorkerChanged,
+) {
+  document.querySelectorAll("[data-worker-delta]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const buildingId = getSelectedBuildingId();
+      const delta = Number(button.dataset.workerDelta);
+
+      if (buildingId == null) {
+        return;
+      }
+
+      try {
+        const data = await requestWorkerChange(buildingId, delta);
+
+        if (data.success) {
+          onWorkerChanged(buildingId, data);
+        } else {
+          alert(data.error || "Cannot change workers");
+        }
+      } catch (err) {
+        console.error("Worker assignment error:", err);
+      }
+    });
+  });
+}
+
 export function initialiseGameActions(refreshStats) {
   window.changeWorkers = async function (buildingId, delta) {
     try {

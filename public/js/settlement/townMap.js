@@ -10,7 +10,7 @@ import {
   drawSelectedBuilding,
 } from "./townRenderer.js";
 import { updateBuildingInfo } from "./buildingInfo.js";
-import { requestWorkerChange } from "../game/actions.js";
+import { initialiseWorkerButtons } from "../game/actions.js";
 
 const canvas = document.querySelector("#town-map");
 const ctx = canvas.getContext("2d");
@@ -45,28 +45,33 @@ canvas.addEventListener("click", (event) => {
   drawableBuildings.forEach((building) => {
     if (top >= building.row && top < building.row + building.height) {
       if (left >= building.column && left < building.column + building.width) {
-        console.log("clicked:", building.name, "ID:", building.id);
         selectedBuildingId = building.id;
         selectedBuilding = building;
       }
     }
   });
-  console.log("ID:", selectedBuildingId);
   updateBuildingInfo(selectedBuilding);
   drawMap();
 });
 
-document.querySelectorAll("[data-worker-delta]").forEach((button) => {
-  button.addEventListener("click", async () => {
-    const delta = Number(button.dataset.workerDelta);
+initialiseWorkerButtons(
+  () => selectedBuildingId,
+  (buildingId, data) => {
+    const building = drawableBuildings.find(
+      (building) => building.id === buildingId,
+    );
 
-    console.log(selectedBuildingId, delta);
-    if (building != null) {
-      const data = await requestWorkerChange(selectedBuildingId, delta);
-      console.log(data);
+    if (!building) {
+      return;
     }
-  });
-});
+
+    building.workers_assigned = data.workers_assigned;
+
+    if (building.id === selectedBuildingId) {
+      updateBuildingInfo(building);
+    }
+  },
+);
 
 async function buildingsArray() {
   const data = await fetchGameData();
