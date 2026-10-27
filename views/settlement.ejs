@@ -12,6 +12,7 @@
             <div id="building-health-progress" class="progress d-none" role="progressbar" aria-label="Building health">
                 <div id="building-health-bar" class="progress-bar"></div>
             </div>
+            <div id="building-production" class="d-none"></div>
             <div id="building-worker-section" class="d-none">
                 <p id="building-workers"></p>
 
@@ -23,6 +24,19 @@
                         +
                     </button>
                 </div>
+            </div>
+            <div id="building-tool-section" class="d-none">
+                <label for="building-tool-policy" class="form-label">
+                    Tool policy
+                </label>
+
+                <select id="building-tool-policy" class="form-select form-select-sm">
+                    <option value="none">None</option>
+                    <option value="stone">Stone Tools (+10%)</option>
+                    <option value="iron">Iron Tools (+20%)</option>
+                </select>
+
+                <div id="building-tool-active" class="form-text"></div>
             </div>
         </aside>
     </div>

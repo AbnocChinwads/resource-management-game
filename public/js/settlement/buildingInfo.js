@@ -1,3 +1,5 @@
+import { updateProductionConsumptionElement } from "../game/buildingProduction.js";
+
 function updateBuildingHealth(building) {
   // Health text, percentage, progress bar and colours
   const buildingHealthProgress = document.querySelector(
@@ -43,6 +45,19 @@ function updateBuildingWorkers(building) {
   }
 }
 
+function updateBuildingProduction(building) {
+  const buildingProduction = document.querySelector("#building-production");
+
+  const isProduction = building?.type === "production";
+  buildingProduction.classList.toggle("d-none", !isProduction);
+
+  if (isProduction) {
+    updateProductionConsumptionElement(buildingProduction, building);
+  } else {
+    buildingProduction.textContent = "";
+  }
+}
+
 export function updateBuildingInfo(building) {
   const buildingName = document.querySelector("#building-name");
   const buildingNumber = document.querySelector("#building-number");
@@ -57,4 +72,5 @@ export function updateBuildingInfo(building) {
 
   updateBuildingHealth(building);
   updateBuildingWorkers(building);
+  updateBuildingProduction(building);
 }
