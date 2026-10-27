@@ -94,15 +94,17 @@ async function loadBuildings() {
   const buildings = await buildingsArray();
 
   buildings.forEach((building, index) => {
+    const existingBuilding = drawableBuildings.find((drawable) => {
+      return drawable.id === building.id;
+    });
+
+    if (existingBuilding) {
+      Object.assign(existingBuilding, building);
+
+      return;
+    }
     const drawableBuilding = {
-      id: building.id,
-      type: building.type,
-      name: building.name,
-      building_number: building.building_number,
-      health: building.health,
-      max_health: building.max_health,
-      workers_assigned: building.workers_assigned,
-      effectiveWorkerCapacity: building.effectiveWorkerCapacity,
+      ...building,
       width: 2,
       height: 2,
       row: 0 + Math.floor(index / 5) * 2,
@@ -111,6 +113,10 @@ async function loadBuildings() {
     };
     drawableBuildings.push(drawableBuilding);
   });
+  const selectedBuilding = drawableBuildings.find(
+    (drawable) => drawable.id === selectedBuildingId,
+  );
+  updateBuildingInfo(selectedBuilding);
   drawMap();
 }
 
@@ -128,3 +134,4 @@ function drawMap() {
 
 drawMap();
 loadBuildings();
+setInterval(loadBuildings, 3000);
