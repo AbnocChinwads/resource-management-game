@@ -1,6 +1,7 @@
 import {
   updateProductionConsumptionElement,
   updateToolPolicyControl,
+  updateActiveToolBonus,
 } from "../game/buildingProduction.js";
 
 function updateBuildingHealth(building) {
@@ -64,12 +65,15 @@ function updateBuildingProduction(building) {
 function updateBuildingTools(building) {
   const buildingTool = document.querySelector("#building-tool-section");
   const buildingPolicy = document.querySelector("#building-tool-policy");
+  const buildingToolActive = document.querySelector("#building-tool-active");
 
   const isProduction = building?.type === "production";
+
   buildingTool.classList.toggle("d-none", !isProduction);
 
   if (isProduction) {
     updateToolPolicyControl(buildingPolicy, building);
+    updateActiveToolBonus(buildingToolActive, building);
   }
 }
 

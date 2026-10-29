@@ -141,18 +141,14 @@ export function updateToolPolicyControl(select, building) {
   select.dataset.currentPolicy = toolPolicy;
 }
 
-export function updateActiveToolBonus(row, building) {
-  const activeToolElement = row.querySelector(
-    `#building-${building.id}-tool-active`,
-  );
-
-  if (!activeToolElement) return;
+export function updateActiveToolBonus(element, building) {
+  if (!element) return;
 
   const activeBonus = Math.round(
     (Number(building.toolEfficiencyMultiplier ?? 1) - 1) * 100,
   );
 
-  activeToolElement.textContent =
+  element.textContent =
     activeBonus > 0 ? `Active bonus: +${activeBonus}%` : "Active bonus: none";
 }
 
