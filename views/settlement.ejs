@@ -37,6 +37,16 @@
                 </select>
 
                 <div id="building-tool-active" class="form-text"></div>
+                <div id="building-tool-timer" class="mt-1 d-none">
+                    <div id="building-tool-progress" class="progress position-relative" role="progressbar"
+                        aria-label="Tool durability remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div id="building-tool-timer-bar" class="progress-bar bg-primary"
+                            style="width: 0%; transition: width 1s linear;"></div>
+
+                        <span id="building-tool-timer-text"
+                            class="position-absolute top-50 start-50 translate-middle text-light"></span>
+                    </div>
+                </div>
             </div>
         </aside>
     </div>

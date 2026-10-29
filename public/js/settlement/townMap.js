@@ -10,13 +10,19 @@ import {
   drawSelectedBuilding,
 } from "./townRenderer.js";
 import { updateBuildingInfo } from "./buildingInfo.js";
-import { setupToolPolicyControl } from "../game/buildingProduction.js";
+import {
+  setupToolPolicyControl,
+  updateToolTimer,
+  startToolTimer,
+} from "../game/buildingProduction.js";
 import { initialiseWorkerButtons } from "../game/actions.js";
 
 const canvas = document.querySelector("#town-map");
 const ctx = canvas.getContext("2d");
 
 let selectedBuildingId = null;
+let maintenanceAvailable = false;
+
 const tileSize = 32;
 const tileTypes = {
   0: {
@@ -51,7 +57,7 @@ canvas.addEventListener("click", (event) => {
       }
     }
   });
-  updateBuildingInfo(selectedBuilding);
+  updateBuildingInfo(selectedBuilding, maintenanceAvailable);
   drawMap();
 });
 
@@ -69,7 +75,7 @@ initialiseWorkerButtons(
     building.workers_assigned = data.workers_assigned;
 
     if (building.id === selectedBuildingId) {
-      updateBuildingInfo(building);
+      updateBuildingInfo(building, maintenanceAvailable);
     }
   },
 );
@@ -87,10 +93,12 @@ setupToolPolicyControl(
     building.tool_policy = toolPolicy;
 
     if (selectedBuildingId === buildingId) {
-      updateBuildingInfo(building);
+      updateBuildingInfo(building, maintenanceAvailable);
     }
   },
 );
+
+startToolTimer(() => selectedBuildingId);
 
 async function buildingsArray() {
   const data = await fetchGameData();
@@ -112,7 +120,13 @@ createVerticalPath(terrainMap, 0, Math.floor(columns / 2), rows);
 async function loadBuildings() {
   const buildings = await buildingsArray();
 
+  maintenanceAvailable = buildings.some(
+    (building) =>
+      building.type === "maintenance" && Number(building.health) > 0,
+  );
+
   buildings.forEach((building, index) => {
+    updateToolTimer(building);
     const existingBuilding = drawableBuildings.find((drawable) => {
       return drawable.id === building.id;
     });
@@ -122,6 +136,7 @@ async function loadBuildings() {
 
       return;
     }
+
     const drawableBuilding = {
       ...building,
       width: 2,
@@ -135,7 +150,7 @@ async function loadBuildings() {
   const selectedBuilding = drawableBuildings.find(
     (drawable) => drawable.id === selectedBuildingId,
   );
-  updateBuildingInfo(selectedBuilding);
+  updateBuildingInfo(selectedBuilding, maintenanceAvailable);
   drawMap();
 }
 

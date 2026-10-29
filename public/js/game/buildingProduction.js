@@ -152,16 +152,21 @@ export function updateActiveToolBonus(element, building) {
     activeBonus > 0 ? `Active bonus: +${activeBonus}%` : "Active bonus: none";
 }
 
-function renderToolTimer(row, buildingId, state) {
-  const timer = row.querySelector(`#building-${buildingId}-tool-timer`);
-
-  const progress = row.querySelector(`#building-${buildingId}-tool-progress`);
-
-  const bar = row.querySelector(`#building-${buildingId}-tool-timer-bar`);
-
-  const text = row.querySelector(`#building-${buildingId}-tool-timer-text`);
+function renderToolTimer(state) {
+  const timer = document.querySelector("#building-tool-timer");
+  const progress = document.querySelector("#building-tool-progress");
+  const bar = document.querySelector("#building-tool-timer-bar");
+  const text = document.querySelector("#building-tool-timer-text");
 
   if (!timer || !progress || !bar || !text) {
+    return;
+  }
+
+  if (!state) {
+    timer.classList.add("d-none");
+    bar.style.width = "0%";
+    progress.setAttribute("aria-valuenow", "0");
+    text.textContent = "";
     return;
   }
 
@@ -188,7 +193,7 @@ function renderToolTimer(row, buildingId, state) {
   text.textContent = formatToolTimer(remaining);
 }
 
-export function updateToolTimer(row, building) {
+export function updateToolTimer(building) {
   const buildingId = Number(building.id);
 
   const serverRemaining = Math.max(
@@ -250,28 +255,26 @@ export function updateToolTimer(row, building) {
     state.duration = duration;
     state.running = running;
   }
-
-  renderToolTimer(row, buildingId, state);
 }
 
-setInterval(() => {
-  for (const [buildingId, state] of toolTimerStates) {
-    const row = document.querySelector(`[data-building-id="${buildingId}"]`);
-
-    if (!row) {
-      toolTimerStates.delete(buildingId);
-
-      continue;
-    }
-
-    if (state.running && state.displayRemaining > 0) {
-      if (state.holdSeconds > 0) {
-        state.holdSeconds -= 1;
-      } else {
-        state.displayRemaining = Math.max(0, state.displayRemaining - 1);
+export function startToolTimer(getSelectedBuildingId) {
+  setInterval(() => {
+    // Update every stored countdown
+    for (const [buildingId, state] of toolTimerStates) {
+      if (state.running && state.displayRemaining > 0) {
+        if (state.holdSeconds > 0) {
+          state.holdSeconds -= 1;
+        } else {
+          state.displayRemaining = Math.max(0, state.displayRemaining - 1);
+        }
       }
     }
 
-    renderToolTimer(row, buildingId, state);
-  }
-}, 1000);
+    // Find the timer belonging to the selected building
+    const selectedBuildingId = getSelectedBuildingId();
+    const selectedState = toolTimerStates.get(selectedBuildingId);
+
+    // Display only that timer
+    renderToolTimer(selectedState);
+  }, 1000);
+}
