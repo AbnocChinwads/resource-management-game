@@ -10,6 +10,7 @@ import {
   drawSelectedBuilding,
 } from "./townRenderer.js";
 import { updateBuildingInfo } from "./buildingInfo.js";
+import { setupToolPolicyControl } from "../game/buildingProduction.js";
 import { initialiseWorkerButtons } from "../game/actions.js";
 
 const canvas = document.querySelector("#town-map");
@@ -68,6 +69,24 @@ initialiseWorkerButtons(
     building.workers_assigned = data.workers_assigned;
 
     if (building.id === selectedBuildingId) {
+      updateBuildingInfo(building);
+    }
+  },
+);
+
+setupToolPolicyControl(
+  document.querySelector("#building-tool-policy"),
+  () => selectedBuildingId,
+  (buildingId, toolPolicy) => {
+    const building = drawableBuildings.find(
+      (drawable) => drawable.id === buildingId,
+    );
+
+    if (!building) return;
+
+    building.tool_policy = toolPolicy;
+
+    if (selectedBuildingId === buildingId) {
       updateBuildingInfo(building);
     }
   },

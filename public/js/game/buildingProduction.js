@@ -85,18 +85,19 @@ export function updateProductionConsumptionElement(element, building) {
   element.innerHTML = productionHtml + consumptionHtml;
 }
 
-export function setupToolPolicyControl(row, building) {
-  const toolPolicySelect = row.querySelector(
-    `#building-${building.id}-tool-policy`,
-  );
+export function setupToolPolicyControl(
+  select,
+  getBuildingId,
+  onToolPolicyChanged,
+) {
+  if (!select) return;
 
-  if (!toolPolicySelect) return;
+  select.addEventListener("change", async () => {
+    const buildingId = getBuildingId();
 
-  toolPolicySelect.addEventListener("change", async (event) => {
-    const select = event.target;
+    if (buildingId === null) return;
 
     const previousPolicy = select.dataset.currentPolicy ?? "none";
-
     const toolPolicy = select.value;
 
     try {
@@ -107,37 +108,39 @@ export function setupToolPolicyControl(row, building) {
         },
         credentials: "include",
         body: JSON.stringify({
-          buildingId: building.id,
+          buildingId,
           toolPolicy,
         }),
       });
 
       const data = await res.json();
 
-      if (!data.success) {
+      if (data.success) {
+        onToolPolicyChanged(buildingId, data.toolPolicy);
+      } else if (getBuildingId() === buildingId) {
         select.value = previousPolicy;
-        return;
       }
 
       select.dataset.currentPolicy = data.toolPolicy;
     } catch (err) {
       console.error("Tool policy update error:", err);
-      select.value = previousPolicy;
+
+      if (getBuildingId() === buildingId) {
+        select.value = previousPolicy;
+      }
     }
   });
 }
 
-export function updateToolPolicyControl(row, building) {
-  const toolPolicySelect = row.querySelector(
-    `#building-${building.id}-tool-policy`,
-  );
+export function updateToolPolicyControl(select, building) {
+  if (!select) {
+    return;
+  }
 
-  if (!toolPolicySelect) return;
+  const toolPolicy = building.toolPolicy ?? "none";
 
-  const toolPolicy = building.tool_policy ?? "none";
-
-  toolPolicySelect.value = toolPolicy;
-  toolPolicySelect.dataset.currentPolicy = toolPolicy;
+  select.value = toolPolicy;
+  select.dataset.currentPolicy = toolPolicy;
 }
 
 export function updateActiveToolBonus(row, building) {

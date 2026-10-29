@@ -74,9 +74,11 @@ export function updateBuildings(buildings) {
 
       addBuildingRowToGroup(container, groupRow, row);
 
-      if (building.type === "production") {
-        setupToolPolicyControl(row, building);
-      }
+      const toolPolicySelect = row.querySelector(
+        `#building-${building.id}-tool-policy`,
+      );
+
+      setupToolPolicyControl(toolPolicySelect, () => building.id);
     }
 
     updateMaintenanceControl(row, building, maintenanceAvailable);
@@ -114,7 +116,11 @@ export function updateBuildings(buildings) {
         building,
       );
 
-      updateToolPolicyControl(row, building);
+      const toolPolicySelect = row.querySelector(
+        `#building-${building.id}-tool-policy`,
+      );
+
+      updateToolPolicyControl(toolPolicySelect, building);
 
       updateActiveToolBonus(row, building);
 
