@@ -120,8 +120,6 @@ export function setupToolPolicyControl(
       } else if (getBuildingId() === buildingId) {
         select.value = previousPolicy;
       }
-
-      select.dataset.currentPolicy = data.toolPolicy;
     } catch (err) {
       console.error("Tool policy update error:", err);
 
@@ -137,7 +135,7 @@ export function updateToolPolicyControl(select, building) {
     return;
   }
 
-  const toolPolicy = building.toolPolicy ?? "none";
+  const toolPolicy = building.tool_policy ?? "none";
 
   select.value = toolPolicy;
   select.dataset.currentPolicy = toolPolicy;
