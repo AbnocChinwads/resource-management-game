@@ -15,6 +15,7 @@ import {
   updateToolTimer,
   startToolTimer,
 } from "../game/buildingProduction.js";
+import { setupMaintenanceControl } from "../game/buildingMaintenance.js";
 import { initialiseWorkerButtons } from "../game/actions.js";
 
 const canvas = document.querySelector("#town-map");
@@ -91,6 +92,24 @@ setupToolPolicyControl(
     if (!building) return;
 
     building.tool_policy = toolPolicy;
+
+    if (selectedBuildingId === buildingId) {
+      updateBuildingInfo(building, maintenanceAvailable);
+    }
+  },
+);
+
+setupMaintenanceControl(
+  document.querySelector("#building-maintenance-checkbox"),
+  () => selectedBuildingId,
+  (buildingId, autoRepair) => {
+    const building = drawableBuildings.find(
+      (drawable) => drawable.id === buildingId,
+    );
+
+    if (!building) return;
+
+    building.auto_repair = autoRepair;
 
     if (selectedBuildingId === buildingId) {
       updateBuildingInfo(building, maintenanceAvailable);

@@ -1,10 +1,12 @@
-export function setupMaintenanceControl(row, building) {
-  const maintenanceCheckbox = row.querySelector(`#maintenance-${building.id}`);
+export function setupMaintenanceControl(checkbox, getSelectedBuildingId, onMaintenanceChanged) {
+  if (!checkbox) return;
 
-  if (!maintenanceCheckbox) return;
+  checkbox.addEventListener("change", async () => {
+    const buildingId = getSelectedBuildingId();
 
-  maintenanceCheckbox.addEventListener("change", async (event) => {
-    const enabled = event.target.checked;
+    if (buildingId === null) return;
+
+    const enabled = checkbox.checked;
 
     const res = await fetch("/update-maintenance", {
       method: "POST",
@@ -13,12 +15,18 @@ export function setupMaintenanceControl(row, building) {
       },
       credentials: "include",
       body: JSON.stringify({
-        buildingId: building.id,
+        buildingId,
         autoRepair: enabled,
       }),
     });
 
-    await res.json();
+    const data = await res.json();
+
+    if (data.success) {
+      onMaintenanceChanged(buildingId, data.autoRepair);
+    } else if (getSelectedBuildingId() === buildingId) {
+      checkbox.checked = !enabled;
+    }
   });
 }
 
