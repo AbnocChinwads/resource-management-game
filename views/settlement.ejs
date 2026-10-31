@@ -1,64 +1,65 @@
 <%- include("partials/header.ejs") %>
     <link rel="stylesheet" href="/styles/settlement.css">
-
-    <h1>Settlement</h1>
     <%- include("partials/player-status.ejs") %>
-    <%- include("partials/construction-menu.ejs") %>
+
 
         <div id="town-map-container">
             <canvas id="town-map"></canvas>
-            <aside id="building-info">
-                <h5 id="building-name">No building selected</h5>
-                <p id="building-number"></p>
-                <p id="building-health"></p>
-                <div id="building-health-progress" class="progress d-none" role="progressbar"
-                    aria-label="Building health">
-                    <div id="building-health-bar" class="progress-bar"></div>
-                </div>
-                <div id="building-maintenance-section" class="maintenance-switch form-check form-switch d-none">
-                    <input id="building-maintenance-checkbox" class="form-check-input" type="checkbox" role="switch">
-                    <label class="form-check-label" for="building-maintenance-checkbox">
-                        Automatic repairs
-                    </label>
-                </div>
-                <div id="building-production" class="d-none"></div>
-                <div id="building-worker-section" class="d-none">
-                    <p id="building-workers"></p>
-
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-danger px-2" aria-label="Remove worker" data-worker-delta="-1">
-                            -
-                        </button>
-                        <button class="btn btn-sm btn-success px-2" aria-label="Add worker" data-worker-delta="1">
-                            +
-                        </button>
+            <%- include("partials/construction-menu.ejs") %>
+                <aside id="building-info">
+                    <h5 id="building-name">No building selected</h5>
+                    <p id="building-number"></p>
+                    <p id="building-health"></p>
+                    <div id="building-health-progress" class="progress d-none" role="progressbar"
+                        aria-label="Building health">
+                        <div id="building-health-bar" class="progress-bar"></div>
                     </div>
-                </div>
-                <div id="building-tool-section" class="d-none">
-                    <label for="building-tool-policy" class="form-label">
-                        Tool policy
-                    </label>
+                    <div id="building-maintenance-section" class="maintenance-switch form-check form-switch d-none">
+                        <input id="building-maintenance-checkbox" class="form-check-input" type="checkbox"
+                            role="switch">
+                        <label class="form-check-label" for="building-maintenance-checkbox">
+                            Automatic repairs
+                        </label>
+                    </div>
+                    <div id="building-production" class="d-none"></div>
+                    <div id="building-worker-section" class="d-none">
+                        <p id="building-workers"></p>
 
-                    <select id="building-tool-policy" class="form-select form-select-sm">
-                        <option value="none">None</option>
-                        <option value="stone">Stone Tools (+10%)</option>
-                        <option value="iron">Iron Tools (+20%)</option>
-                    </select>
-
-                    <div id="building-tool-active" class="form-text"></div>
-                    <div id="building-tool-timer" class="mt-1 d-none">
-                        <div id="building-tool-progress" class="progress position-relative" role="progressbar"
-                            aria-label="Tool durability remaining" aria-valuemin="0" aria-valuemax="100"
-                            aria-valuenow="0">
-                            <div id="building-tool-timer-bar" class="progress-bar bg-primary"
-                                style="width: 0%; transition: width 1s linear;"></div>
-
-                            <span id="building-tool-timer-text"
-                                class="position-absolute top-50 start-50 translate-middle text-light"></span>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-danger px-2" aria-label="Remove worker"
+                                data-worker-delta="-1">
+                                -
+                            </button>
+                            <button class="btn btn-sm btn-success px-2" aria-label="Add worker" data-worker-delta="1">
+                                +
+                            </button>
                         </div>
                     </div>
-                </div>
-            </aside>
+                    <div id="building-tool-section" class="d-none">
+                        <label for="building-tool-policy" class="form-label">
+                            Tool policy
+                        </label>
+
+                        <select id="building-tool-policy" class="form-select form-select-sm">
+                            <option value="none">None</option>
+                            <option value="stone">Stone Tools (+10%)</option>
+                            <option value="iron">Iron Tools (+20%)</option>
+                        </select>
+
+                        <div id="building-tool-active" class="form-text"></div>
+                        <div id="building-tool-timer" class="mt-1 d-none">
+                            <div id="building-tool-progress" class="progress position-relative" role="progressbar"
+                                aria-label="Tool durability remaining" aria-valuemin="0" aria-valuemax="100"
+                                aria-valuenow="0">
+                                <div id="building-tool-timer-bar" class="progress-bar bg-primary"
+                                    style="width: 0%; transition: width 1s linear;"></div>
+
+                                <span id="building-tool-timer-text"
+                                    class="position-absolute top-50 start-50 translate-middle text-light"></span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
         </div>
 
         <script type="module" src="/js/settlement/townMap.js"></script>
