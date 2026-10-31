@@ -120,12 +120,6 @@ setupMaintenanceControl(
 
 startToolTimer(() => selectedBuildingId);
 
-/*async function buildingsArray() {
-  const data = await fetchGameData();
-
-  return data.buildings;
-}*/
-
 const bounds = canvas.parentElement.getBoundingClientRect();
 canvas.width = bounds.width;
 canvas.height = bounds.height;
@@ -138,7 +132,6 @@ createHorizontalPath(terrainMap, Math.floor(rows / 2), 0, columns);
 createVerticalPath(terrainMap, 0, Math.floor(columns / 2), rows);
 
 async function loadBuildings() {
-  //const buildings = await buildingsArray();
   const data = await fetchGameData();
 
   updatePlayerDisplay(data);
