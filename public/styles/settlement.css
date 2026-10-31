@@ -36,6 +36,18 @@
   border-radius: 0.5rem;
 }
 
+#construction-info {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 1;
+  padding: 1rem;
+  background-color: #252525;
+  border: 1px solid #555;
+  border-radius: 0.5rem;
+}
+
 .maintenance-switch .form-check-input {
   background-image: url("../images/wrench-adjustable-circle.svg");
   background-color: var(--bs-secondary);

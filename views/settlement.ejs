@@ -1,8 +1,9 @@
-<%- include("partials/header") %>
+<%- include("partials/header.ejs") %>
     <link rel="stylesheet" href="/styles/settlement.css">
 
     <h1>Settlement</h1>
-    <%- include("partials/player-status") %>
+    <%- include("partials/player-status.ejs") %>
+    <%- include("partials/construction-menu.ejs") %>
 
         <div id="town-map-container">
             <canvas id="town-map"></canvas>
@@ -62,4 +63,4 @@
 
         <script type="module" src="/js/settlement/townMap.js"></script>
         <%- include('partials/announcementModal.ejs'); -%>
-            <%- include("partials/footer") %>
+            <%- include("partials/footer.ejs") %>

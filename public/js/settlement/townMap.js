@@ -19,6 +19,7 @@ import { setupMaintenanceControl } from "../game/buildingMaintenance.js";
 import { initialiseWorkerButtons } from "../game/actions.js";
 import { updatePlayerDisplay } from "../game/playerDisplay.js";
 import { checkAnnouncements } from "../game/announcements.js";
+import { updateConstructionMenu } from "./constructionMenu.js";
 
 const canvas = document.querySelector("#town-map");
 const ctx = canvas.getContext("2d");
@@ -136,6 +137,7 @@ async function loadBuildings() {
   const data = await fetchGameData();
 
   updatePlayerDisplay(data);
+  updateConstructionMenu(data);
 
   const buildings = data.buildings;
 

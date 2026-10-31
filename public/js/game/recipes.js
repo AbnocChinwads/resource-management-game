@@ -2,7 +2,6 @@ export function updateRecipes(data) {
   const recipes = data.recipes;
   const recipeInputs = data.recipeInputs;
   const resources = data.resources;
-  const buildings = data.buildings;
 
   document.querySelectorAll("[data-recipe-id]").forEach((recipeElement) => {
     const recipeId = Number(recipeElement.dataset.recipeId);
@@ -49,29 +48,7 @@ export function updateRecipes(data) {
       }
     }
 
-    let canStart = true;
-
-    inputs.forEach((input) => {
-      const resource = resources.find(
-        (r) => r.resource_type_id === input.resource_type_id,
-      );
-
-      const amount = resource?.amount ?? 0;
-
-      if (amount < input.amount) {
-        canStart = false;
-      }
-    });
-
-    if (recipe.required_building_id) {
-      const hasBuilding = buildings.some(
-        (b) => b.building_id === recipe.required_building_id,
-      );
-
-      if (!hasBuilding) {
-        canStart = false;
-      }
-    }
+    const canStart = canStartRecipe(recipe, data);
 
     const task = data.tasks.find((task) => task.recipe_id === recipeId);
 
@@ -138,4 +115,36 @@ export function updateRecipes(data) {
       recipeElement.style.display = "";
     }
   });
+}
+
+export function canStartRecipe(recipe, data) {
+  const recipeInputs = data.recipeInputs;
+  const inputs = recipeInputs.filter((input) => input.recipe_id === recipe.id);
+  const resources = data.resources;
+  const buildings = data.buildings;
+  let canStart = true;
+
+  inputs.forEach((input) => {
+    const resource = resources.find(
+      (r) => r.resource_type_id === input.resource_type_id,
+    );
+
+    const amount = resource?.amount ?? 0;
+
+    if (amount < input.amount) {
+      canStart = false;
+    }
+  });
+
+  if (recipe.required_building_id) {
+    const hasBuilding = buildings.some(
+      (b) => b.building_id === recipe.required_building_id,
+    );
+
+    if (!hasBuilding) {
+      canStart = false;
+    }
+  }
+
+  return canStart;
 }
