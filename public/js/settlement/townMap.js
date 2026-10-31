@@ -18,6 +18,7 @@ import {
 import { setupMaintenanceControl } from "../game/buildingMaintenance.js";
 import { initialiseWorkerButtons } from "../game/actions.js";
 import { updatePlayerDisplay } from "../game/playerDisplay.js";
+import { checkAnnouncements } from "../game/announcements.js";
 
 const canvas = document.querySelector("#town-map");
 const ctx = canvas.getContext("2d");
@@ -186,4 +187,5 @@ function drawMap() {
 
 drawMap();
 loadBuildings();
+checkAnnouncements();
 setInterval(loadBuildings, 3000);
