@@ -1,50 +1,3 @@
-/*
-#settlement-map {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 1rem 0;
-}
-
-.settlement-zone {
-  min-height: 250px;
-  padding: 1rem;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.75rem;
-}
-
-.settlement-zone h2 {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-}
-
-.settlement-zone-buildings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.settlement-building {
-  width: 130px;
-  min-height: 100px;
-  padding: 0.75rem;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.5rem;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.settlement-building-icon {
-    font-size: 2.5rem;
-    line-height: 1;
-}
-*/
-
 .cover-container {
   height: 100dvh;
   min-height: 0 !important;
@@ -81,6 +34,17 @@
   background-color: #252525;
   border: 1px solid #555;
   border-radius: 0.5rem;
+}
+
+.maintenance-switch .form-check-input {
+  background-image: url("../images/wrench-adjustable-circle.svg");
+  background-color: var(--bs-secondary);
+  border: none;
+}
+
+.maintenance-switch .form-check-input:checked {
+  background-image: url("../images/wrench-adjustable-circle.svg");
+  background-color: var(--bs-success);
 }
 
 @media (min-width: 768px) {

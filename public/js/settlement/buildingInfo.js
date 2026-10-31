@@ -4,6 +4,8 @@ import {
   updateActiveToolBonus,
 } from "../game/buildingProduction.js";
 
+import { updateMaintenanceControl } from "../game/buildingMaintenance.js";
+
 function updateBuildingHealth(building) {
   // Health text, percentage, progress bar and colours
   const buildingHealthProgress = document.querySelector(
@@ -32,6 +34,22 @@ function updateBuildingHealth(building) {
   } else {
     buildingHealthBar.classList.add("bg-danger");
   }
+}
+
+function updateBuildingMaintenance(building, maintenanceAvailable) {
+  const buildingMaintenance = document.querySelector(
+    "#building-maintenance-section",
+  );
+  const buildingCheckbox = document.querySelector(
+    "#building-maintenance-checkbox",
+  );
+
+  updateMaintenanceControl(
+    buildingMaintenance,
+    buildingCheckbox,
+    building,
+    maintenanceAvailable,
+  );
 }
 
 function updateBuildingWorkers(building) {
@@ -77,7 +95,7 @@ function updateBuildingTools(building) {
   }
 }
 
-export function updateBuildingInfo(building) {
+export function updateBuildingInfo(building, maintenanceAvailable) {
   const buildingName = document.querySelector("#building-name");
   const buildingNumber = document.querySelector("#building-number");
 
@@ -93,4 +111,5 @@ export function updateBuildingInfo(building) {
   updateBuildingWorkers(building);
   updateBuildingProduction(building);
   updateBuildingTools(building);
+  updateBuildingMaintenance(building, maintenanceAvailable);
 }

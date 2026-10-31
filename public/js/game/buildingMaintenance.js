@@ -22,16 +22,15 @@ export function setupMaintenanceControl(row, building) {
   });
 }
 
-export function updateMaintenanceControl(row, building, maintenanceAvailable) {
-  const maintenanceControl = row.querySelector("[data-maintenance-control]");
+export function updateMaintenanceControl(
+  section,
+  checkbox,
+  building,
+  maintenanceAvailable,
+) {
+  if (!section || !checkbox) return;
 
-  if (maintenanceControl) {
-    maintenanceControl.classList.toggle("d-none", !maintenanceAvailable);
-  }
+  section.classList.toggle("d-none", !building || !maintenanceAvailable);
 
-  const maintenanceCheckbox = row.querySelector(`#maintenance-${building.id}`);
-
-  if (maintenanceCheckbox) {
-    maintenanceCheckbox.checked = Boolean(building.auto_repair);
-  }
+  checkbox.checked = Boolean(building?.auto_repair);
 }
