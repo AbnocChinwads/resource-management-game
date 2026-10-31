@@ -17,6 +17,7 @@ import {
 } from "../game/buildingProduction.js";
 import { setupMaintenanceControl } from "../game/buildingMaintenance.js";
 import { initialiseWorkerButtons } from "../game/actions.js";
+import { updatePlayerDisplay } from "../game/playerDisplay.js";
 
 const canvas = document.querySelector("#town-map");
 const ctx = canvas.getContext("2d");
@@ -119,11 +120,11 @@ setupMaintenanceControl(
 
 startToolTimer(() => selectedBuildingId);
 
-async function buildingsArray() {
+/*async function buildingsArray() {
   const data = await fetchGameData();
 
   return data.buildings;
-}
+}*/
 
 const bounds = canvas.parentElement.getBoundingClientRect();
 canvas.width = bounds.width;
@@ -137,7 +138,12 @@ createHorizontalPath(terrainMap, Math.floor(rows / 2), 0, columns);
 createVerticalPath(terrainMap, 0, Math.floor(columns / 2), rows);
 
 async function loadBuildings() {
-  const buildings = await buildingsArray();
+  //const buildings = await buildingsArray();
+  const data = await fetchGameData();
+
+  updatePlayerDisplay(data);
+
+  const buildings = data.buildings;
 
   maintenanceAvailable = buildings.some(
     (building) =>
